@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, MessageCircle, Heart } from "lucide-react";
+import { MessageCircle, Heart, ExternalLink } from "lucide-react";
 
 const Footer = () => {
   return (
