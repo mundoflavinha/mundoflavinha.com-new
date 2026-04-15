@@ -36,13 +36,13 @@ const Footer = () => {
           <div>
             <h4 className="font-heading font-bold text-sm text-foreground mb-4">Redes Sociais</h4>
             <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors">
-                <Instagram className="w-5 h-5" />
+              <a href="#" className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors" aria-label="Instagram">
+                <ExternalLink className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors">
-                <Youtube className="w-5 h-5" />
+              <a href="#" className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors" aria-label="YouTube">
+                <ExternalLink className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors">
+              <a href="#" className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors" aria-label="WhatsApp">
                 <MessageCircle className="w-5 h-5" />
               </a>
             </div>
