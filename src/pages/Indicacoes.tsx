@@ -1,74 +1,145 @@
-import { useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { ExternalLink, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
-import { motion } from "framer-motion";
+import { products as products02 } from "@/pages/Achadinhos02";
+import { products as products35 } from "@/pages/Achadinhos35";
+import { products as products68 } from "@/pages/Achadinhos68";
+import { products as productsFamilia } from "@/pages/AchadinhosFamilia";
 
-const filters = ["Todos", "Brinquedos", "Livros", "Materiais Sensoriais", "Para Mães", "Organização"];
+const filters = ["Todos", "0-2 anos", "3-5 anos", "6-8 anos", "Em família"];
 
-const products = [
-  { name: "Blocos de Madeira Montessori", age: "2+ anos", category: "Brinquedos", desc: "Perfeitos para coordenação motora e criatividade" },
-  { name: "Kit Massinha Sensorial", age: "3+ anos", category: "Materiais Sensoriais", desc: "Texturas incríveis para estimular os sentidos" },
-  { name: "Livro 'Monstro das Cores'", age: "3+ anos", category: "Livros", desc: "Um clássico sobre emoções para os pequenos" },
-  { name: "Torre de Empilhar Arco-íris", age: "1+ ano", category: "Brinquedos", desc: "Cores vibrantes e encaixe perfeito" },
-  { name: "Organizador de Brinquedos", age: "Todas as idades", category: "Organização", desc: "Mantenha o cantinho de brincar organizado" },
-  { name: "Colar de Amamentação", age: "Para mães", category: "Para Mães", desc: "Seguro e estimulante para o bebê" },
+type Product = {
+  title: string;
+  eyebrow?: string;
+  description: string;
+  recommendedAge: string;
+  image: string;
+  link?: string;
+  category: string;
+};
+
+const allProducts: Product[] = [
+  ...products02.map((item) => ({ ...item, category: "0-2 anos" })),
+  ...products35.map((item) => ({ ...item, category: "3-5 anos" })),
+  ...products68.map((item) => ({ ...item, category: "6-8 anos" })),
+  ...productsFamilia.map((item) => ({ ...item, category: "Em família" })),
 ];
 
 const Indicacoes = () => {
   const [activeFilter, setActiveFilter] = useState("Todos");
 
+  const filteredProducts = useMemo(() => {
+    if (activeFilter === "Todos") {
+      return allProducts;
+    }
+
+    return allProducts.filter((item) => item.category === activeFilter);
+  }, [activeFilter]);
+
   return (
     <Layout>
       <PageBanner
         title="Achadinhos da Flavinha"
-        subtitle="Aqui estão os materiais, brinquedos e itens que a Flavinha usa e recomenda para sua família"
+        subtitle="Brinquedos, jogos e materiais que ajudam a criar memórias. Uma seleção especial para incentivar o brincar, a criatividade e a conexão entre pais e filhos."
         bgColor="bg-pastel-yellow/20"
       />
 
       <section className="py-12 md:py-16">
         <div className="container">
-          <div className="flex flex-wrap gap-2 mb-8 justify-center">
-            {filters.map((f) => (
+          <div className="mb-5 text-center">
+            <p className="text-sm font-medium text-muted-foreground">
+              {filteredProducts.length} achadinhos disponíveis
+            </p>
+          </div>
+
+          <div className="mb-8 flex flex-wrap justify-center gap-2">
+            {filters.map((filter) => (
               <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`px-4 py-2 rounded-full text-sm font-heading font-semibold transition-colors ${
-                  activeFilter === f
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`rounded-full px-4 py-2 text-sm font-heading font-semibold transition-colors ${
+                  activeFilter === filter
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-foreground/70 hover:bg-secondary/80"
                 }`}
               >
-                {f}
+                {filter}
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((item) => (
-              <motion.div
-                key={item.name}
-                whileHover={{ y: -4 }}
-                className="bg-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="aspect-square bg-secondary rounded-xl mb-4 flex items-center justify-center text-4xl">
-                  🧸
-                </div>
-                <span className="text-xs font-heading font-semibold text-primary">{item.category}</span>
-                <h3 className="font-heading font-bold text-foreground mt-1">{item.name}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
-                <p className="text-xs text-muted-foreground mt-1">{item.age}</p>
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" className="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-semibold gap-1 w-full">
-                    Ver indicação <ExternalLink className="w-3 h-3" />
-                  </Button>
-                </a>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredProducts.map((item, index) => {
+              const cardContent = (
+                <>
+                  <div className="aspect-square overflow-hidden rounded-xl bg-secondary">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-full w-full object-contain p-3 transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-heading font-bold text-primary">
+                      <Star className="h-3 w-3" />
+                      {item.category}
+                    </span>
+                    <span className="rounded-full bg-pastel-yellow/60 px-2.5 py-1 text-xs font-heading font-bold text-foreground">
+                      {item.recommendedAge}
+                    </span>
+                  </div>
+                  <h2 className="mt-3 font-heading text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+                    {item.title}
+                  </h2>
+                  {item.eyebrow ? (
+                    <p className="mt-1 text-sm font-heading font-semibold text-primary">{item.eyebrow}</p>
+                  ) : null}
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </>
+              );
+
+              return (
+                <motion.article
+                  key={`${item.category}-${item.title}-${index}`}
+                  whileHover={{ y: -4 }}
+                  className="overflow-hidden rounded-2xl bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  {item.link ? (
+                    <a href={item.link} target="_blank" rel="noopener noreferrer" className="group block">
+                      {cardContent}
+                    </a>
+                  ) : (
+                    <div className="group">{cardContent}</div>
+                  )}
+                  {item.link ? (
+                    <a href={item.link} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        size="sm"
+                        className="mt-4 w-full gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground"
+                      >
+                        Ver mais
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Button>
+                    </a>
+                  ) : (
+                    <Button
+                      size="sm"
+                      disabled
+                      className="mt-4 w-full rounded-full bg-primary font-heading font-bold text-primary-foreground"
+                    >
+                      Link em breve
+                    </Button>
+                  )}
+                </motion.article>
+              );
+            })}
           </div>
 
-          <p className="text-center mt-8 text-xs text-muted-foreground/70">
+          <p className="mt-8 text-center text-xs text-muted-foreground/70">
             Alguns links desta página podem gerar comissão sem custo extra para você.
           </p>
         </div>

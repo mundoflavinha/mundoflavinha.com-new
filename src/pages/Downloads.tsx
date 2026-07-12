@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
-import { motion } from "framer-motion";
+import jogoDaReciclagem from "@/assets/downloadgratuito/JogodaReciclagem.png";
+import jogoDaTampinha from "@/assets/downloadgratuito/JogodaTampinha.png";
+import semaforoDoToque from "@/assets/downloadgratuito/semaforodotoque.png";
+import coleteEducativo from "@/assets/downloadgratuito/coleteeducativo.png";
 
 const materials = [
-  { name: "Roda das Emoções", emoji: "🎡", desc: "Ajude seu filho a identificar e expressar sentimentos", color: "bg-pink/30" },
-  { name: "Desafio 7 Dias Sem Telas", emoji: "📵", desc: "Um desafio divertido para reconectar a família", color: "bg-baby-blue/30" },
-  { name: "Cartas de Sentimentos", emoji: "💌", desc: "Cartas ilustradas para conversar sobre emoções", color: "bg-pastel-yellow/30" },
-  { name: "Jogo da Memória", emoji: "🧩", desc: "Jogo de memória para imprimir e brincar", color: "bg-mint/30" },
-  { name: "Calendário de Brincadeiras", emoji: "📅", desc: "30 dias de brincadeiras para fazer em família", color: "bg-lilac/30" },
-  { name: "Kit Recorte e Cole", emoji: "✂️", desc: "Atividade de coordenação motora para pequenos", color: "bg-pink/20" },
+  { name: "Jogo da Reciclagem", img: jogoDaReciclagem },
+  { name: "Cada Tampinha no Seu Lugar", img: jogoDaTampinha },
+  { name: "Semáforo do Toque", img: semaforoDoToque },
+  { name: "Colete Educativo", img: coleteEducativo },
 ];
 
 const Downloads = () => {
@@ -21,30 +23,51 @@ const Downloads = () => {
   return (
     <Layout>
       <PageBanner
-        title="Downloads Gratuitos"
-        subtitle="Materiais gratuitos para imprimir e brincar em casa com seus filhos"
+        title="Materiais gratuitos para imprimir e brincar"
+        subtitle="Atividades educativas prontas para famílias, professores e escolas incentivarem o aprendizado de forma lúdica."
         bgColor="bg-baby-blue/20"
       />
 
       <section className="py-12 md:py-16">
         <div className="container">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mb-8 text-center">
+            <p className="text-sm font-medium text-muted-foreground">{materials.length} materiais disponíveis</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {materials.map((item) => (
-              <motion.div
+              <motion.article
                 key={item.name}
                 whileHover={{ y: -4 }}
-                className="bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow text-center cursor-pointer"
-                onClick={() => setDownloadModal(item.name)}
+                className="overflow-hidden rounded-2xl bg-card text-center shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className={`w-20 h-20 ${item.color} rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4`}>
-                  {item.emoji}
-                </div>
-                <h3 className="font-heading font-bold text-foreground">{item.name}</h3>
-                <p className="text-sm text-muted-foreground mt-2">{item.desc}</p>
-                <Button className="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2">
-                  <Download className="w-4 h-4" /> Baixar grátis
-                </Button>
-              </motion.div>
+                <button
+                  type="button"
+                  onClick={() => setDownloadModal(item.name)}
+                  className="group block w-full cursor-pointer text-center"
+                >
+                  <div className="aspect-square overflow-hidden bg-secondary">
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h2 className="font-heading text-base font-bold text-foreground transition-colors group-hover:text-primary">
+                      {item.name}
+                    </h2>
+                    <Button
+                      size="sm"
+                      className="mt-3 rounded-full bg-primary text-xs font-heading font-semibold text-primary-foreground gap-1"
+                    >
+                      <Download className="h-3 w-3" />
+                      Baixar grátis
+                    </Button>
+                  </div>
+                </button>
+              </motion.article>
             ))}
           </div>
         </div>

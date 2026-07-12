@@ -1,18 +1,66 @@
-import { ArrowRight, BookOpen, MessageCircle, Download } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, MessageCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import { motion } from "framer-motion";
+import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.png";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.png";
+import momentosNatacao from "@/assets/Artigo/Momentos-Natação.png";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.png";
+import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.png";
 
-const categories = ["Todos", "Maternidade", "Desenvolvimento infantil", "Telas", "Escola", "Emoções", "Rotina"];
+const categories = [
+  "Todos",
+  "Reflexão",
+  "Maternidade",
+  "Infância",
+  "Brincadeiras sem telas",
+  "Memórias afetivas",
+  "Educação financeira",
+];
 
 const posts = [
-  { title: "Por que brincar é mais importante do que parece", category: "Desenvolvimento infantil", excerpt: "A ciência comprova: brincar não é apenas diversão. É a principal forma de aprendizado na infância e impacta diretamente o desenvolvimento cerebral.", date: "10 Abr 2026" },
-  { title: "O que aprendi sobre infância depois de me tornar mãe", category: "Maternidade", excerpt: "Ser mãe mudou completamente a minha visão sobre o que as crianças realmente precisam. E não é o que eu imaginava.", date: "7 Abr 2026" },
-  { title: "O dia que minha filha comprou um presente para o irmão", category: "Emoções", excerpt: "Uma história real e emocionante sobre como as crianças são capazes de atos de generosidade que nos surpreendem.", date: "3 Abr 2026" },
-  { title: "Menos telas, mais presença", category: "Telas", excerpt: "Como reduzimos o tempo de tela na nossa casa e o que mudou na rotina e no comportamento das crianças.", date: "28 Mar 2026" },
-  { title: "Como criar uma rotina de brincadeiras sem enlouquecer", category: "Rotina", excerpt: "Dicas práticas para encaixar brincadeiras no dia a dia sem sentir culpa quando não dá.", date: "24 Mar 2026" },
-  { title: "A escola não substitui o brincar", category: "Escola", excerpt: "Por que mesmo com a melhor escola, as crianças ainda precisam de brincadeira livre e tempo em família.", date: "20 Mar 2026" },
+  {
+    title: "Dei R$20 para cada filho meu no shopping e o que aconteceu me fez pensar!",
+    category: "Reflexão",
+    excerpt: "Uma experiência simples no shopping virou uma reflexão sobre escolhas, espera, limites e educação financeira infantil na prática.",
+    date: "30 Mai 2026",
+    image: vinteReais,
+    href: "/blog/20-reais-shopping",
+  },
+  {
+    title: "No carro da minha infância não existia tela. Existia conversa.",
+    category: "Reflexão",
+    excerpt: "Uma reflexão sobre como brincadeiras simples no carro podem criar conexão, memórias afetivas e presença entre pais e filhos.",
+    date: "30 Mai 2026",
+    image: brincadeiraNoCarro,
+    href: "/blog/brincadeira-no-carro",
+  },
+  {
+    title: "O dia em que meus filhos criaram uma lojinha no prédio.",
+    category: "Reflexão",
+    excerpt: "Uma brincadeira com squishies de papel virou uma experiência linda sobre criatividade, educação financeira e autonomia.",
+    date: "30 Mai 2026",
+    image: empreendedorismoInfantil,
+    href: "/blog/empreendedorismo-infantil",
+  },
+  {
+    title: "Presença se constrói nos pequenos momentos.",
+    category: "Reflexão",
+    excerpt: "Entre brincadeiras na piscina, risadas e pequenos gestos de cuidado, uma reflexão sobre presença, vínculos e infância.",
+    date: "30 Mai 2026",
+    image: momentosNatacao,
+    href: "/blog/presenca-pequenos-momentos",
+  },
+  {
+    title: "Eu tinha prometido para mim mesma que NÃO iria comprar o álbum da Copa.",
+    category: "Reflexão",
+    excerpt: "Entre figurinhas repetidas, pacotinhos e memórias afetivas, entendi que o álbum da Copa vai muito além do consumo.",
+    date: "30 Mai 2026",
+    image: albumDaCopa,
+    href: "/blog/album-da-copa",
+  },
 ];
 
 const Blog = () => {
@@ -27,38 +75,39 @@ const Blog = () => {
       <section className="py-12 md:py-16">
         <div className="container">
           <div className="flex flex-wrap gap-2 mb-8 justify-center">
-            {categories.map((c) => (
+            {categories.map((category) => (
               <button
-                key={c}
+                key={category}
                 className="px-4 py-2 rounded-full text-sm font-heading font-semibold bg-secondary text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors"
               >
-                {c}
+                {category}
               </button>
             ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <motion.div
-                key={post.title}
-                whileHover={{ y: -4 }}
-                className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="aspect-[4/3] bg-lilac/10 flex items-center justify-center">
-                  <BookOpen className="w-12 h-12 text-primary/30" />
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-heading font-semibold text-primary">{post.category}</span>
-                    <span className="text-xs text-muted-foreground">{post.date}</span>
+              <Link to={post.href} key={post.title}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full"
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-lilac/10">
+                    <img src={post.image} alt={post.title} className="h-full w-full object-cover" loading="lazy" />
                   </div>
-                  <h3 className="font-heading font-bold text-foreground leading-snug">{post.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{post.excerpt}</p>
-                  <span className="inline-flex items-center gap-1 mt-4 text-sm font-heading font-semibold text-primary">
-                    Ler mais <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </motion.div>
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-heading font-semibold text-primary">{post.category}</span>
+                      <span className="text-xs text-muted-foreground">{post.date}</span>
+                    </div>
+                    <h3 className="font-heading font-bold text-foreground leading-snug">{post.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{post.excerpt}</p>
+                    <span className="inline-flex items-center gap-1 mt-4 text-sm font-heading font-semibold text-primary">
+                      Ler mais <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
 

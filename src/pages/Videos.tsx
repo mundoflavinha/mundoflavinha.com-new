@@ -1,27 +1,62 @@
-import { useState } from "react";
-import { Play, ArrowRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { AlertCircle, ArrowRight, Calendar, Play } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
-import { motion } from "framer-motion";
-import familyPlay from "@/assets/family-play.jpg";
-import age35 from "@/assets/age-3-5.jpg";
-import age68 from "@/assets/age-6-8.jpg";
-import age02 from "@/assets/age-0-2.jpg";
+import { ChannelVideo, getChannelVideos } from "@/lib/youtube";
 
-const categories = ["Todos", "Recentes", "Brincadeiras", "Experiências", "Vlogs em Família"];
+const formatPublishedAt = (value: string) =>
+  new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
 
-const videos = [
-  { title: "5 brincadeiras para dias de chuva", category: "Brincadeiras", img: age35 },
-  { title: "Rotina de brincadeiras da semana", category: "Vlogs em Família", img: familyPlay },
-  { title: "Experiência com cores e água", category: "Experiências", img: age68 },
-  { title: "Primeiro dia sem telas do Lucas", category: "Vlogs em Família", img: age02 },
-  { title: "Massinha sensorial caseira", category: "Brincadeiras", img: age35 },
-  { title: "O que compramos de brinquedos educativos", category: "Recentes", img: age68 },
-];
+const VideosSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {Array.from({ length: 9 }).map((_, index) => (
+      <div key={index} className="bg-card rounded-2xl overflow-hidden shadow-sm">
+        <Skeleton className="aspect-square rounded-none" />
+        <div className="p-4 space-y-3">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-9 w-28 rounded-full" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const Videos = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [selectedVideo, setSelectedVideo] = useState<ChannelVideo | null>(null);
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["youtube-channel-videos"],
+    queryFn: getChannelVideos,
+    staleTime: 1000 * 60 * 30,
+  });
+
+  const filteredVideos = useMemo(() => {
+    if (!data?.videos) {
+      return [];
+    }
+
+    if (activeCategory === "Todos") {
+      return data.videos;
+    }
+
+    return data.videos.filter((video) => video.categories.includes(activeCategory));
+  }, [activeCategory, data?.videos]);
 
   return (
     <Layout>
@@ -33,61 +68,140 @@ const Videos = () => {
 
       <section className="py-12 md:py-16">
         <div className="container">
-          <div className="max-w-3xl mx-auto mb-12">
-            <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-video group cursor-pointer">
-              <img src={familyPlay} alt="Vídeo em destaque" className="w-full h-full object-cover" loading="lazy" />
-              <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center group-hover:bg-foreground/30 transition-colors">
-                <div className="w-16 h-16 rounded-full bg-primary-foreground/90 flex items-center justify-center shadow-lg">
-                  <Play className="w-8 h-8 text-primary ml-1" />
-                </div>
-              </div>
+          {isLoading && <VideosSkeleton />}
+
+          {error && (
+            <div className="max-w-2xl mx-auto rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+              <AlertCircle className="w-10 h-10 text-primary mx-auto mb-3" />
+              <h2 className="font-heading font-bold text-xl text-foreground">
+                Não foi possível carregar os vídeos
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                {(error as Error).message}
+              </p>
+              <p className="mt-4 text-xs text-muted-foreground">
+                Configure `VITE_YOUTUBE_API_KEY` e, se necessário, `VITE_YOUTUBE_CHANNEL_ID` no `.env.local`.
+              </p>
             </div>
-            <h3 className="font-heading font-bold text-xl text-foreground mt-4 text-center">Vídeo em Destaque</h3>
-          </div>
+          )}
 
-          <div className="flex flex-wrap gap-2 mb-8 justify-center">
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setActiveCategory(c)}
-                className={`px-4 py-2 rounded-full text-sm font-heading font-semibold transition-colors ${
-                  activeCategory === c
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-foreground/70 hover:bg-secondary/80"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
+          {!isLoading && !error && data?.videos && (
+            <>
+              <div className="flex flex-wrap gap-2 mb-8 justify-center">
+                {data.categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`px-4 py-2 rounded-full text-sm font-heading font-semibold transition-colors ${
+                      activeCategory === category
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-foreground/70 hover:bg-secondary/80"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video) => (
-              <motion.div
-                key={video.title}
-                whileHover={{ y: -4 }}
-                className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <img src={video.img} alt={video.title} className="w-full h-full object-cover" loading="lazy" />
-                  <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-primary-foreground/80 flex items-center justify-center">
-                      <Play className="w-6 h-6 text-primary ml-0.5" />
-                    </div>
-                  </div>
+              {filteredVideos.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredVideos.map((video) => (
+                    <motion.article
+                      key={video.id}
+                      whileHover={{ y: -4 }}
+                      className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedVideo(video)}
+                        className="block w-full text-left"
+                        aria-label={`Assistir ${video.title}`}
+                      >
+                        <div className="relative aspect-video overflow-hidden bg-foreground/5">
+                          {video.thumbnailUrl && (
+                            <img
+                              src={video.thumbnailUrl}
+                              alt={video.title}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-full bg-primary-foreground/90 flex items-center justify-center shadow-sm">
+                              <Play className="w-7 h-7 text-primary ml-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                      <div className="p-4">
+                        <button type="button" onClick={() => setSelectedVideo(video)} className="block w-full text-left">
+                          <div className="flex flex-wrap gap-1.5">
+                            {(video.categories.length ? video.categories : ["Mundo Flavinha"]).slice(0, 2).map((category) => (
+                              <span key={category} className="text-xs font-heading font-semibold text-primary">
+                                {category}
+                              </span>
+                            ))}
+                          </div>
+                          <h3 className="font-heading font-bold text-sm text-foreground mt-1 leading-snug">
+                            {video.title}
+                          </h3>
+                          <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {formatPublishedAt(video.publishedAt)}
+                          </p>
+                        </button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedVideo(video)}
+                          className="mt-3 rounded-full font-heading text-xs border-primary/30 text-foreground gap-1"
+                        >
+                          Assistir aqui <ArrowRight className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </motion.article>
+                  ))}
                 </div>
-                <div className="p-4">
-                  <span className="text-xs font-heading font-semibold text-primary">{video.category}</span>
-                  <h3 className="font-heading font-bold text-sm text-foreground mt-1">{video.title}</h3>
-                  <Button size="sm" variant="outline" className="mt-3 rounded-full font-heading text-xs border-primary/30 text-foreground gap-1">
-                    Assistir <ArrowRight className="w-3 h-3" />
-                  </Button>
+              ) : (
+                <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+                  <h2 className="font-heading font-bold text-xl text-foreground">Nenhum vídeo nessa playlist</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Escolha outra categoria para ver os vídeos disponíveis.
+                  </p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              )}
+            </>
+          )}
         </div>
       </section>
+
+      <Dialog open={Boolean(selectedVideo)} onOpenChange={(open) => !open && setSelectedVideo(null)}>
+        <DialogContent className="max-w-5xl border-0 bg-background p-0 overflow-hidden">
+          {selectedVideo && (
+            <>
+              <div className="aspect-video w-full bg-black">
+                <iframe
+                  key={selectedVideo.id}
+                  src={`${selectedVideo.embedUrl}?autoplay=1&rel=0`}
+                  title={selectedVideo.title}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+              <DialogHeader className="p-5">
+                <DialogTitle className="font-heading text-xl font-bold leading-tight text-foreground">
+                  {selectedVideo.title}
+                </DialogTitle>
+                <DialogDescription className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {formatPublishedAt(selectedVideo.publishedAt)}
+                </DialogDescription>
+              </DialogHeader>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

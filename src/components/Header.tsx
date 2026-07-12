@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo_01.png";
 
 const navItems = [
   { label: "Início", path: "/" },
@@ -10,6 +10,7 @@ const navItems = [
   { label: "Downloads", path: "/downloads" },
   { label: "Vídeos", path: "/videos" },
   { label: "Blog", path: "/blog" },
+  { label: "Achadinhos", path: "/indicacoes" },
   { label: "Loja", path: "/loja" },
   { label: "Sobre", path: "/sobre" },
 ];
@@ -17,6 +18,7 @@ const navItems = [
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === "/";
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
@@ -41,14 +43,16 @@ const Header = () => {
           ))}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-3">
-          <Link to="/downloads">
-            <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-heading font-bold text-sm gap-2">
-              <Download className="w-4 h-4" />
-              Baixar atividade gratuita
-            </Button>
-          </Link>
-        </div>
+        {!isHome && (
+          <div className="hidden lg:flex items-center gap-3">
+            <Link to="/downloads">
+              <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-heading font-bold text-sm gap-2">
+                <Download className="w-4 h-4" />
+                Baixar atividade gratuita
+              </Button>
+            </Link>
+          </div>
+        )}
 
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -76,12 +80,14 @@ const Header = () => {
                 {item.label}
               </Link>
             ))}
-            <Link to="/downloads" onClick={() => setIsOpen(false)} className="mt-2">
-              <Button className="w-full rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2">
-                <Download className="w-4 h-4" />
-                Baixar atividade gratuita
-              </Button>
-            </Link>
+            {!isHome && (
+              <Link to="/downloads" onClick={() => setIsOpen(false)} className="mt-2">
+                <Button className="w-full rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2">
+                  <Download className="w-4 h-4" />
+                  Baixar atividade gratuita
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
       )}

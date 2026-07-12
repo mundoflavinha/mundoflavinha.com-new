@@ -1,75 +1,163 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { ArrowRight, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
-import age02 from "@/assets/age-0-2.jpg";
-import age35 from "@/assets/age-3-5.jpg";
-import age68 from "@/assets/age-6-8.jpg";
-import familyPlay from "@/assets/family-play.jpg";
+import { brincadeiras02 } from "@/data/brincadeiras02";
+import { brincadeiras35 } from "@/data/brincadeiras35";
+import { brincadeiras68 } from "@/data/brincadeiras68";
+import { brincadeirasFamilia } from "@/data/brincadeirasFamilia";
 
-const filters = ["Todas", "0-2 anos", "3-5 anos", "6-8 anos", "Sem telas", "Sensorial", "Coordenação motora", "Emoções", "Em família"];
+const filters = ["Todas", "0-2 anos", "3-5 anos", "6-8 anos", "Em família"];
 
-const brincadeiras = [
-  { title: "Pintura com os dedos", age: "1-3 anos", category: "Sensorial", img: age35, desc: "Explore texturas e cores usando tinta atóxica e muita diversão." },
-  { title: "Caça ao tesouro em casa", age: "4-6 anos", category: "Em família", img: familyPlay, desc: "Uma aventura pela casa que estimula o raciocínio e a cooperação." },
-  { title: "Empilhando objetos", age: "0-2 anos", category: "Coordenação motora", img: age02, desc: "Desenvolve coordenação motora e concentração dos pequenos." },
-  { title: "Teatro de fantoches", age: "3-5 anos", category: "Emoções", img: age35, desc: "Estimule a imaginação e a expressão emocional das crianças." },
-  { title: "Circuito motor no quintal", age: "4-7 anos", category: "Coordenação motora", img: age68, desc: "Movimente o corpo com desafios divertidos ao ar livre." },
-  { title: "Massinha caseira", age: "2-5 anos", category: "Sensorial", img: age35, desc: "Receita fácil e segura para horas de brincadeira criativa." },
+type BrincadeiraCard = {
+  id: string;
+  title: string;
+  age: string;
+  category: string;
+  image: string;
+  summary: string;
+  time?: string;
+  path: string;
+};
+
+const allBrincadeiras: BrincadeiraCard[] = [
+  ...brincadeiras02.map((item) => ({
+    id: `0-2-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "0-2 anos",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/0-a-2-anos/${item.slug}`,
+  })),
+  ...brincadeiras35.map((item) => ({
+    id: `3-5-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "3-5 anos",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/3-a-5-anos/${item.slug}`,
+  })),
+  ...brincadeiras68.map((item) => ({
+    id: `6-8-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "6-8 anos",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/6-a-8-anos/${item.slug}`,
+  })),
+  ...brincadeirasFamilia.map((item) => ({
+    id: `familia-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "Em família",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/em-familia/${item.slug}`,
+  })),
 ];
 
 const Brincadeiras = () => {
   const [activeFilter, setActiveFilter] = useState("Todas");
 
+  const filteredBrincadeiras = useMemo(() => {
+    if (activeFilter === "Todas") {
+      return allBrincadeiras;
+    }
+
+    return allBrincadeiras.filter((item) => item.category === activeFilter);
+  }, [activeFilter]);
+
   return (
     <Layout>
       <PageBanner
         title="Brincadeiras"
-        subtitle="Ideias práticas e divertidas para cada fase do desenvolvimento do seu filho"
+        subtitle="Todas as ideias cadastradas no Mundo Flavinha, organizadas por fase e por momentos em família."
       />
 
       <section className="py-12 md:py-16">
         <div className="container">
-          <div className="flex flex-wrap gap-2 mb-8 justify-center">
-            {filters.map((f) => (
+          <div className="mb-5 text-center">
+            <p className="text-sm font-medium text-muted-foreground">
+              {filteredBrincadeiras.length} brincadeiras disponíveis
+            </p>
+          </div>
+
+          <div className="mb-8 flex flex-wrap justify-center gap-2">
+            {filters.map((filter) => (
               <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`px-4 py-2 rounded-full text-sm font-heading font-semibold transition-colors ${
-                  activeFilter === f
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`rounded-full px-4 py-2 text-sm font-heading font-semibold transition-colors ${
+                  activeFilter === filter
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-foreground/70 hover:bg-secondary/80"
                 }`}
               >
-                {f}
+                {filter}
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {brincadeiras.map((item) => (
-              <motion.div
-                key={item.title}
-                whileHover={{ y: -4 }}
-                className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredBrincadeiras.map((item, index) => (
+              <motion.article
+                key={item.id}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.35, delay: Math.min(index * 0.01, 0.2) }}
+                className="overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className="aspect-video overflow-hidden">
-                  <img src={item.img} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-heading font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{item.age}</span>
-                    <span className="text-xs text-muted-foreground">{item.category}</span>
+                <Link to={item.path} className="block">
+                  <div className="aspect-[4/3] overflow-hidden bg-secondary">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-full w-full object-contain p-1 transition-transform duration-300 hover:scale-105"
+                      loading="lazy"
+                    />
                   </div>
-                  <h3 className="font-heading font-bold text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
-                  <Button size="sm" className="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-semibold gap-1">
-                    <Star className="w-3 h-3" /> Ver brincadeira
-                  </Button>
+                </Link>
+                <div className="p-5">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-heading font-bold text-primary">
+                      {item.category}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-pastel-yellow/60 px-2.5 py-1 text-xs font-heading font-bold text-foreground">
+                      <Star className="h-3 w-3" />
+                      {item.age.split(".")[0]}
+                    </span>
+                  </div>
+                  <h2 className="font-heading text-xl font-bold leading-tight text-foreground">{item.title}</h2>
+                  <p className="mt-2 min-h-[48px] text-sm leading-relaxed text-muted-foreground">{item.summary}</p>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    {item.time ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        {item.time.split(".")[0]}
+                      </span>
+                    ) : (
+                      <span />
+                    )}
+                    <Link to={item.path}>
+                      <Button size="sm" className="gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground">
+                        Ver brincadeira
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
         </div>

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Heart, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import aboutFamily from "@/assets/about-family.jpg";
+import aboutFamily from "@/assets/about-family-1.png";
 import heroFamily from "@/assets/hero-family.jpg";
 
 const values = [
