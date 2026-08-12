@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Download, Star, Heart, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import SectionTitle from "@/components/SectionTitle";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
+import NewsletterForm from "@/components/NewsletterForm";
 import heroFamily from "@/assets/hero_family_01.png";
 import age02 from "@/assets/age-0-2-(1).png";
 import age35 from "@/assets/age-3-5-(1).png";
@@ -400,14 +400,7 @@ const Index = () => {
             <p className="mt-3 text-muted-foreground">
               Receba novidades, materiais e ideias para brincar com seus filhos.
             </p>
-            <form className="mt-6 space-y-3" onSubmit={(e) => e.preventDefault()}>
-              <Input placeholder="Seu nome" className="rounded-full border-border text-center" />
-              <Input type="email" placeholder="Seu e-mail" className="rounded-full border-border text-center" />
-              <Input placeholder="WhatsApp (com DDD)" className="rounded-full border-border text-center" />
-              <Button type="submit" className="w-full rounded-full bg-primary text-primary-foreground font-heading font-bold text-base h-12">
-                Quero receber ✨
-              </Button>
-            </form>
+            <NewsletterForm variant="full" />
           </div>
         </div>
       </section>

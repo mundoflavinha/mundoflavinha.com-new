@@ -14,9 +14,8 @@ import {
   Tag,
   UserRound,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
+import NewsletterForm from "@/components/NewsletterForm";
 import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.png";
 import albumDaCopa from "@/assets/Artigo/Album-da-Copa.png";
 import momentosNatacao from "@/assets/Artigo/Momentos-Natação.png";
@@ -299,12 +298,7 @@ const Artigo20ReaisShopping = () => {
                   <p className="mt-2 text-sm text-muted-foreground">
                     Atividades, dicas e histórias para uma infância com mais conexão.
                   </p>
-                  <form className="mt-4 flex gap-2" onSubmit={(event) => event.preventDefault()}>
-                    <Input type="email" placeholder="Seu e-mail" className="rounded-full bg-card" />
-                    <Button type="submit" className="h-10 w-10 shrink-0 rounded-full bg-primary p-0 text-primary-foreground">
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </form>
+                  <NewsletterForm />
                 </div>
 
                 <div className="rounded-2xl bg-mint/20 p-5 shadow-sm">
