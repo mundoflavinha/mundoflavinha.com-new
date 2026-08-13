@@ -8,7 +8,11 @@ import {
   getConsentTexts,
   type AcaoConsentimento,
   type Finalidade,
-} from "../src/lib/consent";
+  // Extensão .js explícita: package.json tem "type": "module", e sob ESM
+  // nativo do Node um import relativo sem extensão falha com
+  // ERR_MODULE_NOT_FOUND (é o arquivo compilado .js que existe em runtime,
+  // mesmo a fonte sendo .ts — convenção padrão de projeto ESM/NodeNext).
+} from "../src/lib/consent.js";
 
 const sql = neon(process.env.DATABASE_URL!);
 

@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { fetchChannelVideos } from "../src/lib/youtubeFetcher";
+// Extensão .js explícita: ver comentário equivalente em api/lead.ts.
+import { fetchChannelVideos } from "../src/lib/youtubeFetcher.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
