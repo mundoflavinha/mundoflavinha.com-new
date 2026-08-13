@@ -31,16 +31,28 @@ import ArtigoEmpreendedorismoInfantil from "./pages/ArtigoEmpreendedorismoInfant
 import ArtigoBrincadeiraNoCarro from "./pages/ArtigoBrincadeiraNoCarro.tsx";
 import Artigo20ReaisShopping from "./pages/Artigo20ReaisShopping.tsx";
 import Sobre from "./pages/Sobre.tsx";
+import PoliticaDePrivacidade from "./pages/PoliticaDePrivacidade.tsx";
+import TermosDeUso from "./pages/TermosDeUso.tsx";
+import Contato from "./pages/Contato.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    // Com âncora (ex: /politica-de-privacidade#direitos-do-titular), rolar para o
+    // topo destruiria o deep-link. Numa SPA o browser não consegue resolver a
+    // âncora sozinho no primeiro load, porque o elemento ainda não existe quando
+    // ele tenta — por isso resolvemos aqui, já com a árvore renderizada.
+    if (hash) {
+      document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView();
+      return;
+    }
+
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 };
@@ -80,6 +92,9 @@ const App = () => (
           <Route path="/blog/brincadeira-no-carro" element={<ArtigoBrincadeiraNoCarro />} />
           <Route path="/blog/20-reais-shopping" element={<Artigo20ReaisShopping />} />
           <Route path="/sobre" element={<Sobre />} />
+          <Route path="/politica-de-privacidade" element={<PoliticaDePrivacidade />} />
+          <Route path="/termos-de-uso" element={<TermosDeUso />} />
+          <Route path="/contato" element={<Contato />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -185,7 +185,7 @@ const Videos = () => {
                   src={`${selectedVideo.embedUrl}?autoplay=1&rel=0`}
                   title={selectedVideo.title}
                   className="h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allow="autoplay; encrypted-media; picture-in-picture"
                   allowFullScreen
                 />
               </div>

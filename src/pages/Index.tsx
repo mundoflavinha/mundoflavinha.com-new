@@ -7,6 +7,7 @@ import Layout from "@/components/Layout";
 import SectionTitle from "@/components/SectionTitle";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
 import NewsletterForm from "@/components/NewsletterForm";
+import YouTubeEmbed from "@/components/YouTubeEmbed";
 import heroFamily from "@/assets/hero_family_01.png";
 import age02 from "@/assets/age-0-2-(1).png";
 import age35 from "@/assets/age-3-5-(1).png";
@@ -93,13 +94,11 @@ const Index = () => {
           />
           <div className="max-w-3xl mx-auto">
             <div className="relative rounded-2xl overflow-hidden shadow-lg bg-foreground/5 aspect-video">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/uuaYyN7v8H4?start=19"
+              <YouTubeEmbed
+                videoId="uuaYyN7v8H4"
                 title="Novo vídeo no canal Mundo Flavinha"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                loading="lazy"
+                start={19}
+                className="h-full w-full"
               />
             </div>
             <div className="mt-6 flex flex-wrap justify-center gap-3">

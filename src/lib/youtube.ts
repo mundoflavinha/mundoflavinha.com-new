@@ -231,7 +231,9 @@ export const getChannelVideos = async (): Promise<ChannelVideosResult> => {
         publishedAt: item.contentDetails?.videoPublishedAt || item.snippet.publishedAt,
         thumbnailUrl: getBestThumbnailUrl(item.snippet),
         url: `https://www.youtube.com/watch?v=${id}`,
-        embedUrl: `https://www.youtube.com/embed/${id}`,
+        // nocookie = modo de privacidade ampliada do YouTube. O player só é
+        // montado quando alguém abre o modal do vídeo (ver Videos.tsx).
+        embedUrl: `https://www.youtube-nocookie.com/embed/${id}`,
         categories: categoriesByVideoId.get(id) || [],
       };
     })

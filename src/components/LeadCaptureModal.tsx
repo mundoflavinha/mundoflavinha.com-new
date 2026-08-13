@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Download } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { motion, AnimatePresence } from "framer-motion";
+import ConsentFields, { HoneypotField, comLinkPolitica } from "@/components/ConsentFields";
+import { CONSENT_TEXTS, FAIXAS_ETARIAS, PERFIS, type FaixaEtaria, type Perfil } from "@/lib/consent";
+import { enviarLead } from "@/lib/leadApi";
 
 interface LeadCaptureModalProps {
   isOpen: boolean;
@@ -21,33 +23,53 @@ const slugify = (value: string) =>
 
 type Status = "idle" | "loading" | "error";
 
+const camposIniciais = {
+  nome: "",
+  email: "",
+  whatsapp: "",
+  perfil: "" as Perfil | "",
+  faixaEtaria: "" as FaixaEtaria | "",
+};
+
+// `<select>` nativo em vez do Select do shadcn: este modal não é um Dialog do
+// Radix (é um motion.div com overlay próprio e stopPropagation), e o portal do
+// Radix conflita com esse overlay — dá para clicar numa opção e fechar o modal.
+const selectClasses =
+  "flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm";
+
 const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalProps) => {
   const [submitted, setSubmitted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
-  const [consentimento, setConsentimento] = useState(false);
-  const [formData, setFormData] = useState({ nome: "", email: "", whatsapp: "", idadeCrianca: "" });
+  const [optIn, setOptIn] = useState({ optInEmail: false, optInWhatsapp: false });
+  const [formData, setFormData] = useState(camposIniciais);
+  const [honeypot, setHoneypot] = useState("");
+  const renderedAt = useRef(Date.now());
+
+  useEffect(() => {
+    if (isOpen) renderedAt.current = Date.now();
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!consentimento || status === "loading") return;
+    if (status === "loading") return;
 
     setStatus("loading");
     try {
-      const response = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "lead_magnet",
-          nome: formData.nome,
-          email: formData.email,
-          whatsapp: formData.whatsapp,
-          idadeCrianca: formData.idadeCrianca || undefined,
-          material: materialName,
-          consentimento: true,
-        }),
+      await enviarLead({
+        type: "lead_magnet",
+        origem: "lead_magnet",
+        nome: formData.nome,
+        email: formData.email,
+        whatsapp: formData.whatsapp || undefined,
+        perfil: formData.perfil || undefined,
+        faixaEtaria: formData.faixaEtaria || undefined,
+        material: materialName,
+        optInEmail: optIn.optInEmail,
+        // Sem número informado, não existe decisão sobre WhatsApp a registrar.
+        optInWhatsapp: formData.whatsapp ? optIn.optInWhatsapp : false,
+        hp: honeypot,
+        elapsedMs: Date.now() - renderedAt.current,
       });
-
-      if (!response.ok) throw new Error("request failed");
 
       setStatus("idle");
       setSubmitted(true);
@@ -59,8 +81,9 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
   const handleClose = () => {
     setSubmitted(false);
     setStatus("idle");
-    setConsentimento(false);
-    setFormData({ nome: "", email: "", whatsapp: "", idadeCrianca: "" });
+    setOptIn({ optInEmail: false, optInWhatsapp: false });
+    setFormData(camposIniciais);
+    setHoneypot("");
     onClose();
   };
 
@@ -78,10 +101,14 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-card rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative"
+            className="bg-card rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={handleClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={handleClose}
+              aria-label="Fechar"
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
 
@@ -96,6 +123,8 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-3">
+                  <HoneypotField value={honeypot} onChange={setHoneypot} />
+
                   <Input
                     placeholder="Seu nome"
                     required
@@ -112,32 +141,62 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                   <Input
-                    placeholder="WhatsApp (com DDD)"
-                    required
+                    placeholder="WhatsApp com DDD (opcional)"
                     className="rounded-xl border-border"
                     value={formData.whatsapp}
                     onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                   />
-                  <Input
-                    placeholder="Idade da criança (opcional)"
-                    className="rounded-xl border-border"
-                    value={formData.idadeCrianca}
-                    onChange={(e) => setFormData({ ...formData, idadeCrianca: e.target.value })}
+
+                  <select
+                    aria-label="Você é"
+                    className={selectClasses}
+                    value={formData.perfil}
+                    onChange={(e) => setFormData({ ...formData, perfil: e.target.value as Perfil | "" })}
+                  >
+                    <option value="">Você é... (opcional)</option>
+                    {PERFIS.map((perfil) => (
+                      <option key={perfil.value} value={perfil.value}>
+                        {perfil.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    aria-label="Faixa etária de interesse"
+                    className={selectClasses}
+                    value={formData.faixaEtaria}
+                    onChange={(e) => setFormData({ ...formData, faixaEtaria: e.target.value as FaixaEtaria | "" })}
+                  >
+                    <option value="">Faixa etária de interesse (opcional)</option>
+                    {FAIXAS_ETARIAS.map((faixa) => (
+                      <option key={faixa.value} value={faixa.value}>
+                        {faixa.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <ConsentFields
+                    optInEmail={optIn.optInEmail}
+                    optInWhatsapp={optIn.optInWhatsapp}
+                    onChange={(patch) => setOptIn((atual) => ({ ...atual, ...patch }))}
+                    showWhatsapp={Boolean(formData.whatsapp)}
                   />
-                  <label className="flex items-start gap-2 text-xs text-muted-foreground">
-                    <Checkbox
-                      checked={consentimento}
-                      onCheckedChange={(checked) => setConsentimento(checked === true)}
-                      className="mt-0.5"
-                    />
-                    Concordo em fornecer meus dados para receber o material e comunicações do Mundo Flavinha. Posso cancelar quando quiser.
-                  </label>
+
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    {comLinkPolitica(CONSENT_TEXTS.entrega_material)}
+                  </p>
+
                   {status === "error" && (
-                    <p className="text-xs text-destructive">Não foi possível enviar seus dados. Tente novamente em instantes.</p>
+                    <p className="text-xs text-destructive">
+                      Não foi possível enviar seus dados. Tente novamente em instantes.
+                    </p>
                   )}
+
+                  {/* Sem `disabled` por consentimento: receber o material não pode
+                      depender de aceitar comunicação de marketing. */}
                   <Button
                     type="submit"
-                    disabled={!consentimento || status === "loading"}
+                    disabled={status === "loading"}
                     className="w-full rounded-full bg-primary text-primary-foreground font-heading font-bold disabled:opacity-50"
                   >
                     {status === "loading" ? "Enviando..." : "Quero baixar grátis!"}
@@ -152,14 +211,11 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
                 <a
                   href={`/materiais/${slugify(materialName)}.pdf`}
                   download
-                  className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground font-heading font-bold px-4 py-2 text-sm hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-heading font-bold text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   <Download className="w-4 h-4" />
                   Baixar agora
                 </a>
-                <p className="mt-4 text-xs text-muted-foreground">
-                  💬 Entre também no nosso grupo do WhatsApp!
-                </p>
               </div>
             )}
           </motion.div>
