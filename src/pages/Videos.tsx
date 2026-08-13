@@ -79,9 +79,6 @@ const Videos = () => {
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
                 {(error as Error).message}
               </p>
-              <p className="mt-4 text-xs text-muted-foreground">
-                Configure `VITE_YOUTUBE_API_KEY` e, se necessário, `VITE_YOUTUBE_CHANNEL_ID` no `.env.local`.
-              </p>
             </div>
           )}
 
