@@ -107,7 +107,10 @@ const requestYouTube = async <T>(path: string, params: Record<string, string | n
   const response = await fetch(url.toString());
 
   if (!response.ok) {
-    throw new Error(`YouTube API respondeu ${response.status} em ${path}`);
+    // Corpo do erro do Google ajuda a diferenciar chave inválida de
+    // parâmetro inválido de canal/quota — ambos batem como HTTP 400/403.
+    const bodyText = await response.text().catch(() => "");
+    throw new Error(`YouTube API respondeu ${response.status} em ${path}: ${bodyText.slice(0, 300)}`);
   }
 
   return response.json() as Promise<T>;
