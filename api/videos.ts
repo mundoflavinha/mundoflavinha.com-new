@@ -30,11 +30,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(data);
   } catch (err) {
     console.error("falha ao buscar vídeos do YouTube", err);
-    // TODO(temporário/diagnóstico): remover "detail" assim que o 502 em
-    // produção estiver identificado — não deixar mensagem de erro interna
-    // vazando na resposta pública depois disso.
-    return res
-      .status(502)
-      .json({ error: "Não foi possível carregar os vídeos.", detail: err instanceof Error ? err.message : String(err) });
+    return res.status(502).json({ error: "Não foi possível carregar os vídeos." });
   }
 }
