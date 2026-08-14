@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Brain, Clock, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Brain, Clock, Star } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { brincadeiras68 } from "@/data/brincadeiras68";

@@ -302,7 +302,7 @@ const Index = () => {
                       Conhecer material
                     </Button>
                   </a>
-                ) : "path" in item ? (
+                ) : item.path ? (
                   <Link to={item.path}>
                     <Button size="sm" className="mt-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-xs w-full">
                       Conhecer material

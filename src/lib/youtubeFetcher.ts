@@ -117,7 +117,10 @@ const requestYouTube = async <T>(path: string, params: Record<string, string | n
 };
 
 const getChannelDetails = async (apiKey: string, channelId: string | undefined, handle: string) => {
-  const params = channelId
+  // Tipado explicitamente porque a união dos dois objetos literais faz o TS
+  // inferir `forHandle?: undefined` num ramo e `id?: undefined` no outro, o que
+  // não casa com o Record<string, string | number> esperado.
+  const params: Record<string, string | number> = channelId
     ? { part: "contentDetails", id: channelId, key: apiKey }
     : { part: "contentDetails", forHandle: handle, key: apiKey };
 

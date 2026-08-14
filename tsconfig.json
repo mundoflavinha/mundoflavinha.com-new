@@ -1,24 +1,11 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "skipLibCheck": true,
-    "strictNullChecks": false
-  },
+  // Solution file: só aponta para os projetos reais. As opções de compilação
+  // vivem em cada tsconfig.*.json — declarar `compilerOptions` aqui seria letra
+  // morta, porque nenhum dos projetos abaixo faz `extends` deste arquivo.
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    }
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.api.json" }
   ]
 }
