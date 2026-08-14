@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
-import jogoDaReciclagem from "@/assets/downloadgratuito/JogodaReciclagem.png";
-import jogoDaTampinha from "@/assets/downloadgratuito/JogodaTampinha.png";
-import semaforoDoToque from "@/assets/downloadgratuito/semaforodotoque.png";
-import coleteEducativo from "@/assets/downloadgratuito/coleteeducativo.png";
+import jogoDaReciclagem from "@/assets/downloadgratuito/JogodaReciclagem.webp";
+import jogoDaTampinha from "@/assets/downloadgratuito/JogodaTampinha.webp";
+import semaforoDoToque from "@/assets/downloadgratuito/semaforodotoque.webp";
+import coleteEducativo from "@/assets/downloadgratuito/coleteeducativo.webp";
 
 const materials = [
   { name: "Jogo da Reciclagem", img: jogoDaReciclagem },

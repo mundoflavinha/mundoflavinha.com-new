@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import NewsletterForm from "@/components/NewsletterForm";
-import albumDaCopa from "@/assets/Artigo/Album-da-Copa.png";
-import momentosNatacao from "@/assets/Artigo/Momentos-Natação.png";
-import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.png";
-import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.png";
-import flaviaGuimaraes from "@/assets/Flavia-Guimaraes.png";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
+import momentosNatacao from "@/assets/Artigo/Momentos-Natação.webp";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.webp";
+import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.webp";
+import flaviaGuimaraes from "@/assets/Flavia-Guimaraes.webp";
 
 const articleUrl = "https://mundoflavinha.com/blog/empreendedorismo-infantil";
 const articleTitle = "O dia em que meus filhos criaram uma lojinha no prédio";

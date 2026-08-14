@@ -14,12 +14,12 @@ import {
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import babyCards01 from "@/assets/loja flavinha/01 monocromatico.png";
-import babyCards02 from "@/assets/loja flavinha/02 monocromatico.png";
-import preview01 from "@/assets/loja flavinha/monocromatico01.png";
-import preview02 from "@/assets/loja flavinha/monocromatico02.png";
-import preview03 from "@/assets/loja flavinha/monocromatico03.png";
-import preview04 from "@/assets/loja flavinha/monocromatico04.png";
+import babyCards01 from "@/assets/loja flavinha/01 monocromatico.webp";
+import babyCards02 from "@/assets/loja flavinha/02 monocromatico.webp";
+import preview01 from "@/assets/loja flavinha/monocromatico01.webp";
+import preview02 from "@/assets/loja flavinha/monocromatico02.webp";
+import preview03 from "@/assets/loja flavinha/monocromatico03.webp";
+import preview04 from "@/assets/loja flavinha/monocromatico04.webp";
 
 const checkoutUrl = "#comprar";
 

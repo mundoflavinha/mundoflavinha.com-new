@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import { motion } from "framer-motion";
-import aboutFamily from "@/assets/about-family.jpg";
+import aboutFamily from "@/assets/about-family.webp";
 
 const products = [
   { name: "100 Brincadeiras para Pais Sem Habilidades", price: "R$ 47,00", emoji: "🎲", age: "1-8 anos", desc: "Um guia completo com brincadeiras simples e divertidas que qualquer pai ou mãe pode fazer, sem precisar de nenhuma habilidade especial.", benefits: ["Sem materiais complicados", "Para todas as idades", "Passo a passo ilustrado"] },

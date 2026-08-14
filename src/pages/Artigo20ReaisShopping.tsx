@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import NewsletterForm from "@/components/NewsletterForm";
-import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.png";
-import albumDaCopa from "@/assets/Artigo/Album-da-Copa.png";
-import momentosNatacao from "@/assets/Artigo/Momentos-Natação.png";
-import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.png";
-import flaviaGuimaraes from "@/assets/Flavia-Guimaraes.png";
+import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.webp";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
+import momentosNatacao from "@/assets/Artigo/Momentos-Natação.webp";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.webp";
+import flaviaGuimaraes from "@/assets/Flavia-Guimaraes.webp";
 
 const articleUrl = "https://mundoflavinha.com/blog/20-reais-shopping";
 const articleTitle = "Dei R$20 para cada filho meu no shopping e o que aconteceu me fez pensar!";

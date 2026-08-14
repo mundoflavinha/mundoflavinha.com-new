@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import { motion } from "framer-motion";
-import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.png";
-import albumDaCopa from "@/assets/Artigo/Album-da-Copa.png";
-import momentosNatacao from "@/assets/Artigo/Momentos-Natação.png";
-import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.png";
-import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.png";
+import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.webp";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
+import momentosNatacao from "@/assets/Artigo/Momentos-Natação.webp";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.webp";
+import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.webp";
 
 const categories = [
   "Todos",

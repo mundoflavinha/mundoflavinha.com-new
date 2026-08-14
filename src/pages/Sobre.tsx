@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { Heart, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import aboutFamily from "@/assets/about-family-1.png";
-import heroFamily from "@/assets/hero-family.jpg";
+import aboutFamily from "@/assets/about-family-1.webp";
+import heroFamily from "@/assets/hero-family.webp";
 
 const values = [
   { icon: "📵", title: "Menos telas", desc: "Acreditamos que as crianças precisam de menos telas e mais presença." },

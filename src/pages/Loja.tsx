@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import { motion } from "framer-motion";
-import cartaoDiaDosPais from "@/assets/loja flavinha/cartaodiadospais.png";
-import monocromaticoProduto from "@/assets/loja flavinha/01 monocromatico.png";
+import cartaoDiaDosPais from "@/assets/loja flavinha/cartaodiadospais.webp";
+import monocromaticoProduto from "@/assets/loja flavinha/01 monocromatico.webp";
 
 const products = [
   {
