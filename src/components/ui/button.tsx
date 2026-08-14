@@ -44,4 +44,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
+// `buttonVariants` junto do componente é convenção do shadcn/ui; separar
+// divergiria do upstream e quebraria `npx shadcn add` no futuro. O único efeito
+// é o Fast Refresh deste arquivo em desenvolvimento.
+// eslint-disable-next-line react-refresh/only-export-components
 export { Button, buttonVariants };

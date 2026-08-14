@@ -90,7 +90,7 @@ if (mode === "generate") {
       if (done % 20 === 0) console.log(`  ${done}/${images.length}...`);
     } catch (err) {
       skipped++;
-      console.error(`  falhou: ${relative(ROOT, file)}`);
+      console.error(`  falhou: ${relative(ROOT, file)} — ${err instanceof Error ? err.message : err}`);
     }
   }
   console.log(`\nGerados: ${done}. Falharam: ${skipped}.`);

@@ -3,7 +3,8 @@ import { X, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import ConsentFields, { HoneypotField, comLinkPolitica } from "@/components/ConsentFields";
+import ConsentFields, { HoneypotField } from "@/components/ConsentFields";
+import { comLinkPolitica } from "@/lib/consentText";
 import { CONSENT_TEXTS, FAIXAS_ETARIAS, PERFIS, type FaixaEtaria, type Perfil } from "@/lib/consent";
 import { enviarLead } from "@/lib/leadApi";
 

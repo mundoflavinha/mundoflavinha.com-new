@@ -3,7 +3,8 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { HoneypotField, comLinkPolitica } from "@/components/ConsentFields";
+import { HoneypotField } from "@/components/ConsentFields";
+import { comLinkPolitica } from "@/lib/consentText";
 import { CONSENT_TEXTS } from "@/lib/consent";
 import { enviarLead } from "@/lib/leadApi";
 

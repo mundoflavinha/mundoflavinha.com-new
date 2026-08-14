@@ -26,8 +26,6 @@ const LIMITE_POR_EMAIL = 3;
 const MIN_PREENCHIMENTO_MS = 2_000;
 const MAX_PREENCHIMENTO_MS = 12 * 60 * 60 * 1000;
 
-const ORIGENS = ["lead_magnet", "newsletter_full", "newsletter_compact"] as const;
-
 const baseSchema = z.object({
   consentVersion: z.string().trim().min(1).max(20),
   email: z.string().trim().toLowerCase().email().max(254),
