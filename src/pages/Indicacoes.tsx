@@ -4,10 +4,10 @@ import { ExternalLink, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
-import { products as products02 } from "@/pages/Achadinhos02";
-import { products as products35 } from "@/pages/Achadinhos35";
-import { products as products68 } from "@/pages/Achadinhos68";
-import { products as productsFamilia } from "@/pages/AchadinhosFamilia";
+import { products as products02 } from "@/data/achadinhos02";
+import { products as products35 } from "@/data/achadinhos35";
+import { products as products68 } from "@/data/achadinhos68";
+import { products as productsFamilia } from "@/data/achadinhosFamilia";
 
 const filters = ["Todos", "0-2 anos", "3-5 anos", "6-8 anos", "Em família"];
 
