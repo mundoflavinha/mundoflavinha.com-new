@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import PageBanner from "@/components/PageBanner";
 import { motion } from "framer-motion";
+import { WHATSAPP } from "@/lib/site";
 import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.webp";
 import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
 import momentosNatacao from "@/assets/Artigo/Momentos-Natação.webp";
@@ -116,14 +117,21 @@ const Blog = () => {
               <Download className="w-8 h-8 text-primary mx-auto mb-3" />
               <h3 className="font-heading font-bold text-lg text-foreground">Material gratuito</h3>
               <p className="text-sm text-muted-foreground mt-2">Baixe uma atividade grátis para brincar com seus filhos.</p>
-              <Button className="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-bold">Baixar grátis</Button>
+              {/* Antes era um <Button> solto, sem href nem onClick: clicar não fazia nada. */}
+              <Link to="/downloads">
+                <Button className="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-bold">Baixar grátis</Button>
+              </Link>
             </div>
-            <div className="bg-mint/15 rounded-3xl p-8 text-center">
-              <MessageCircle className="w-8 h-8 text-foreground mx-auto mb-3" />
-              <h3 className="font-heading font-bold text-lg text-foreground">Grupo do WhatsApp</h3>
-              <p className="text-sm text-muted-foreground mt-2">Receba ideias de brincadeiras e inspirações diárias.</p>
-              <Button className="mt-4 rounded-full bg-[hsl(142,70%,45%)] text-primary-foreground font-heading font-bold">Entrar no grupo</Button>
-            </div>
+            {WHATSAPP.convitegrupo && (
+              <div className="bg-mint/15 rounded-3xl p-8 text-center">
+                <MessageCircle className="w-8 h-8 text-foreground mx-auto mb-3" />
+                <h3 className="font-heading font-bold text-lg text-foreground">Grupo do WhatsApp</h3>
+                <p className="text-sm text-muted-foreground mt-2">Receba ideias de brincadeiras e inspirações diárias.</p>
+                <a href={WHATSAPP.convitegrupo} target="_blank" rel="noopener noreferrer">
+                  <Button className="mt-4 rounded-full bg-[hsl(142,70%,45%)] text-primary-foreground font-heading font-bold">Entrar no grupo</Button>
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </section>

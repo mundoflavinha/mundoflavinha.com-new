@@ -8,6 +8,7 @@ import SectionTitle from "@/components/SectionTitle";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
 import NewsletterForm from "@/components/NewsletterForm";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
+import { WHATSAPP } from "@/lib/site";
 import heroFamily from "@/assets/hero_family_01.webp";
 import age02 from "@/assets/age-0-2-(1).webp";
 import age35 from "@/assets/age-3-5-(1).webp";
@@ -366,27 +367,31 @@ const Index = () => {
         </div>
       </section>
 
-      {/* WHATSAPP GROUP */}
-      <section className="py-16 md:py-20">
-        <div className="container">
-          <div className="max-w-2xl mx-auto text-center bg-mint/20 rounded-3xl p-8 md:p-12">
-            <div className="w-16 h-16 rounded-full bg-mint/50 flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-8 h-8 text-foreground" />
+      {/* WHATSAPP GROUP — só aparece quando houver convite real cadastrado em
+          src/lib/site.ts. Antes o botão apontava para chat.whatsapp.com/example
+          e não levava a lugar nenhum. */}
+      {WHATSAPP.convitegrupo && (
+        <section className="py-16 md:py-20">
+          <div className="container">
+            <div className="max-w-2xl mx-auto text-center bg-mint/20 rounded-3xl p-8 md:p-12">
+              <div className="w-16 h-16 rounded-full bg-mint/50 flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-foreground" />
+              </div>
+              <h2 className="font-heading font-bold text-2xl md:text-3xl text-foreground">
+                Grupo do WhatsApp sobre brincar
+              </h2>
+              <p className="mt-3 text-muted-foreground leading-relaxed">
+                Entre para o grupo do WhatsApp e receba ideias de brincadeiras, inspirações e novidades do Mundo Flavinha.
+              </p>
+              <a href={WHATSAPP.convitegrupo} target="_blank" rel="noopener noreferrer">
+                <Button className="mt-6 rounded-full bg-[hsl(142,70%,45%)] text-primary-foreground font-heading font-bold text-base px-8 py-3 h-auto gap-2 hover:bg-[hsl(142,70%,40%)]">
+                  <MessageCircle className="w-5 h-5" /> Entrar no grupo
+                </Button>
+              </a>
             </div>
-            <h2 className="font-heading font-bold text-2xl md:text-3xl text-foreground">
-              Grupo do WhatsApp sobre brincar
-            </h2>
-            <p className="mt-3 text-muted-foreground leading-relaxed">
-              Entre para o grupo do WhatsApp e receba ideias de brincadeiras, inspirações e novidades do Mundo Flavinha.
-            </p>
-            <a href="https://chat.whatsapp.com/example" target="_blank" rel="noopener noreferrer">
-              <Button className="mt-6 rounded-full bg-[hsl(142,70%,45%)] text-primary-foreground font-heading font-bold text-base px-8 py-3 h-auto gap-2 hover:bg-[hsl(142,70%,40%)]">
-                <MessageCircle className="w-5 h-5" /> Entrar no grupo
-              </Button>
-            </a>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* NEWSLETTER */}
       <section className="py-16 md:py-20 bg-lilac/10">

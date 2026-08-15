@@ -27,11 +27,14 @@ const Header = () => {
           <img src={logo} alt="Mundo Flavinha" className="h-12 md:h-14 w-auto" />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav aria-label="Navegação principal" className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
+              // Sem aria-current, a rota ativa era sinalizada só por cor —
+              // invisível para leitor de tela e falha WCAG 1.4.1.
+              aria-current={location.pathname === item.path ? "page" : undefined}
               className={`px-3 py-2 rounded-lg text-sm font-heading font-semibold transition-colors hover:bg-secondary ${
                 location.pathname === item.path
                   ? "text-primary bg-secondary"
@@ -57,20 +60,23 @@ const Header = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors text-foreground"
-          aria-label="Menu"
+          aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={isOpen}
+          aria-controls="menu-mobile"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {isOpen && (
-        <div className="lg:hidden bg-card border-t border-border">
-          <nav className="container py-4 flex flex-col gap-1">
+        <div id="menu-mobile" className="lg:hidden bg-card border-t border-border">
+          <nav aria-label="Navegação principal" className="container py-4 flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
+                aria-current={location.pathname === item.path ? "page" : undefined}
                 className={`px-4 py-3 rounded-lg font-heading font-semibold transition-colors ${
                   location.pathname === item.path
                     ? "text-primary bg-secondary"

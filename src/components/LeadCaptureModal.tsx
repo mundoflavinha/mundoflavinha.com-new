@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Download } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import ConsentFields, { HoneypotField } from "@/components/ConsentFields";
 import { comLinkPolitica } from "@/lib/consentText";
 import { CONSENT_TEXTS, FAIXAS_ETARIAS, PERFIS, type FaixaEtaria, type Perfil } from "@/lib/consent";
@@ -32,9 +32,8 @@ const camposIniciais = {
   faixaEtaria: "" as FaixaEtaria | "",
 };
 
-// `<select>` nativo em vez do Select do shadcn: este modal não é um Dialog do
-// Radix (é um motion.div com overlay próprio e stopPropagation), e o portal do
-// Radix conflita com esse overlay — dá para clicar numa opção e fechar o modal.
+// `<select>` nativo em vez do Select do shadcn: são só 4 opções, funciona
+// melhor no mobile e evita mais um portal aninhado dentro do Dialog.
 const selectClasses =
   "flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm";
 
@@ -79,7 +78,11 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
     }
   };
 
-  const handleClose = () => {
+  // Roda em QUALQUER fechamento — X, ESC ou clique fora. Antes só o X
+  // limpava o formulário, então fechar por outro caminho deixava os dados
+  // preenchidos para a próxima abertura.
+  const handleOpenChange = (aberto: boolean) => {
+    if (aberto) return;
     setSubmitted(false);
     setStatus("idle");
     setOptIn({ optInEmail: false, optInWhatsapp: false });
@@ -89,140 +92,125 @@ const LeadCaptureModal = ({ isOpen, onClose, materialName }: LeadCaptureModalPro
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/30 backdrop-blur-sm"
-          onClick={handleClose}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-card rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={handleClose}
-              aria-label="Fechar"
-              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {!submitted ? (
-              <>
-                <div className="text-center mb-6">
-                  <div className="w-12 h-12 rounded-full bg-pastel-yellow flex items-center justify-center mx-auto mb-3">
-                    <Download className="w-6 h-6 text-foreground" />
-                  </div>
-                  <h3 className="font-heading font-bold text-xl text-foreground">{materialName}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Preencha seus dados para baixar gratuitamente</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <HoneypotField value={honeypot} onChange={setHoneypot} />
-
-                  <Input
-                    placeholder="Seu nome"
-                    required
-                    className="rounded-xl border-border"
-                    value={formData.nome}
-                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  />
-                  <Input
-                    type="email"
-                    placeholder="Seu e-mail"
-                    required
-                    className="rounded-xl border-border"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
-                  <Input
-                    placeholder="WhatsApp com DDD (opcional)"
-                    className="rounded-xl border-border"
-                    value={formData.whatsapp}
-                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                  />
-
-                  <select
-                    aria-label="Você é"
-                    className={selectClasses}
-                    value={formData.perfil}
-                    onChange={(e) => setFormData({ ...formData, perfil: e.target.value as Perfil | "" })}
-                  >
-                    <option value="">Você é... (opcional)</option>
-                    {PERFIS.map((perfil) => (
-                      <option key={perfil.value} value={perfil.value}>
-                        {perfil.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    aria-label="Faixa etária de interesse"
-                    className={selectClasses}
-                    value={formData.faixaEtaria}
-                    onChange={(e) => setFormData({ ...formData, faixaEtaria: e.target.value as FaixaEtaria | "" })}
-                  >
-                    <option value="">Faixa etária de interesse (opcional)</option>
-                    {FAIXAS_ETARIAS.map((faixa) => (
-                      <option key={faixa.value} value={faixa.value}>
-                        {faixa.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  <ConsentFields
-                    optInEmail={optIn.optInEmail}
-                    optInWhatsapp={optIn.optInWhatsapp}
-                    onChange={(patch) => setOptIn((atual) => ({ ...atual, ...patch }))}
-                    showWhatsapp={Boolean(formData.whatsapp)}
-                  />
-
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    {comLinkPolitica(CONSENT_TEXTS.entrega_material)}
-                  </p>
-
-                  {status === "error" && (
-                    <p className="text-xs text-destructive">
-                      Não foi possível enviar seus dados. Tente novamente em instantes.
-                    </p>
-                  )}
-
-                  {/* Sem `disabled` por consentimento: receber o material não pode
-                      depender de aceitar comunicação de marketing. */}
-                  <Button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="w-full rounded-full bg-primary text-primary-foreground font-heading font-bold disabled:opacity-50"
-                  >
-                    {status === "loading" ? "Enviando..." : "Quero baixar grátis!"}
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <div className="text-center py-4">
-                <div className="text-4xl mb-3">🎉</div>
-                <h3 className="font-heading font-bold text-xl text-foreground mb-2">Pronto!</h3>
-                <p className="text-muted-foreground text-sm mb-4">Seu cadastro foi recebido. Baixe o material abaixo.</p>
-                <a
-                  href={`/materiais/${slugify(materialName)}.pdf`}
-                  download
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-heading font-bold text-primary-foreground transition-opacity hover:opacity-90"
-                >
-                  <Download className="w-4 h-4" />
-                  Baixar agora
-                </a>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        // Mantém o visual anterior: o padrão do Radix é bg-black/80, bem mais
+        // duro que o overlay suave que este modal já usava.
+        overlayClassName="bg-foreground/30 backdrop-blur-sm"
+        className="max-h-[90vh] w-[calc(100%-2rem)] max-w-md gap-0 overflow-y-auto rounded-2xl border-0 bg-card p-6 shadow-2xl md:p-8"
+      >
+        {!submitted ? (
+          <>
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-full bg-pastel-yellow flex items-center justify-center mx-auto mb-3">
+                <Download className="w-6 h-6 text-foreground" />
               </div>
+              <DialogTitle className="font-heading font-bold text-xl text-foreground">{materialName}</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-1">
+                Preencha seus dados para baixar gratuitamente
+              </DialogDescription>
+            </div>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <HoneypotField value={honeypot} onChange={setHoneypot} />
+
+            <Input
+              placeholder="Seu nome"
+              required
+              className="rounded-xl border-border"
+              value={formData.nome}
+              onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+            />
+            <Input
+              type="email"
+              placeholder="Seu e-mail"
+              required
+              className="rounded-xl border-border"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+            <Input
+              placeholder="WhatsApp com DDD (opcional)"
+              className="rounded-xl border-border"
+              value={formData.whatsapp}
+              onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+            />
+
+            <select
+              aria-label="Você é"
+              className={selectClasses}
+              value={formData.perfil}
+              onChange={(e) => setFormData({ ...formData, perfil: e.target.value as Perfil | "" })}
+            >
+              <option value="">Você é... (opcional)</option>
+              {PERFIS.map((perfil) => (
+                <option key={perfil.value} value={perfil.value}>
+                  {perfil.label}
+                </option>
+              ))}
+            </select>
+
+            <select
+              aria-label="Faixa etária de interesse"
+              className={selectClasses}
+              value={formData.faixaEtaria}
+              onChange={(e) => setFormData({ ...formData, faixaEtaria: e.target.value as FaixaEtaria | "" })}
+            >
+              <option value="">Faixa etária de interesse (opcional)</option>
+              {FAIXAS_ETARIAS.map((faixa) => (
+                <option key={faixa.value} value={faixa.value}>
+                  {faixa.label}
+                </option>
+              ))}
+            </select>
+
+            <ConsentFields
+              optInEmail={optIn.optInEmail}
+              optInWhatsapp={optIn.optInWhatsapp}
+              onChange={(patch) => setOptIn((atual) => ({ ...atual, ...patch }))}
+              showWhatsapp={Boolean(formData.whatsapp)}
+            />
+
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {comLinkPolitica(CONSENT_TEXTS.entrega_material)}
+            </p>
+
+            {status === "error" && (
+              <p className="text-xs text-destructive">
+                Não foi possível enviar seus dados. Tente novamente em instantes.
+              </p>
             )}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+
+            {/* Sem `disabled` por consentimento: receber o material não pode
+                depender de aceitar comunicação de marketing. */}
+            <Button
+              type="submit"
+              disabled={status === "loading"}
+              className="w-full rounded-full bg-primary text-primary-foreground font-heading font-bold disabled:opacity-50"
+            >
+              {status === "loading" ? "Enviando..." : "Quero baixar grátis!"}
+            </Button>
+          </form>
+        </>
+        ) : (
+          <div className="text-center py-4">
+            <div className="text-4xl mb-3">🎉</div>
+            <DialogTitle className="font-heading font-bold text-xl text-foreground mb-2">Pronto!</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm mb-4">
+              Seu cadastro foi recebido. Baixe o material abaixo.
+            </DialogDescription>
+            <a
+              href={`/materiais/${slugify(materialName)}.pdf`}
+              download
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-heading font-bold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <Download className="w-4 h-4" />
+              Baixar agora
+            </a>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 

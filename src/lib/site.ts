@@ -30,6 +30,22 @@ export const CONTATO = {
   prazoRespostaDias: 15,
 } as const;
 
+export const WHATSAPP = {
+  /** Só dígitos, com código do país (55) e DDD. Formato exigido pelo wa.me. */
+  numero: "5521999854707",
+  /**
+   * Convite do grupo (chat.whatsapp.com/...). Ainda pendente: é um link
+   * diferente do número, gerado dentro do próprio grupo no WhatsApp.
+   * Enquanto for null, os CTAs de "entrar no grupo" não são exibidos —
+   * melhor não mostrar do que mostrar um botão que não leva a lugar nenhum.
+   */
+  convitegrupo: null as string | null,
+} as const;
+
+/** Link direto de conversa. `texto` vira mensagem pré-preenchida. */
+export const linkWhatsApp = (texto?: string) =>
+  `https://wa.me/${WHATSAPP.numero}${texto ? `?text=${encodeURIComponent(texto)}` : ""}`;
+
 export const REDES_SOCIAIS = [
   { label: "Instagram", href: "https://www.instagram.com/mundoflavinhaoficial/" },
   { label: "YouTube", href: "https://www.youtube.com/@mundoflavinha" },
