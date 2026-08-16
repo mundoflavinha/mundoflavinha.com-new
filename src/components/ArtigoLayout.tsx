@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import NewsletterForm from "@/components/NewsletterForm";
+import { articleJsonLd } from "@/lib/seo";
 import flaviaGuimaraes from "@/assets/Flavia-Guimaraes.webp";
 
 /**
@@ -105,7 +106,12 @@ const ArtigoLayout = ({
   );
 
   return (
-    <Layout>
+    <Layout
+      title={title}
+      description={subtitle}
+      image={heroImage}
+      jsonLd={articleJsonLd({ headline: title, description: subtitle, image: heroImage, url })}
+    >
       <article className="bg-background">
         <section className="py-8 md:py-12">
           <div className="container">

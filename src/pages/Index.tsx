@@ -9,6 +9,7 @@ import LeadCaptureModal from "@/components/LeadCaptureModal";
 import NewsletterForm from "@/components/NewsletterForm";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import { WHATSAPP } from "@/lib/site";
+import { organizationJsonLd } from "@/lib/seo";
 import heroFamily from "@/assets/hero_family_01.webp";
 import age02 from "@/assets/age-0-2-(1).webp";
 import age35 from "@/assets/age-3-5-(1).webp";
@@ -38,7 +39,7 @@ const Index = () => {
   const [downloadModal, setDownloadModal] = useState<string | null>(null);
 
   return (
-    <Layout>
+    <Layout jsonLd={organizationJsonLd()}>
       {/* HERO */}
       <section className="relative overflow-hidden bg-secondary py-12 md:py-20 lg:py-24">
         <div className="absolute top-10 left-10 w-20 h-20 bg-pastel-yellow/40 rounded-full blur-2xl" />

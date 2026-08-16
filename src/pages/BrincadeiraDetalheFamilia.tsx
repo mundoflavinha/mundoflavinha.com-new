@@ -21,7 +21,7 @@ const BrincadeiraDetalheFamilia = () => {
   }
 
   return (
-    <Layout>
+    <Layout title={brincadeira.title} description={brincadeira.summary} image={brincadeira.image}>
       <article>
         <section className="bg-pink/15 py-8 md:py-12">
           <div className="container">

@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import RouteErrorBoundary from "@/components/RouteErrorBoundary";
 
@@ -117,50 +118,52 @@ const RouteFallback = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <ScrollToTop />
-        <RouteErrorBoundary>
-          <Suspense fallback={<RouteFallback />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/brincadeiras" element={<Brincadeiras />} />
-              <Route path="/brincadeiras/0-a-2-anos" element={<Brincadeiras02 />} />
-              <Route path="/brincadeiras/0-a-2-anos/:slug" element={<BrincadeiraDetalhe02 />} />
-              <Route path="/brincadeiras/3-a-5-anos" element={<Brincadeiras35 />} />
-              <Route path="/brincadeiras/3-a-5-anos/:slug" element={<BrincadeiraDetalhe35 />} />
-              <Route path="/brincadeiras/6-a-8-anos" element={<Brincadeiras68 />} />
-              <Route path="/brincadeiras/6-a-8-anos/:slug" element={<BrincadeiraDetalhe68 />} />
-              <Route path="/brincadeiras/em-familia" element={<BrincadeirasFamilia />} />
-              <Route path="/brincadeiras/em-familia/:slug" element={<BrincadeiraDetalheFamilia />} />
-              <Route path="/downloads" element={<Downloads />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/indicacoes" element={<Indicacoes />} />
-              <Route path="/indicacoes/0-a-2-anos" element={<Achadinhos02 />} />
-              <Route path="/indicacoes/3-a-5-anos" element={<Achadinhos35 />} />
-              <Route path="/indicacoes/6-a-8-anos" element={<Achadinhos68 />} />
-              <Route path="/indicacoes/jogos-em-familia" element={<AchadinhosFamilia />} />
-              <Route path="/loja" element={<Loja />} />
-              <Route path="/loja/cartoes-alto-contraste-bebes" element={<CartoesAltoContraste />} />
-              <Route path="/infoprodutos" element={<Infoprodutos />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/album-da-copa" element={<ArtigoAlbumDaCopa />} />
-              <Route path="/blog/presenca-pequenos-momentos" element={<ArtigoPresencaPequenosMomentos />} />
-              <Route path="/blog/empreendedorismo-infantil" element={<ArtigoEmpreendedorismoInfantil />} />
-              <Route path="/blog/brincadeira-no-carro" element={<ArtigoBrincadeiraNoCarro />} />
-              <Route path="/blog/20-reais-shopping" element={<Artigo20ReaisShopping />} />
-              <Route path="/sobre" element={<Sobre />} />
-              <Route path="/politica-de-privacidade" element={<PoliticaDePrivacidade />} />
-              <Route path="/termos-de-uso" element={<TermosDeUso />} />
-              <Route path="/contato" element={<Contato />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </RouteErrorBoundary>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <RouteErrorBoundary>
+            <Suspense fallback={<RouteFallback />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/brincadeiras" element={<Brincadeiras />} />
+                <Route path="/brincadeiras/0-a-2-anos" element={<Brincadeiras02 />} />
+                <Route path="/brincadeiras/0-a-2-anos/:slug" element={<BrincadeiraDetalhe02 />} />
+                <Route path="/brincadeiras/3-a-5-anos" element={<Brincadeiras35 />} />
+                <Route path="/brincadeiras/3-a-5-anos/:slug" element={<BrincadeiraDetalhe35 />} />
+                <Route path="/brincadeiras/6-a-8-anos" element={<Brincadeiras68 />} />
+                <Route path="/brincadeiras/6-a-8-anos/:slug" element={<BrincadeiraDetalhe68 />} />
+                <Route path="/brincadeiras/em-familia" element={<BrincadeirasFamilia />} />
+                <Route path="/brincadeiras/em-familia/:slug" element={<BrincadeiraDetalheFamilia />} />
+                <Route path="/downloads" element={<Downloads />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/indicacoes" element={<Indicacoes />} />
+                <Route path="/indicacoes/0-a-2-anos" element={<Achadinhos02 />} />
+                <Route path="/indicacoes/3-a-5-anos" element={<Achadinhos35 />} />
+                <Route path="/indicacoes/6-a-8-anos" element={<Achadinhos68 />} />
+                <Route path="/indicacoes/jogos-em-familia" element={<AchadinhosFamilia />} />
+                <Route path="/loja" element={<Loja />} />
+                <Route path="/loja/cartoes-alto-contraste-bebes" element={<CartoesAltoContraste />} />
+                <Route path="/infoprodutos" element={<Infoprodutos />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/album-da-copa" element={<ArtigoAlbumDaCopa />} />
+                <Route path="/blog/presenca-pequenos-momentos" element={<ArtigoPresencaPequenosMomentos />} />
+                <Route path="/blog/empreendedorismo-infantil" element={<ArtigoEmpreendedorismoInfantil />} />
+                <Route path="/blog/brincadeira-no-carro" element={<ArtigoBrincadeiraNoCarro />} />
+                <Route path="/blog/20-reais-shopping" element={<Artigo20ReaisShopping />} />
+                <Route path="/sobre" element={<Sobre />} />
+                <Route path="/politica-de-privacidade" element={<PoliticaDePrivacidade />} />
+                <Route path="/termos-de-uso" element={<TermosDeUso />} />
+                <Route path="/contato" element={<Contato />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </RouteErrorBoundary>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Gerado por scripts/generate-sitemap.mjs a cada build — não é fonte.
+public/sitemap.xml
 .env
 .env.*
 !.env.example
