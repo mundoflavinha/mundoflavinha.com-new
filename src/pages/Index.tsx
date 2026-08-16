@@ -368,8 +368,7 @@ const Index = () => {
       </section>
 
       {/* WHATSAPP GROUP — só aparece quando houver convite real cadastrado em
-          src/lib/site.ts. Antes o botão apontava para chat.whatsapp.com/example
-          e não levava a lugar nenhum. */}
+          src/lib/site.ts (WHATSAPP.convitegrupo). */}
       {WHATSAPP.convitegrupo && (
         <section className="py-16 md:py-20">
           <div className="container">

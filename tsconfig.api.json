@@ -12,5 +12,5 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["api", "src/lib/consent.ts", "src/lib/youtubeFetcher.ts"]
+  "include": ["api", "src/lib/consent.ts", "src/lib/youtubeFetcher.ts", "src/lib/leadSchema.ts"]
 }

@@ -1,10 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
-import { z } from "zod";
+import type { z } from "zod";
 import {
-  FAIXA_ETARIA_VALUES,
-  PERFIL_VALUES,
   getConsentTexts,
   type AcaoConsentimento,
   type Finalidade,
@@ -13,6 +11,7 @@ import {
   // ERR_MODULE_NOT_FOUND (é o arquivo compilado .js que existe em runtime,
   // mesmo a fonte sendo .ts — convenção padrão de projeto ESM/NodeNext).
 } from "../src/lib/consent.js";
+import { payloadSchema, legacySchema } from "../src/lib/leadSchema.js";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -25,56 +24,6 @@ const LIMITE_POR_EMAIL = 3;
 
 const MIN_PREENCHIMENTO_MS = 2_000;
 const MAX_PREENCHIMENTO_MS = 12 * 60 * 60 * 1000;
-
-const baseSchema = z.object({
-  consentVersion: z.string().trim().min(1).max(20),
-  email: z.string().trim().toLowerCase().email().max(254),
-  nome: z.string().trim().min(1).max(200).optional(),
-  whatsapp: z.string().trim().min(8).max(30).optional(),
-  optInEmail: z.boolean(),
-  optInWhatsapp: z.boolean(),
-  path: z.string().trim().max(200).optional(),
-  /** Honeypot: campo escondido. Qualquer conteúdo reprova. */
-  hp: z.string().max(0).optional(),
-  /** Tempo decorrido desde a renderização do formulário. Relativo, imune a relógio errado. */
-  elapsedMs: z.number().int().nonnegative().optional(),
-  faixaEtaria: z.enum(FAIXA_ETARIA_VALUES as unknown as [string, ...string[]]).optional(),
-  perfil: z.enum(PERFIL_VALUES as unknown as [string, ...string[]]).optional(),
-});
-
-const newsletterSchema = baseSchema.extend({
-  type: z.literal("newsletter"),
-  origem: z.enum(["newsletter_full", "newsletter_compact"]),
-});
-
-const leadMagnetSchema = baseSchema.extend({
-  type: z.literal("lead_magnet"),
-  nome: z.string().trim().min(1).max(200),
-  material: z.string().trim().min(1).max(200),
-  origem: z.literal("lead_magnet"),
-});
-
-const payloadSchema = z
-  .discriminatedUnion("type", [newsletterSchema, leadMagnetSchema])
-  .refine((data) => !data.optInWhatsapp || !!data.whatsapp, {
-    message: "optInWhatsapp exige whatsapp preenchido",
-  });
-
-/**
- * Shape antigo, aceito por UMA release.
- * Motivo: front e API sobem juntos, mas uma aba aberta há 20 minutos ainda tem
- * o bundle velho. Sem isso, esse envio vira 400 e o lead se perde em silêncio.
- * `idadeCrianca` é intencionalmente DESCARTADO — é justamente o dado que a
- * issue #3 mandou parar de coletar.
- */
-const legacySchema = z.object({
-  type: z.enum(["newsletter", "lead_magnet"]),
-  nome: z.string().trim().max(200).optional(),
-  email: z.string().trim().toLowerCase().email().max(254),
-  whatsapp: z.string().trim().max(30).optional(),
-  material: z.string().trim().max(200).optional(),
-  consentimento: z.boolean().optional(),
-});
 
 type EventoConsentimento = { finalidade: Finalidade; acao: AcaoConsentimento; texto: string };
 
