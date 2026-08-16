@@ -4,7 +4,11 @@
  * instancia no top-level do módulo).
  */
 import { z } from "zod";
-import { FAIXA_ETARIA_VALUES, PERFIL_VALUES } from "./consent";
+// Extensão .js obrigatória: este módulo é carregado por api/lead.ts sob ESM
+// nativo do Node ("type": "module"), onde import relativo sem extensão estoura
+// ERR_MODULE_NOT_FOUND em runtime. Typecheck e testes não pegam — ambos usam
+// resolução de bundler. Ver src/test/apiEsm.test.ts.
+import { FAIXA_ETARIA_VALUES, PERFIL_VALUES } from "./consent.js";
 
 const baseSchema = z.object({
   consentVersion: z.string().trim().min(1).max(20),
