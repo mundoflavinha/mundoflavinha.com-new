@@ -1,4 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+/*
+ * Fontes auto-hospedadas, servidas pelo próprio domínio.
+ *
+ * Antes vinham de fonts.googleapis.com por @import. Isso fazia TODA visita, em
+ * todas as 122 páginas, contatar o Google antes de qualquer consentimento: uma
+ * requisição ao googleapis para o CSS e mais duas ao gstatic para os arquivos
+ * .woff2 — medido no navegador, não suposto. O visitante entregava IP,
+ * user-agent e Referer ao Google só por abrir o site.
+ *
+ * Isso contradizia frontalmente a postura do próprio projeto, que faz facade no
+ * player do YouTube justamente para não contatar o Google sem escolha. E o
+ * Google não estava (nem está) declarado como operador de fontes na Política.
+ *
+ * Variável (`wght.css`): um arquivo cobre 200–1000, então some a lista de pesos
+ * fixos do @import antigo. Só o estilo normal — o site não usa itálico.
+ */
+@import '@fontsource-variable/nunito/wght.css';
+@import '@fontsource-variable/quicksand/wght.css';
 
 @tailwind base;
 @tailwind components;
@@ -43,8 +60,8 @@
     --mint: 160 35% 82%;
     --warm-white: 30 33% 98%;
 
-    --font-heading: 'Quicksand', sans-serif;
-    --font-body: 'Nunito', sans-serif;
+    --font-heading: 'Quicksand Variable', 'Quicksand', sans-serif;
+    --font-body: 'Nunito Variable', 'Nunito', sans-serif;
   }
 }
 

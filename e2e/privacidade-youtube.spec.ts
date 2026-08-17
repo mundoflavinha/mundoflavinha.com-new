@@ -11,16 +11,45 @@ import { expect, test } from "@playwright/test";
  * consentimento — este teste é o contrato que a troca tem que preservar.
  */
 
-const DOMINIOS_GOOGLE = /(youtube\.com|youtube-nocookie\.com|ytimg\.com|google\.com|googlevideo\.com|doubleclick\.net)/;
+const DOMINIOS_GOOGLE =
+  /(youtube\.com|youtube-nocookie\.com|ytimg\.com|googlevideo\.com|google\.com|googleapis\.com|gstatic\.com|googletagmanager\.com|google-analytics\.com|doubleclick\.net)/;
 
-test("a home não contata o YouTube antes do clique", async ({ page }) => {
-  const pedidos: string[] = [];
-  page.on("request", (req) => {
-    if (DOMINIOS_GOOGLE.test(req.url())) pedidos.push(req.url());
+/**
+ * A asserção forte: NENHUMA requisição sai do nosso domínio ao carregar.
+ *
+ * A versão anterior listava domínios do Google por nome — e a lista tinha
+ * `google.com`, que não casa com `fonts.googleapis.com` nem `fonts.gstatic.com`.
+ * O teste passava verde enquanto todas as 122 páginas pediam as fontes ao
+ * Google a cada visita, entregando IP, user-agent e Referer antes de qualquer
+ * consentimento. Uma lista de domínios só pega o que quem escreveu lembrou.
+ *
+ * Por isso a regra aqui é por exclusão: só o próprio site. Qualquer terceiro
+ * novo — analytics, fonte, CDN, pixel — falha por padrão e precisa de uma
+ * decisão explícita para entrar.
+ */
+const ROTAS_SEM_TERCEIROS = ["/", "/sobre", "/blog/album-da-copa", "/downloads", "/brincadeiras"];
+
+for (const rota of ROTAS_SEM_TERCEIROS) {
+  test(`${rota} não faz nenhuma requisição a terceiros ao carregar`, async ({ page, baseURL }) => {
+    const externas: string[] = [];
+    page.on("request", (req) => {
+      if (!req.url().startsWith(baseURL!) && !req.url().startsWith("data:")) externas.push(req.url());
+    });
+
+    await page.goto(rota, { waitUntil: "networkidle" });
+    expect(externas, `saiu do domínio: ${externas.join(", ")}`).toEqual([]);
   });
+}
 
-  await page.goto("/", { waitUntil: "networkidle" });
-  expect(pedidos, `contatou: ${pedidos.join(", ")}`).toEqual([]);
+test("as fontes são servidas pelo próprio domínio", async ({ page }) => {
+  await page.goto("/sobre");
+  const familias = await page.evaluate(() => {
+    const h1 = document.querySelector("h1");
+    return h1 ? getComputedStyle(h1).fontFamily : "";
+  });
+  // Se o @fontsource sair e o nome da família não bater, o texto cai no
+  // fallback sans-serif do sistema sem erro nenhum — regressão só visual.
+  expect(familias).toContain("Quicksand Variable");
 });
 
 test("o clique carrega o player, e só em youtube-nocookie", async ({ page }) => {
