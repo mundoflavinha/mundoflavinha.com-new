@@ -116,12 +116,16 @@ const produtos = [
               )}
 
               {item.link ? (
-                <a href={item.link} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" class="mt-4 w-full gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground">
-                    Ver mais
-                    <Icon name="lucide:external-link" class="h-3.5 w-3.5" />
-                  </Button>
-                </a>
+                <Button
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="sm"
+                  class="mt-4 w-full gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground"
+                >
+                  Ver mais
+                  <Icon name="lucide:external-link" class="h-3.5 w-3.5" />
+                </Button>
               ) : (
                 <Button
                   disabled

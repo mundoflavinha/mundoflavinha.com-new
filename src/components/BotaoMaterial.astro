@@ -1,0 +1,67 @@
+---
+import { Icon } from "astro-icon/components";
+import type { Material } from "@/data/materiais";
+
+/**
+ * Card-gatilho de um material gratuito. Abre o modal via LeadModal.astro.
+ *
+ * É UM `<button>` só, envolvendo imagem, título e o rótulo "Baixar grátis".
+ * As duas versões React tinham problemas diferentes de semântica no mesmo
+ * ponto:
+ *
+ * - `/downloads` tinha um `<button>` dentro de outro `<button>` (o `<Button>`
+ *   do shadcn renderiza `<button>`) — HTML inválido;
+ * - a home usava um `<div>` com `onClick` e sem papel nenhum. Dava para
+ *   acionar pelo teclado, mas por acidente: o Enter caía no `<Button>` interno
+ *   e o clique borbulhava até o `<div>`. Nada disso estava declarado.
+ *
+ * Aqui o "Baixar grátis" é um `<span>` estilizado: mesma aparência, sem
+ * elemento interativo aninhado.
+ */
+
+interface Props {
+  material: Material;
+  variant?: "home" | "downloads";
+}
+
+const { material, variant = "home" } = Astro.props;
+const naHome = variant === "home";
+---
+
+<button
+  type="button"
+  id={`gatilho-${material.id}`}
+  data-material={material.id}
+  class="group block w-full cursor-pointer overflow-hidden rounded-2xl bg-card text-center shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+>
+  <div class="aspect-square overflow-hidden bg-secondary">
+    <img
+      src={material.image.src}
+      width={material.image.width}
+      height={material.image.height}
+      alt={material.nome}
+      class:list={[
+        "h-full w-full object-cover",
+        !naHome && "transition-transform duration-300 group-hover:scale-105",
+      ]}
+      loading="lazy"
+    />
+  </div>
+  <div class="p-4">
+    {
+      naHome ? (
+        <h3 class="font-heading text-sm font-bold text-foreground md:text-base">{material.nome}</h3>
+      ) : (
+        <h2 class="font-heading text-base font-bold text-foreground transition-colors group-hover:text-primary">
+          {material.nome}
+        </h2>
+      )
+    }
+    <span
+      class="mt-3 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-heading font-semibold text-primary-foreground"
+    >
+      <Icon name="lucide:download" class="h-3 w-3" />
+      Baixar grátis
+    </span>
+  </div>
+</button>

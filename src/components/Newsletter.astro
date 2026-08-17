@@ -1,0 +1,53 @@
+---
+import NewsletterForm from "@/components/NewsletterForm";
+
+/**
+ * Casca do formulário de newsletter: a ilha React mais a guarda que protege a
+ * janela entre "o HTML já está na página" e "o JavaScript já assumiu".
+ *
+ * O Astro renderiza o HTML da ilha no build. Então o <form> existe — e responde
+ * a Enter — antes de a hidratação instalar o onSubmit. Um <form> sem action nem
+ * method faz GET para a própria URL, o que colocaria o e-mail digitado na query
+ * string: histórico do navegador, logs do servidor e cabeçalho Referer. Para um
+ * dado pessoal coletado sob consentimento, isso é vazamento.
+ *
+ * A guarda roda no parse (is:inline, fora do grafo de módulos) e escuta submit
+ * na fase de captura, então intercepta antes de qualquer outro handler. Depois
+ * da hidratação ela não faz mais nada: o React marca data-hidratado e o próprio
+ * onSubmit passa a cuidar do preventDefault.
+ */
+
+interface Props {
+  variant?: "compact" | "full";
+}
+
+const { variant = "compact" } = Astro.props;
+---
+
+<div data-ilha-newsletter data-hidratado="false">
+  <NewsletterForm client:visible variant={variant} />
+  <p data-aviso-hidratacao hidden class="mt-2 text-xs text-muted-foreground" role="status">
+    Carregando o formulário… tente novamente em um instante.
+  </p>
+</div>
+
+<script is:inline>
+  // Idempotente: a home tem uma newsletter, os artigos têm outra, e nada impede
+  // que um dia duas apareçam na mesma página.
+  if (!window.__guardaNewsletterInstalada) {
+    window.__guardaNewsletterInstalada = true;
+    document.addEventListener(
+      "submit",
+      (evento) => {
+        const casca = evento.target instanceof Element && evento.target.closest("[data-ilha-newsletter]");
+        if (!casca || casca.getAttribute("data-hidratado") === "true") return;
+
+        evento.preventDefault();
+        evento.stopPropagation();
+        const aviso = casca.querySelector("[data-aviso-hidratacao]");
+        if (aviso) aviso.hidden = false;
+      },
+      true,
+    );
+  }
+</script>

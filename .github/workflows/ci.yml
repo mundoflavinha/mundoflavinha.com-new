@@ -37,3 +37,26 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Depende do build: estas asserções leem o HTML realmente gerado em dist/.
+      - name: Testes sobre o HTML gerado
+        run: npm run test:html
+
+      # As quatro classes de defeito que nada acima alcança: corrida de
+      # hidratação, foco/teclado, chunk que não carrega e submissão de
+      # formulário antes de o JavaScript assumir. Vitest roda em Node, sem
+      # navegador; os testes de dist/ leem HTML parado. Nenhum dos dois vê
+      # hidratação acontecer — e é exatamente ali que mora a ponte do modal.
+      - name: Instalar navegador do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Testes de ponta a ponta
+        run: npm run test:e2e
+
+      - name: Guardar o relatório quando falhar
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

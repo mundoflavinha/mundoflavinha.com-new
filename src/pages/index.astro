@@ -1,15 +1,462 @@
 ---
-// Placeholder da Fase 1: a home real tem islands (modal, newsletter, vídeo)
-// e é portada na Fase 4. Existe aqui só para o build ter uma rota raiz.
 import Layout from "@/layouts/Layout.astro";
 import SectionTitle from "@/components/SectionTitle.astro";
+import Button from "@/components/Button.astro";
+import BotaoMaterial from "@/components/BotaoMaterial.astro";
+import LeadModal from "@/components/LeadModal.astro";
+import Newsletter from "@/components/Newsletter.astro";
+import YouTubeFacade from "@/components/YouTubeFacade.astro";
+import { Icon } from "astro-icon/components";
+import { WHATSAPP } from "@/lib/site";
+import { organizationJsonLd } from "@/lib/seoJsonLd";
+import { MATERIAIS } from "@/data/materiais";
+import heroFamily from "@/assets/hero_family_01.webp";
+import age02 from "@/assets/age-0-2-(1).webp";
+import age35 from "@/assets/age-3-5-(1).webp";
+import age68 from "@/assets/age-6-8-(1).webp";
+import familyPlay from "@/assets/family-play-(1).webp";
+import vinteReais from "@/assets/Artigo/20-reais-para-meus-filhos.webp";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.webp";
+import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.webp";
+import cartaoDiaDosPais from "@/assets/loja flavinha/cartaodiadospais.webp";
+import monocromaticoProduto from "@/assets/loja flavinha/01 monocromatico.webp";
+import achadinho02 from "@/assets/achadinho da flavinha/0-2-achadinhoflavinha.webp";
+import achadinho35 from "@/assets/achadinho da flavinha/3-5-achadinhoflavinha.webp";
+import achadinho68 from "@/assets/achadinho da flavinha/6-8-achadinhoflavinha.webp";
+import achadinhoFamilia from "@/assets/achadinho da flavinha/emfamilia-achadinhoflavinha.webp";
+
+const faixas = [
+  {
+    label: "Brincadeiras de 0 a 2 anos",
+    img: age02,
+    desc: "Atividades para explorar, descobrir e se desenvolver.",
+    path: "/brincadeiras/0-a-2-anos",
+  },
+  {
+    label: "Brincadeiras de 3 a 5 anos",
+    img: age35,
+    desc: "Ideias para aprender brincando todos os dias.",
+    path: "/brincadeiras/3-a-5-anos",
+  },
+  {
+    label: "Brincadeiras de 6 a 8 anos",
+    img: age68,
+    desc: "Desafios criativos para estimular habilidades e autonomia.",
+    path: "/brincadeiras/6-a-8-anos",
+  },
+  {
+    label: "Brincadeiras em família",
+    img: familyPlay,
+    desc: "Para criar memórias, fortalecer vínculos e se divertir juntos.",
+    path: "/brincadeiras/em-familia",
+  },
+];
+
+const achadinhos = [
+  {
+    name: "Brinquedos de 0 a 2 anos",
+    age: "Primeiras descobertas, estímulos sensoriais e muita diversão para os pequenos exploradores.",
+    image: achadinho02,
+    path: "/indicacoes/0-a-2-anos",
+  },
+  {
+    name: "Brinquedos de 3 a 5 anos",
+    age: "Imaginação, criatividade e brincadeiras que transformam aprendizado em aventura.",
+    image: achadinho35,
+    path: "/indicacoes/3-a-5-anos",
+  },
+  {
+    name: "Brinquedos de 6 a 8 anos",
+    age: "Jogos, desafios e atividades que estimulam raciocínio, autonomia e criatividade.",
+    image: achadinho68,
+    path: "/indicacoes/6-a-8-anos",
+  },
+  {
+    name: "Jogos para Brincar em Família",
+    age: "Momentos de conexão, risadas e memórias longe das telas.",
+    image: achadinhoFamilia,
+    path: "/indicacoes/jogos-em-familia",
+  },
+];
+
+const produtosLoja = [
+  {
+    name: "Kit Cartão Criativo Dia dos Pai",
+    price: "R$ 14,99",
+    img: cartaoDiaDosPais,
+    href: "https://www.mundoflavinha.com/dia-dos-pais",
+    externo: true,
+  },
+  {
+    name: "Cartões de Alto Contraste para Bebês",
+    price: "Um kit imprimível para estimular os primeiros olhares do bebê, sem telas e com muito carinho.",
+    img: monocromaticoProduto,
+    href: "/loja/cartoes-alto-contraste-bebes",
+    externo: false,
+  },
+  { name: "Desafio Desconectar para Conectar", price: "R$ 27,00", emoji: "🌟" },
+  { name: "Atividades Sensoriais", price: "R$ 37,00", emoji: "🎨" },
+];
+
+const posts = [
+  {
+    title: "Dei R$20 para cada filho meu no shopping e o que aconteceu me fez pensar!",
+    category: "Reflexão",
+    img: vinteReais,
+    href: "/blog/20-reais-shopping",
+  },
+  {
+    title: "Eu tinha prometido para mim mesma que NÃO iria comprar o álbum da Copa.",
+    category: "Reflexão",
+    img: albumDaCopa,
+    href: "/blog/album-da-copa",
+  },
+  {
+    title: "No carro da minha infância não existia tela. Existia conversa.",
+    category: "Reflexão",
+    img: brincadeiraNoCarro,
+    href: "/blog/brincadeira-no-carro",
+  },
+  {
+    title: "O dia em que meus filhos criaram uma lojinha no prédio.",
+    category: "Reflexão",
+    img: empreendedorismoInfantil,
+    href: "/blog/empreendedorismo-infantil",
+  },
+];
 ---
 
-<Layout>
-  <section class="container py-16">
-    <SectionTitle
-      title="Esqueleto Astro"
-      subtitle="Fase 1 da migração. As páginas reais entram nas fases seguintes."
-    />
+<Layout jsonLd={organizationJsonLd()}>
+  {/* HERO */}
+  <section class="relative overflow-hidden bg-secondary py-12 md:py-20 lg:py-24">
+    <div class="absolute top-10 left-10 w-20 h-20 bg-pastel-yellow/40 rounded-full blur-2xl"></div>
+    <div class="absolute bottom-10 right-10 w-32 h-32 bg-baby-blue/30 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-pink/20 rounded-full blur-2xl"></div>
+
+    <div class="container relative z-10">
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-yellow/60 text-sm font-heading font-semibold text-foreground mb-4">
+            <Icon name="lucide:sparkles" class="w-4 h-4" /> Mundo Flavinha
+          </span>
+          <h1 class="font-heading font-bold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-foreground leading-tight">
+            Menos telas.
+            <br />
+            <span class="text-primary">Mais infância.</span>
+            <br />
+            Mais memórias em família.
+          </h1>
+          <p class="mt-4 md:mt-6 text-muted-foreground text-base md:text-lg leading-relaxed max-w-lg">
+            Brincadeiras, ideias, atividades, materiais, vídeos e recursos para famílias que querem mais conexão com
+            seus filhos.
+          </p>
+          <div class="mt-6 md:mt-8 flex flex-wrap gap-3">
+            <Button
+              href="/brincadeiras"
+              class="rounded-full bg-primary text-primary-foreground font-heading font-bold text-base px-6 py-3 h-auto gap-2"
+            >
+              <Icon name="lucide:star" class="w-4 h-4" /> Ver brincadeiras
+            </Button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-xl">
+            <img
+              src={heroFamily.src}
+              width={heroFamily.width}
+              height={heroFamily.height}
+              alt="Flávia brincando com Lucas e Bárbara"
+              class="w-full h-auto object-cover"
+              fetchpriority="high"
+            />
+          </div>
+          <div class="absolute -bottom-4 -left-4 w-24 h-24 bg-mint/50 rounded-full blur-xl"></div>
+          <div class="absolute -top-4 -right-4 w-20 h-20 bg-pastel-yellow/50 rounded-full blur-xl"></div>
+        </div>
+      </div>
+    </div>
   </section>
+
+  {/* VIDEO DESTAQUE */}
+  <section class="py-16 md:py-20">
+    <div class="container">
+      <SectionTitle
+        title="Novo vídeo no canal"
+        subtitle="Toda segunda e quinta tem vídeo novo no canal Mundo Flavinha."
+      />
+      <div class="max-w-3xl mx-auto">
+        <div class="relative rounded-2xl overflow-hidden shadow-lg bg-foreground/5 aspect-video">
+          <YouTubeFacade
+            videoId="uuaYyN7v8H4"
+            title="Novo vídeo no canal Mundo Flavinha"
+            start={19}
+            class="h-full w-full"
+          />
+        </div>
+        <div class="mt-6 flex flex-wrap justify-center gap-3">
+          <Button
+            href="https://www.youtube.com/@mundoflavinha"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2"
+          >
+            <Icon name="lucide:play" class="w-4 h-4" /> Assistir no YouTube
+          </Button>
+          <Button
+            href="/videos"
+            variant="outline"
+            class="rounded-full font-heading font-bold border-primary/30 text-foreground hover:bg-primary/10 gap-2"
+          >
+            Ver todos os vídeos <Icon name="lucide:arrow-right" class="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* BRINCADEIRAS POR IDADE */}
+  <section class="py-16 md:py-20 bg-secondary/50">
+    <div class="container">
+      <SectionTitle
+        title="Brincadeiras por idade"
+        subtitle="Encontre brincadeiras perfeitas para cada fase do desenvolvimento"
+      />
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {
+          faixas.map((item) => (
+            <a
+              href={item.path}
+              class="reveal block overflow-hidden rounded-2xl bg-card shadow-sm transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-md"
+            >
+              <div class="aspect-square overflow-hidden">
+                <img
+                  src={item.img.src}
+                  width={item.img.width}
+                  height={item.img.height}
+                  alt={item.label}
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div class="p-4 text-center">
+                <h3 class="font-heading font-bold text-foreground">{item.label}</h3>
+                <p class="text-xs text-muted-foreground mt-1">{item.desc}</p>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  {/* DOWNLOADS GRATUITOS */}
+  <section class="py-16 md:py-20">
+    <div class="container">
+      <SectionTitle
+        title="Materiais gratuitos para imprimir e brincar"
+        subtitle="Atividades educativas prontas para famílias, professores e escolas incentivarem o aprendizado de forma lúdica."
+      />
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {MATERIAIS.map((material) => <BotaoMaterial material={material} variant="home" />)}
+      </div>
+    </div>
+  </section>
+
+  {/* INDICAÇÕES DA FLAVINHA */}
+  <section class="py-16 md:py-20 bg-pastel-yellow/20">
+    <div class="container">
+      <SectionTitle
+        title="Achadinhos da Flavinha"
+        subtitle="Brinquedos, jogos e materiais que ajudam a criar memórias. Uma seleção especial de produtos que fizeram parte da infância dos meus filhos, Lucas e Bárbara, além de outras recomendações que acredito no poder do brincar, da criatividade e da conexão entre pais e filhos."
+      />
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {
+          achadinhos.map((item) => (
+            <div class="reveal rounded-2xl bg-card p-5 shadow-sm transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-md">
+              <a href={item.path} class="group block">
+                <div class="aspect-square bg-secondary rounded-xl mb-3 overflow-hidden">
+                  <img
+                    src={item.image.src}
+                    width={item.image.width}
+                    height={item.image.height}
+                    alt={item.name}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 class="font-heading font-bold text-sm text-foreground transition-colors group-hover:text-primary">
+                  {item.name}
+                </h3>
+                <p class="text-xs text-muted-foreground mt-1 leading-snug">{item.age}</p>
+                <span class="mt-3 inline-flex w-full items-center justify-center rounded-full border border-primary/30 px-3 py-1.5 text-xs font-heading text-foreground">
+                  Ver recomendações
+                </span>
+              </a>
+            </div>
+          ))
+        }
+      </div>
+      <div class="text-center mt-8">
+        <Button
+          href="/indicacoes"
+          variant="outline"
+          class="rounded-full font-heading font-bold border-primary/30 text-foreground hover:bg-primary/10 gap-2"
+        >
+          Ver todas as indicações <Icon name="lucide:arrow-right" class="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  {/* LOJA FLAVINHA */}
+  <section class="py-16 md:py-20">
+    <div class="container">
+      <SectionTitle
+        title="Loja Flavinha"
+        subtitle="Atividades prontas para imprimir, brincar e aprender - em casa ou na escola."
+      />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {
+          produtosLoja.map((item) => (
+            <div class="reveal rounded-2xl bg-card p-5 shadow-sm transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-md">
+              <div class="aspect-[4/3] bg-lilac/20 rounded-xl mb-3 flex items-center justify-center text-4xl overflow-hidden">
+                {
+                  item.img ? (
+                    <img
+                      src={item.img.src}
+                      width={item.img.width}
+                      height={item.img.height}
+                      alt={item.name}
+                      class="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    item.emoji
+                  )
+                }
+              </div>
+              <h3 class="font-heading font-bold text-sm text-foreground">{item.name}</h3>
+              <p class="text-primary font-bold mt-1">{item.price}</p>
+              <Button
+                href={item.href}
+                target={item.externo ? "_blank" : undefined}
+                rel={item.externo ? "noopener noreferrer" : undefined}
+                size="sm"
+                class="mt-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-xs w-full"
+              >
+                Conhecer material
+              </Button>
+            </div>
+          ))
+        }
+      </div>
+      <div class="text-center mt-8">
+        <Button
+          href="/loja"
+          variant="outline"
+          class="rounded-full font-heading font-bold border-primary/30 text-foreground hover:bg-primary/10 gap-2"
+        >
+          Ver toda a loja <Icon name="lucide:arrow-right" class="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  {/* BLOG */}
+  <section class="py-16 md:py-20 bg-secondary/50">
+    <div class="container">
+      <SectionTitle
+        title="Blog da Flavinha"
+        subtitle="Reflexões, dicas e histórias reais sobre maternidade, infância e conexão em família"
+      />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {
+          posts.map((post) => (
+            <a
+              href={post.href}
+              class="reveal block h-full overflow-hidden rounded-2xl bg-card shadow-sm transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-md"
+            >
+              <div class="aspect-[4/3] overflow-hidden bg-mint/20">
+                <img
+                  src={post.img.src}
+                  width={post.img.width}
+                  height={post.img.height}
+                  alt={post.title}
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div class="p-4">
+                <span class="text-xs font-heading font-semibold text-primary">{post.category}</span>
+                <h3 class="font-heading font-bold text-sm text-foreground mt-1 leading-snug">{post.title}</h3>
+                <span class="inline-flex items-center gap-1 mt-3 text-xs font-heading font-semibold text-primary">
+                  Ler mais <Icon name="lucide:arrow-right" class="w-3 h-3" />
+                </span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+      <div class="mt-8 text-center">
+        <Button
+          href="/blog"
+          variant="outline"
+          class="rounded-full font-heading font-bold border-primary/30 text-foreground hover:bg-primary/10 gap-2"
+        >
+          Leia mais <Icon name="lucide:arrow-right" class="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  {
+    /* WHATSAPP GROUP — só aparece quando houver convite real cadastrado em
+       src/lib/site.ts (WHATSAPP.convitegrupo). */
+    WHATSAPP.convitegrupo && (
+      <section class="py-16 md:py-20">
+        <div class="container">
+          <div class="max-w-2xl mx-auto text-center bg-mint/20 rounded-3xl p-8 md:p-12">
+            <div class="w-16 h-16 rounded-full bg-mint/50 flex items-center justify-center mx-auto mb-4">
+              <Icon name="lucide:message-circle" class="w-8 h-8 text-foreground" />
+            </div>
+            <h2 class="font-heading font-bold text-2xl md:text-3xl text-foreground">
+              Grupo do WhatsApp sobre brincar
+            </h2>
+            <p class="mt-3 text-muted-foreground leading-relaxed">
+              Entre para o grupo do WhatsApp e receba ideias de brincadeiras, inspirações e novidades do Mundo
+              Flavinha.
+            </p>
+            <Button
+              href={WHATSAPP.convitegrupo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-6 rounded-full bg-[hsl(142,70%,45%)] text-primary-foreground font-heading font-bold text-base px-8 py-3 h-auto gap-2 hover:bg-[hsl(142,70%,40%)]"
+            >
+              <Icon name="lucide:message-circle" class="w-5 h-5" /> Entrar no grupo
+            </Button>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {/* NEWSLETTER */}
+  <section class="py-16 md:py-20 bg-lilac/10">
+    <div class="container">
+      <div class="max-w-xl mx-auto text-center">
+        <Icon name="lucide:heart" class="w-10 h-10 text-pink mx-auto mb-4" />
+        <h2 class="font-heading font-bold text-2xl md:text-3xl text-foreground">
+          Receba novidades e ideias para brincar
+        </h2>
+        <p class="mt-3 text-muted-foreground">
+          Receba novidades, materiais e ideias para brincar com seus filhos.
+        </p>
+        <Newsletter variant="full" />
+      </div>
+    </div>
+  </section>
+
+  <LeadModal />
 </Layout>

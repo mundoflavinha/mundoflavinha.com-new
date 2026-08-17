@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,26 @@ interface NewsletterFormProps {
   variant?: "compact" | "full";
 }
 
+/**
+ * Ilha React. O restante da página é HTML estático.
+ *
+ * Duas mudanças em relação à versão SPA, ambas por causa da hidratação tardia:
+ *
+ * 1. `elapsedMs` passa a ser `performance.now()` — milissegundos desde o
+ *    carregamento da página — em vez de "desde a montagem do componente". Na
+ *    SPA os dois coincidiam; numa ilha `client:visible` a montagem acontece
+ *    quando o formulário entra na tela, que é justamente quando a pessoa vai
+ *    preenchê-lo. O servidor descarta em silêncio (HTTP 201, tela de sucesso)
+ *    qualquer envio com menos de 2s — ver MIN_PREENCHIMENTO_MS em api/lead.ts.
+ *    Medir a partir da hidratação encolheria essa janela e jogaria fora leads
+ *    de verdade sem ninguém perceber, dos dois lados.
+ *
+ * 2. O formulário avisa quando hidratou, marcando `data-hidratado` na casca.
+ *    Antes disso o HTML já está na página e um Enter dispararia o submit
+ *    nativo — GET para a própria URL, com o e-mail digitado virando query
+ *    string no histórico, nos logs e no cabeçalho Referer. Ver a guarda em
+ *    Newsletter.astro.
+ */
 const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
   const isFull = variant === "full";
 
@@ -24,7 +44,11 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
   const [optInWhatsapp, setOptInWhatsapp] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<Status>("idle");
-  const renderedAt = useRef(Date.now());
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    formRef.current?.closest("[data-ilha-newsletter]")?.setAttribute("data-hidratado", "true");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +68,7 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
         optInEmail: true,
         optInWhatsapp: isFull && whatsapp ? optInWhatsapp : false,
         hp: honeypot,
-        elapsedMs: Date.now() - renderedAt.current,
+        elapsedMs: Math.round(performance.now()),
       });
 
       setStatus("success");
@@ -59,30 +83,51 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
   };
 
   if (status === "success") {
-    return <p className="text-sm text-muted-foreground">Inscrição confirmada! Fique de olho no seu e-mail. 💌</p>;
+    return (
+      <p role="status" className="text-sm text-muted-foreground">
+        Inscrição confirmada! Fique de olho no seu e-mail. 💌
+      </p>
+    );
   }
 
   if (isFull) {
     return (
-      <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+      <form ref={formRef} onSubmit={handleSubmit} className="mt-6 space-y-3">
         <HoneypotField value={honeypot} onChange={setHoneypot} />
 
+        <label className="sr-only" htmlFor="newsletter-nome">
+          Seu nome
+        </label>
         <Input
+          id="newsletter-nome"
           placeholder="Seu nome"
+          autoComplete="name"
           className="rounded-full border-border text-center"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
         />
+
+        <label className="sr-only" htmlFor="newsletter-email">
+          Seu e-mail
+        </label>
         <Input
+          id="newsletter-email"
           type="email"
           placeholder="Seu e-mail"
+          autoComplete="email"
           required
           className="rounded-full border-border text-center"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
+        <label className="sr-only" htmlFor="newsletter-whatsapp">
+          WhatsApp com DDD (opcional)
+        </label>
         <Input
+          id="newsletter-whatsapp"
           placeholder="WhatsApp com DDD (opcional)"
+          autoComplete="tel"
           className="rounded-full border-border text-center"
           value={whatsapp}
           onChange={(e) => setWhatsapp(e.target.value)}
@@ -110,7 +155,11 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
           )}
         </div>
 
-        {status === "error" && <p className="text-xs text-destructive">Não foi possível enviar. Tente novamente.</p>}
+        {status === "error" && (
+          <p role="alert" className="text-xs text-destructive">
+            Não foi possível enviar. Tente novamente.
+          </p>
+        )}
 
         <Button
           type="submit"
@@ -125,11 +174,16 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+      <form ref={formRef} onSubmit={handleSubmit} className="mt-4 flex gap-2">
         <HoneypotField value={honeypot} onChange={setHoneypot} />
+        <label className="sr-only" htmlFor="newsletter-email-compact">
+          Seu e-mail
+        </label>
         <Input
+          id="newsletter-email-compact"
           type="email"
           placeholder="Seu e-mail"
+          autoComplete="email"
           required
           className="rounded-full bg-card"
           value={email}
@@ -145,7 +199,11 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
         </Button>
       </form>
 
-      {status === "error" && <p className="mt-1 text-xs text-destructive">Não foi possível enviar. Tente novamente.</p>}
+      {status === "error" && (
+        <p role="alert" className="mt-1 text-xs text-destructive">
+          Não foi possível enviar. Tente novamente.
+        </p>
+      )}
 
       <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
         {comLinkPolitica(CONSENT_TEXTS.newsletter_compact)}

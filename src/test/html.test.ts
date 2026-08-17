@@ -97,12 +97,81 @@ describe.skipIf(arquivos.length === 0)("regras específicas", () => {
     expect(html).toMatch(/<meta name="robots" content="noindex">/);
   });
 
-  it("nenhuma página estática carrega runtime de framework", () => {
-    // O ganho central da migração. Se um <script src> de framework aparecer
-    // numa página que não deveria ter island, algo virou island sem querer.
-    const home = readFileSync(join(DIST, "index.html"), "utf-8");
-    const scriptsExternos = home.match(/<script[^>]+src="([^"]+)"/g) ?? [];
-    expect(scriptsExternos, `home carregou: ${scriptsExternos.join(", ")}`).toEqual([]);
+  /**
+   * O ganho central da migração: só as páginas que PRECISAM de React pagam por
+   * ele.
+   *
+   * A versão anterior deste teste procurava `<script src=...>` e passava
+   * sempre — inclusive depois de a home ganhar duas ilhas. O Astro não emite
+   * `src` para ilha nenhuma: ele inlina um `<script type="module">` que faz
+   * `import("/_astro/Componente.hash.js")`. A regex olhava para um atributo
+   * que nunca existiu ali. Verde cobrindo nada.
+   *
+   * A asserção correta é sobre as duas coisas que o Astro de fato emite: o
+   * elemento `<astro-island>` e a referência ao chunk em `/_astro/*.js`.
+   */
+  const ILHAS_ESPERADAS: Record<string, number> = {
+    "/index.html": 2, // NewsletterForm + LeadCaptureModal
+    "/downloads/index.html": 1, // LeadCaptureModal
+    "/videos/index.html": 1, // GaleriaVideos
+    "/blog/20-reais-shopping/index.html": 1, // NewsletterForm no ArtigoLayout
+    "/blog/album-da-copa/index.html": 1,
+    "/blog/brincadeira-no-carro/index.html": 1,
+    "/blog/empreendedorismo-infantil/index.html": 1,
+    "/blog/presenca-pequenos-momentos/index.html": 1,
+  };
+
+  it.each(conteudosGlobais.map((c) => c.rota))("%s tem exatamente o número de ilhas previsto", (rota) => {
+    const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
+    const ilhas = (html.match(/<astro-island\b/g) ?? []).length;
+    expect(ilhas, `ilhas inesperadas — se foi intencional, declare em ILHAS_ESPERADAS`).toBe(
+      ILHAS_ESPERADAS[rota] ?? 0,
+    );
+  });
+
+  it.each(conteudosGlobais.map((c) => c.rota))("%s só baixa JS de framework se tiver ilha", (rota) => {
+    const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
+    const chunks = [...new Set(html.match(/_astro\/[A-Za-z0-9_.-]+\.js/g) ?? [])];
+    if (ILHAS_ESPERADAS[rota]) {
+      expect(chunks.length, "página com ilha deveria carregar pelo menos um chunk").toBeGreaterThan(0);
+    } else {
+      expect(chunks, `${rota} baixa JS sem ter ilha: ${chunks.join(", ")}`).toEqual([]);
+    }
+  });
+
+  /**
+   * Conteúdo interativo não pode aninhar conteúdo interativo.
+   *
+   * Não é purismo de spec: o navegador "conserta" o HTML inválido de formas
+   * diferentes, o alvo do clique fica ambíguo, e leitor de tela anuncia um
+   * controle dentro de outro. Esta classe de bug apareceu três vezes neste
+   * código — `<a><button>` nos cards da Loja, `<button><button>` nos cards de
+   * /downloads, e `<a><button>` em vários pontos da home — sempre pelo mesmo
+   * motivo: o `<Button>` do shadcn renderiza `<button>` e era usado como se
+   * fosse um rótulo. A versão Astro usa `<span>` estilizado nesses lugares.
+   */
+  it("nenhum controle interativo dentro de outro", () => {
+    const ABERTURA = /<(a|button)\b[^>]*>/gi;
+    const problemas = conteudosGlobais.flatMap(({ rota, html }) => {
+      const corpo = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+      const pilha: string[] = [];
+      const achados: string[] = [];
+      // Percorre só as tags de interesse, na ordem, mantendo profundidade.
+      for (const trecho of corpo.split(/(?=<\/?(?:a|button)\b)/i)) {
+        if (/^<\/(a|button)\b/i.test(trecho)) {
+          pilha.pop();
+          continue;
+        }
+        const abre = trecho.match(ABERTURA);
+        if (!abre) continue;
+        const tag = abre[0].match(/^<(a|button)/i)![1].toLowerCase();
+        if (pilha.length > 0) achados.push(`${rota}: <${pilha.join("><")}> contém <${tag}>`);
+        pilha.push(tag);
+      }
+      return achados;
+    });
+
+    expect(problemas, problemas.slice(0, 10).join("\n")).toEqual([]);
   });
 
   it("todo <img> sai com width e height", () => {

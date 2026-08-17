@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { ROTAS_LEGAIS } from "@/lib/site";
 
 /**
@@ -13,6 +12,12 @@ import { ROTAS_LEGAIS } from "@/lib/site";
  * Mora aqui, e não junto dos componentes de consentimento, porque é função pura
  * consumida por dois componentes — exportá-la de um arquivo de componente
  * quebra o Fast Refresh do Vite.
+ *
+ * Usa <a href>, não <Link> do react-router: os formulários agora são ilhas
+ * Astro isoladas, e dentro de uma ilha não existe Router. O <Link> lançaria
+ * "useHref() may be used only in the context of a <Router>" em runtime — erro
+ * que nenhum teste de unidade pegaria, porque o Router existia no App.tsx que
+ * envolvia tudo e deixou de existir.
  */
 export const comLinkPolitica = (texto: string): ReactNode => {
   const marcador = "Política de Privacidade";
@@ -22,13 +27,16 @@ export const comLinkPolitica = (texto: string): ReactNode => {
   return (
     <>
       {texto.slice(0, indice)}
-      <Link
-        to={ROTAS_LEGAIS.privacidade}
+      <a
+        href={ROTAS_LEGAIS.privacidade}
         className="text-primary underline underline-offset-2 hover:opacity-80"
+        // O texto de consentimento vive dentro de um <label> que envolve o
+        // checkbox: sem isto, clicar no link também marcaria/desmarcaria a
+        // caixa — registrando um consentimento que ninguém deu.
         onClick={(event) => event.stopPropagation()}
       >
         {marcador}
-      </Link>
+      </a>
       {texto.slice(indice + marcador.length)}
     </>
   );

@@ -1,0 +1,121 @@
+---
+import LeadCaptureModal from "@/components/LeadCaptureModal";
+import { EVENTO_ABRIR_MATERIAL, TIMEOUT_HIDRATACAO_MS } from "@/lib/leadBridge";
+
+/**
+ * A ponte entre os gatilhos estáticos e a ilha do modal.
+ *
+ * O problema: os cards de download são HTML estático e o modal é uma ilha
+ * React. Entre o HTML aparecer e o React assumir existe uma janela — curta num
+ * desktop rápido, longa num celular ruim — em que um clique não teria para
+ * onde ir. Sem contrato explícito, esse clique some sem deixar rastro.
+ *
+ * O protocolo tem três partes:
+ *
+ *   1. a CAIXA (este elemento) guarda o material pendente e quem o acionou;
+ *   2. o EVENTO avisa a ilha, quando ela já estiver ouvindo;
+ *   3. o ESTADO (`data-estado`) diz em que ponto estamos e evita clique duplo.
+ *
+ * Política de clique múltiplo: o PRIMEIRO vence enquanto estiver pendente. Uma
+ * fila não faz sentido — existe um modal só, e abrir quatro em sequência não é
+ * o que ninguém quis. "Último vence" também não: mostraria um material
+ * diferente do que a pessoa acha que pediu.
+ *
+ * O script é `is:inline` de propósito. Um <script> normal do Astro vira módulo
+ * com `defer`, e módulo adiado é exatamente o que não serve aqui: ele
+ * executaria tarde demais para cobrir a janela que motivou a caixa.
+ */
+---
+
+<div
+  data-lead-mailbox
+  data-estado="idle"
+  data-pendente=""
+  data-acionador=""
+  class="sr-only"
+  role="status"
+  aria-live="polite"
+>
+</div>
+
+<LeadCaptureModal client:load />
+
+<script is:inline define:vars={{ EVENTO_ABRIR_MATERIAL, TIMEOUT_HIDRATACAO_MS }}>
+  (() => {
+    const mailbox = document.querySelector("[data-lead-mailbox]");
+    if (!mailbox) return;
+
+    let temporizador = null;
+
+    const anunciar = (texto) => {
+      mailbox.textContent = texto;
+    };
+
+    const liberar = (gatilho) => {
+      mailbox.dataset.estado = "idle";
+      if (temporizador) clearTimeout(temporizador);
+      temporizador = null;
+      // aria-disabled em vez de `disabled`: um botão desabilitado perde o foco
+      // e não pode recebê-lo de volta quando o modal fechar.
+      gatilho?.removeAttribute("aria-busy");
+    };
+
+    document.addEventListener("click", (evento) => {
+      const gatilho = evento.target instanceof Element && evento.target.closest("[data-material]");
+      if (!gatilho) return;
+
+      const jaHidratou = mailbox.dataset.estado === "hidratado";
+
+      // Já existe um pedido em voo e a ilha ainda não assumiu: ignora, para não
+      // trocar o material debaixo de quem já clicou.
+      if (!jaHidratou && mailbox.dataset.estado === "pendente") return;
+
+      const material = gatilho.getAttribute("data-material");
+      if (!material) return;
+
+      // Grava a caixa ANTES de disparar o evento: se a ilha hidratar entre uma
+      // linha e outra, ela encontra o pendente em vez de perder o clique.
+      if (!jaHidratou) {
+        mailbox.dataset.pendente = material;
+        mailbox.dataset.acionador = gatilho.id || "";
+        mailbox.dataset.estado = "pendente";
+        gatilho.setAttribute("aria-busy", "true");
+        anunciar("Abrindo formulário…");
+
+        temporizador = setTimeout(() => {
+          if (mailbox.dataset.estado !== "pendente") return;
+          mailbox.dataset.estado = "falhou";
+          delete mailbox.dataset.pendente;
+          delete mailbox.dataset.acionador;
+          gatilho.removeAttribute("aria-busy");
+          anunciar("Não foi possível carregar o formulário. Recarregue a página e tente de novo.");
+        }, TIMEOUT_HIDRATACAO_MS);
+      }
+
+      window.dispatchEvent(
+        new CustomEvent(EVENTO_ABRIR_MATERIAL, {
+          detail: { material, acionador: gatilho.id || null },
+        }),
+      );
+
+      if (!jaHidratou) {
+        // A ilha marca `hidratado` ao montar; quando isso acontecer, solta o
+        // botão. Observar é mais barato e mais exato que ficar consultando.
+        const observador = new MutationObserver(() => {
+          if (mailbox.dataset.estado === "hidratado") {
+            observador.disconnect();
+            liberar(gatilho);
+          }
+        });
+        observador.observe(mailbox, { attributes: true, attributeFilter: ["data-estado"] });
+      }
+    });
+  })();
+</script>
+
+<noscript>
+  <p class="container py-4 text-sm text-muted-foreground">
+    O formulário de download precisa de JavaScript. Se preferir, fale com a gente pelo WhatsApp que
+    enviamos o material.
+  </p>
+</noscript>

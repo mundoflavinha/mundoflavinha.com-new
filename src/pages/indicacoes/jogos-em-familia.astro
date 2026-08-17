@@ -44,12 +44,10 @@ const featuredProducts = products.slice(0, 3);
           </div>
           <div class="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
             <p class="font-heading font-bold text-xl text-foreground">Veja os jogos recomendados</p>
-            <a href="#produtos" class="sm:ml-auto">
-              <Button class="rounded-full font-heading">
-                Ver todos os jogos
-                <Icon name="lucide:arrow-down" class="ml-2 h-4 w-4" />
-              </Button>
-            </a>
+            <Button href="#produtos" class="sm:ml-auto rounded-full font-heading">
+              Ver todos os jogos
+              <Icon name="lucide:arrow-down" class="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </div>
 
@@ -136,12 +134,15 @@ const featuredProducts = products.slice(0, 3);
                   <Icon name="lucide:users" class="h-3.5 w-3.5 text-primary" />
                   Indicado: {product.recommendedAge}
                 </div>
-                <a href={product.link} target="_blank" rel="noopener noreferrer" class="mt-auto">
-                  <Button class="w-full rounded-full font-heading">
-                    Ver mais
-                    <Icon name="lucide:external-link" class="ml-2 h-4 w-4" />
-                  </Button>
-                </a>
+                <Button
+                  href={product.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-auto w-full rounded-full font-heading"
+                >
+                  Ver mais
+                  <Icon name="lucide:external-link" class="ml-2 h-4 w-4" />
+                </Button>
               </div>
             </article>
           ))

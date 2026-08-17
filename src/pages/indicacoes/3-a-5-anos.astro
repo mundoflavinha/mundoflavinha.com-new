@@ -54,11 +54,12 @@ const favoriteProducts = products.slice(0, 3);
               }
             </div>
             <p class="mt-6 text-lg font-heading font-semibold text-foreground">Veja os brinquedos recomendados</p>
-            <a href="#produtos">
-              <Button class="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2">
-                Ver todos os brinquedos <Icon name="lucide:arrow-down" class="w-4 h-4" />
-              </Button>
-            </a>
+            <Button
+              href="#produtos"
+              class="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2"
+            >
+              Ver todos os brinquedos <Icon name="lucide:arrow-down" class="w-4 h-4" />
+            </Button>
           </div>
 
           <div>
@@ -146,11 +147,14 @@ const favoriteProducts = products.slice(0, 3);
                 Indicado: {item.recommendedAge}
               </p>
               {item.link ? (
-                <a href={item.link} target="_blank" rel="noopener noreferrer">
-                  <Button class="mt-5 rounded-full bg-primary text-primary-foreground font-heading font-semibold gap-2 w-full">
-                    Ver mais <Icon name="lucide:external-link" class="w-4 h-4" />
-                  </Button>
-                </a>
+                <Button
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-5 rounded-full bg-primary text-primary-foreground font-heading font-semibold gap-2 w-full"
+                >
+                  Ver mais <Icon name="lucide:external-link" class="w-4 h-4" />
+                </Button>
               ) : (
                 <Button disabled class="mt-5 rounded-full font-heading font-semibold gap-2 w-full">
                   Link em breve
