@@ -1,0 +1,173 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import PageBanner from "@/components/PageBanner.astro";
+import Button from "@/components/Button.astro";
+import { Icon } from "astro-icon/components";
+import { products as products02 } from "@/data/achadinhos02";
+import { products as products35 } from "@/data/achadinhos35";
+import { products as products68 } from "@/data/achadinhos68";
+import { products as productsFamilia } from "@/data/achadinhosFamilia";
+
+const filtros = ["Todos", "0-2 anos", "3-5 anos", "6-8 anos", "Em família"];
+
+const produtos = [
+  ...products02.map((item) => ({ ...item, category: "0-2 anos" })),
+  ...products35.map((item) => ({ ...item, category: "3-5 anos" })),
+  ...products68.map((item) => ({ ...item, category: "6-8 anos" })),
+  ...productsFamilia.map((item) => ({ ...item, category: "Em família" })),
+];
+---
+
+<Layout
+  title="Achadinhos da Flavinha"
+  description="Brinquedos, jogos e materiais que ajudam a criar memórias. Uma seleção especial para incentivar o brincar, a criatividade e a conexão entre pais e filhos."
+>
+  <PageBanner
+    title="Achadinhos da Flavinha"
+    subtitle="Brinquedos, jogos e materiais que ajudam a criar memórias. Uma seleção especial para incentivar o brincar, a criatividade e a conexão entre pais e filhos."
+    bgColor="bg-pastel-yellow/20"
+  />
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      <div class="mb-5 text-center">
+        <p id="contador" data-sufixo="achadinhos disponíveis" class="text-sm font-medium text-muted-foreground">
+          {produtos.length} achadinhos disponíveis
+        </p>
+      </div>
+
+      <div class="mb-8 flex flex-wrap justify-center gap-2">
+        {
+          filtros.map((filtro) => (
+            <button
+              type="button"
+              data-filtro={filtro}
+              aria-pressed={filtro === "Todos" ? "true" : "false"}
+              class:list={[
+                "rounded-full px-4 py-2 text-sm font-heading font-semibold transition-colors",
+                filtro === "Todos" ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground/70 hover:bg-secondary/80",
+              ]}
+            >
+              {filtro}
+            </button>
+          ))
+        }
+      </div>
+
+      <div id="grid" aria-live="polite" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          produtos.map((item) => (
+            <article
+              data-categoria={item.category}
+              class="reveal overflow-hidden rounded-2xl bg-card p-5 shadow-sm transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-md"
+            >
+              {item.link ? (
+                <a href={item.link} target="_blank" rel="noopener noreferrer" class="group block">
+                  <div class="aspect-square overflow-hidden rounded-xl bg-secondary">
+                    <img
+                      src={item.image.src}
+                      width={item.image.width}
+                      height={item.image.height}
+                      alt={item.title}
+                      class="h-full w-full object-contain p-3 transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-heading font-bold text-primary">
+                      <Icon name="lucide:star" class="h-3 w-3" />
+                      {item.category}
+                    </span>
+                    <span class="rounded-full bg-pastel-yellow/60 px-2.5 py-1 text-xs font-heading font-bold text-foreground">
+                      {item.recommendedAge}
+                    </span>
+                  </div>
+                  <h2 class="mt-3 font-heading text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+                    {item.title}
+                  </h2>
+                  {item.eyebrow ? <p class="mt-1 text-sm font-heading font-semibold text-primary">{item.eyebrow}</p> : null}
+                  <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </a>
+              ) : (
+                <div class="group">
+                  <div class="aspect-square overflow-hidden rounded-xl bg-secondary">
+                    <img
+                      src={item.image.src}
+                      width={item.image.width}
+                      height={item.image.height}
+                      alt={item.title}
+                      class="h-full w-full object-contain p-3 transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-heading font-bold text-primary">
+                      <Icon name="lucide:star" class="h-3 w-3" />
+                      {item.category}
+                    </span>
+                    <span class="rounded-full bg-pastel-yellow/60 px-2.5 py-1 text-xs font-heading font-bold text-foreground">
+                      {item.recommendedAge}
+                    </span>
+                  </div>
+                  <h2 class="mt-3 font-heading text-lg font-bold leading-tight text-foreground">{item.title}</h2>
+                  {item.eyebrow ? <p class="mt-1 text-sm font-heading font-semibold text-primary">{item.eyebrow}</p> : null}
+                  <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </div>
+              )}
+
+              {item.link ? (
+                <a href={item.link} target="_blank" rel="noopener noreferrer">
+                  <Button size="sm" class="mt-4 w-full gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground">
+                    Ver mais
+                    <Icon name="lucide:external-link" class="h-3.5 w-3.5" />
+                  </Button>
+                </a>
+              ) : (
+                <Button
+                  disabled
+                  size="sm"
+                  class="mt-4 w-full rounded-full bg-primary font-heading font-bold text-primary-foreground"
+                >
+                  Link em breve
+                </Button>
+              )}
+            </article>
+          ))
+        }
+      </div>
+
+      <p class="mt-8 text-center text-xs text-muted-foreground/70">
+        Alguns links desta página podem gerar comissão sem custo extra para você.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    const botoes = document.querySelectorAll("[data-filtro]");
+    const cartoes = document.querySelectorAll("[data-categoria]");
+    const contador = document.getElementById("contador");
+    const sufixo = contador?.dataset.sufixo ?? "";
+
+    function aplicarFiltro(filtro: string) {
+      let visiveis = 0;
+      cartoes.forEach((cartao) => {
+        const mostra = filtro === "Todos" || cartao.getAttribute("data-categoria") === filtro;
+        (cartao as HTMLElement).hidden = !mostra;
+        if (mostra) visiveis++;
+      });
+      if (contador) contador.textContent = `${visiveis} ${sufixo}`;
+      botoes.forEach((botao) => {
+        const ativo = botao.getAttribute("data-filtro") === filtro;
+        botao.setAttribute("aria-pressed", String(ativo));
+        botao.classList.toggle("bg-primary", ativo);
+        botao.classList.toggle("text-primary-foreground", ativo);
+        botao.classList.toggle("bg-secondary", !ativo);
+        botao.classList.toggle("text-foreground/70", !ativo);
+      });
+    }
+
+    botoes.forEach((botao) => {
+      botao.addEventListener("click", () => aplicarFiltro(botao.getAttribute("data-filtro") ?? "Todos"));
+    });
+  </script>
+</Layout>

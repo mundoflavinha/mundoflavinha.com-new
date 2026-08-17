@@ -1,0 +1,254 @@
+---
+import { Icon } from "astro-icon/components";
+import Layout from "@/layouts/Layout.astro";
+
+/**
+ * Layout compartilhado das 4 páginas de detalhe de brincadeira. As 4 eram
+ * ~87% idênticas no React; as diferenças reais (não cosméticas) viram props
+ * explícitas em vez de 4 cópias quase iguais:
+ *
+ * - só a página "0 a 2 anos" NÃO prefixa os títulos dos blocos com emoji
+ * - "6 a 8 anos" e "em família" têm um botão de vídeo (a Familia sempre tem
+ *   `videoUrl`; a 6-8 só às vezes — checar truthy cobre os dois casos)
+ * - "6 a 8 anos" e "em família" cortam idade/tempo no primeiro ponto
+ *   (o dataset delas guarda frase completa: "A partir de 6 anos.")
+ * - "6 a 8 anos" usa object-contain na imagem (as outras, object-cover)
+ * - cor de fundo do hero e ícone do selo "Card NN" mudam por faixa etária
+ */
+
+interface BrincadeiraBase {
+  id: number;
+  slug: string;
+  title: string;
+  image: ImageMetadata;
+  age: string;
+  time: string;
+  mess: string;
+  summary: string;
+  importance: string;
+  prepare: string;
+  play: string;
+  learns: string[];
+  skills: string[];
+  flavinhaTip: string;
+  adaptation: string[];
+  adultAttention: string;
+  finalPhrase: string;
+  videoUrl?: string;
+}
+
+interface Props {
+  brincadeira: BrincadeiraBase;
+  backHref: string;
+  backLabel: string;
+  heroBgClass: string;
+  badgeIcon: string;
+  imageFit?: "cover" | "contain";
+  cortarNoPonto?: boolean;
+  emojiTitulos?: boolean;
+}
+
+const {
+  brincadeira: b,
+  backHref,
+  backLabel,
+  heroBgClass,
+  badgeIcon,
+  imageFit = "cover",
+  cortarNoPonto = false,
+  emojiTitulos = true,
+} = Astro.props;
+
+const primeiraFrase = (s: string) => (cortarNoPonto ? s.split(".")[0] : s);
+
+const blocos = [
+  { emoji: "👶", titulo: "Idade recomendada", conteudo: b.age },
+  { emoji: "⏱️", titulo: "Tempo de atividade", conteudo: b.time },
+  { emoji: "⭐", titulo: "Nível de bagunça", conteudo: b.mess },
+  { emoji: "🧺", titulo: "Como preparar", conteudo: b.prepare },
+  { emoji: "🎉", titulo: "Como brincar", conteudo: b.play },
+] as const;
+
+const tituloBloco = (emoji: string, texto: string) => (emojiTitulos ? `${emoji} ${texto}` : texto);
+---
+
+<Layout title={b.title} description={b.summary} image={b.image.src}>
+  <article>
+    <section class:list={[heroBgClass, "py-8 md:py-12"]}>
+      <div class="container">
+        <a
+          href={backHref}
+          class="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 font-heading font-bold text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <Icon name="lucide:arrow-left" class="h-4 w-4" />
+          Voltar para brincadeiras {backLabel}
+        </a>
+
+        <div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div>
+            <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-heading font-bold text-primary">
+              <Icon name={badgeIcon} class="h-4 w-4" />
+              Card {String(b.id).padStart(2, "0")}
+            </span>
+            <h1 class="mt-4 font-heading text-3xl font-bold leading-tight text-foreground md:text-5xl">
+              {b.title}
+            </h1>
+            <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{b.importance}</p>
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <div class="rounded-2xl bg-card p-4 shadow-sm">
+                <p class="text-xs font-heading font-bold uppercase tracking-wide text-primary">Idade</p>
+                <p class="mt-1 font-heading font-bold text-foreground">{primeiraFrase(b.age)}</p>
+              </div>
+              <div class="rounded-2xl bg-card p-4 shadow-sm">
+                <p class="text-xs font-heading font-bold uppercase tracking-wide text-primary">Tempo</p>
+                <p class="mt-1 font-heading font-bold text-foreground">{primeiraFrase(b.time)}</p>
+              </div>
+              <div class="rounded-2xl bg-card p-4 shadow-sm">
+                <p class="text-xs font-heading font-bold uppercase tracking-wide text-primary">Bagunça</p>
+                <p class="mt-1 font-heading font-bold text-foreground">{b.mess}</p>
+              </div>
+            </div>
+
+            {
+              b.videoUrl && (
+                <a href={b.videoUrl} target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex">
+                  <span class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 font-heading font-bold text-primary-foreground">
+                    <Icon name="lucide:play-circle" class="h-4 w-4" />
+                    Veja como brincar
+                  </span>
+                </a>
+              )
+            }
+          </div>
+
+          <div class="overflow-hidden rounded-2xl bg-card shadow-lg">
+            <img
+              src={b.image.src}
+              width={b.image.width}
+              height={b.image.height}
+              alt={b.title}
+              class:list={["h-full w-full", imageFit === "contain" ? "object-contain p-2" : "object-cover"]}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-12 md:py-16">
+      <div class="container">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div class="space-y-6">
+            {
+              blocos.map((bloco) => (
+                <section class="rounded-2xl bg-card p-5 shadow-sm">
+                  <h2 class="font-heading text-xl font-bold text-foreground">{tituloBloco(bloco.emoji, bloco.titulo)}</h2>
+                  <div class="mt-3 text-muted-foreground leading-relaxed">
+                    <p>{bloco.conteudo}</p>
+                  </div>
+                </section>
+              ))
+            }
+
+            <section class="rounded-2xl bg-card p-5 shadow-sm">
+              <h2 class="font-heading text-xl font-bold text-foreground">
+                {tituloBloco("🧠", "O que a criança aprende?")}
+              </h2>
+              <div class="mt-3 text-muted-foreground leading-relaxed">
+                <ul class="grid gap-2 sm:grid-cols-2">
+                  {b.learns.map((item) => (
+                    <li class="rounded-xl bg-secondary/60 px-3 py-2 text-sm font-medium text-foreground">{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <section class="rounded-2xl bg-card p-5 shadow-sm">
+              <h2 class="font-heading text-xl font-bold text-foreground">
+                {tituloBloco("📈", "Habilidades desenvolvidas")}
+              </h2>
+              <div class="mt-3 text-muted-foreground leading-relaxed">
+                <ul class="grid gap-2 sm:grid-cols-2">
+                  {b.skills.map((item) => (
+                    <li class="rounded-xl bg-primary/10 px-3 py-2 text-sm font-medium text-foreground">{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <section class="rounded-2xl bg-card p-5 shadow-sm">
+              <h2 class="font-heading text-xl font-bold text-foreground">{tituloBloco("❤️", "Dica da Flavinha")}</h2>
+              <div class="mt-3 text-muted-foreground leading-relaxed">
+                <p>{b.flavinhaTip}</p>
+              </div>
+            </section>
+
+            <section class="rounded-2xl bg-card p-5 shadow-sm">
+              <h2 class="font-heading text-xl font-bold text-foreground">{tituloBloco("👶", "Adaptação por idade")}</h2>
+              <div class="mt-3 text-muted-foreground leading-relaxed">
+                <ul class="space-y-2">
+                  {b.adaptation.map((item) => (
+                    <li class="rounded-xl bg-secondary/60 px-3 py-2 text-sm text-foreground">{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <section class="rounded-2xl bg-card p-5 shadow-sm">
+              <h2 class="font-heading text-xl font-bold text-foreground">{tituloBloco("⚠️", "Atenção dos adultos")}</h2>
+              <div class="mt-3 text-muted-foreground leading-relaxed">
+                <p>{b.adultAttention}</p>
+              </div>
+            </section>
+
+            <div class="rounded-2xl bg-pastel-yellow/40 p-6 text-center">
+              <p class="font-heading text-xl font-bold text-foreground">{b.finalPhrase}</p>
+            </div>
+          </div>
+
+          <aside class="space-y-5 lg:sticky lg:top-24 lg:self-start">
+            <div class="rounded-2xl bg-card p-5 shadow-sm">
+              <h2 class="font-heading text-lg font-bold text-foreground">Resumo rápido</h2>
+              <div class="mt-4 space-y-3 text-sm text-muted-foreground">
+                <p class="flex gap-2">
+                  <Icon name="lucide:star" class="mt-0.5 h-4 w-4 text-primary" />
+                  {b.age}
+                </p>
+                <p class="flex gap-2">
+                  <Icon name="lucide:clock" class="mt-0.5 h-4 w-4 text-primary" />
+                  {b.time}
+                </p>
+                <p class="flex gap-2">
+                  <Icon name="lucide:shield-alert" class="mt-0.5 h-4 w-4 text-primary" />
+                  {b.mess}
+                </p>
+              </div>
+            </div>
+
+            <div class="rounded-2xl bg-primary/10 p-5">
+              <h2 class="font-heading text-lg font-bold text-foreground">Por que vale fazer?</h2>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{b.summary}</p>
+            </div>
+
+            {
+              b.videoUrl && (
+                <a href={b.videoUrl} target="_blank" rel="noopener noreferrer">
+                  <span class="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-heading font-bold text-primary-foreground">
+                    <Icon name="lucide:play-circle" class="h-4 w-4" />
+                    Veja como brincar
+                  </span>
+                </a>
+              )
+            }
+
+            <a href={backHref}>
+              <span class="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-heading font-bold text-primary-foreground">
+                <Icon name="lucide:heart" class="h-4 w-4" />
+                Ver outras brincadeiras
+              </span>
+            </a>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </article>
+</Layout>

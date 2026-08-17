@@ -1,0 +1,169 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import PageBanner from "@/components/PageBanner.astro";
+import Button from "@/components/Button.astro";
+import { Icon } from "astro-icon/components";
+import { brincadeiras02 } from "@/data/brincadeiras02";
+import { brincadeiras35 } from "@/data/brincadeiras35";
+import { brincadeiras68 } from "@/data/brincadeiras68";
+import { brincadeirasFamilia } from "@/data/brincadeirasFamilia";
+
+const filtros = ["Todas", "0-2 anos", "3-5 anos", "6-8 anos", "Em família"];
+
+const cards = [
+  ...brincadeiras02.map((item) => ({
+    id: `0-2-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "0-2 anos",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/0-a-2-anos/${item.slug}`,
+  })),
+  ...brincadeiras35.map((item) => ({
+    id: `3-5-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "3-5 anos",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/3-a-5-anos/${item.slug}`,
+  })),
+  ...brincadeiras68.map((item) => ({
+    id: `6-8-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "6-8 anos",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/6-a-8-anos/${item.slug}`,
+  })),
+  ...brincadeirasFamilia.map((item) => ({
+    id: `familia-${item.slug}`,
+    title: item.title,
+    age: item.age,
+    category: "Em família",
+    image: item.image,
+    summary: item.summary,
+    time: item.time,
+    path: `/brincadeiras/em-familia/${item.slug}`,
+  })),
+];
+---
+
+<Layout
+  title="Brincadeiras"
+  description="Todas as ideias de brincadeiras do Mundo Flavinha, organizadas por fase e por momentos em família."
+>
+  <PageBanner
+    title="Brincadeiras"
+    subtitle="Todas as ideias cadastradas no Mundo Flavinha, organizadas por fase e por momentos em família."
+  />
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      <div class="mb-5 text-center">
+        <p id="contador" data-sufixo="brincadeiras disponíveis" class="text-sm font-medium text-muted-foreground">
+          {cards.length} brincadeiras disponíveis
+        </p>
+      </div>
+
+      <div class="mb-8 flex flex-wrap justify-center gap-2">
+        {
+          filtros.map((filtro) => (
+            <button
+              type="button"
+              data-filtro={filtro}
+              aria-pressed={filtro === "Todas" ? "true" : "false"}
+              class:list={[
+                "rounded-full px-4 py-2 text-sm font-heading font-semibold transition-colors",
+                filtro === "Todas" ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground/70 hover:bg-secondary/80",
+              ]}
+            >
+              {filtro}
+            </button>
+          ))
+        }
+      </div>
+
+      <div id="grid" aria-live="polite" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {
+          cards.map((item) => (
+            <article
+              data-categoria={item.category}
+              class="reveal overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow hover:shadow-md"
+            >
+              <a href={item.path} class="block">
+                <div class="aspect-[4/3] overflow-hidden bg-secondary">
+                  <img
+                    src={item.image.src}
+                    width={item.image.width}
+                    height={item.image.height}
+                    alt={item.title}
+                    class="h-full w-full object-contain p-1 transition-transform duration-300 hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+              <div class="p-5">
+                <div class="mb-3 flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-heading font-bold text-primary">
+                    {item.category}
+                  </span>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-pastel-yellow/60 px-2.5 py-1 text-xs font-heading font-bold text-foreground">
+                    <Icon name="lucide:star" class="h-3 w-3" />
+                    {item.age.split(".")[0]}
+                  </span>
+                </div>
+                <h2 class="font-heading text-xl font-bold leading-tight text-foreground">{item.title}</h2>
+                <p class="mt-2 min-h-[48px] text-sm leading-relaxed text-muted-foreground">{item.summary}</p>
+                <div class="mt-4 flex items-center justify-between gap-3">
+                  <span class="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                    <Icon name="lucide:clock" class="h-3.5 w-3.5" />
+                    {item.time.split(".")[0]}
+                  </span>
+                  <Button href={item.path} size="sm" class="gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground">
+                    Ver brincadeira
+                    <Icon name="lucide:arrow-right" class="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const botoes = document.querySelectorAll("[data-filtro]");
+    const cartoes = document.querySelectorAll("[data-categoria]");
+    const contador = document.getElementById("contador");
+    const sufixo = contador?.dataset.sufixo ?? "";
+
+    function aplicarFiltro(filtro: string) {
+      let visiveis = 0;
+      cartoes.forEach((cartao) => {
+        const mostra = filtro === "Todas" || cartao.getAttribute("data-categoria") === filtro;
+        (cartao as HTMLElement).hidden = !mostra;
+        if (mostra) visiveis++;
+      });
+      if (contador) contador.textContent = `${visiveis} ${sufixo}`;
+      botoes.forEach((botao) => {
+        const ativo = botao.getAttribute("data-filtro") === filtro;
+        botao.setAttribute("aria-pressed", String(ativo));
+        botao.classList.toggle("bg-primary", ativo);
+        botao.classList.toggle("text-primary-foreground", ativo);
+        botao.classList.toggle("bg-secondary", !ativo);
+        botao.classList.toggle("text-foreground/70", !ativo);
+      });
+    }
+
+    botoes.forEach((botao) => {
+      botao.addEventListener("click", () => aplicarFiltro(botao.getAttribute("data-filtro") ?? "Todas"));
+    });
+  </script>
+</Layout>

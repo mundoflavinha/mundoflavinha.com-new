@@ -16,9 +16,10 @@ interface Props extends VariantProps<typeof buttonVariants> {
   rel?: string;
   class?: string;
   id?: string;
+  disabled?: boolean;
 }
 
-const { href, variant, size, class: className, target, rel, id } = Astro.props;
+const { href, variant, size, class: className, target, rel, id, disabled } = Astro.props;
 const classes = cn(buttonVariants({ variant, size, className }));
 ---
 
@@ -31,7 +32,7 @@ const classes = cn(buttonVariants({ variant, size, className }));
     // Sem href: preserva o mesmo elemento e a mesma falta de comportamento do
     // original (um <button> sem onClick, focável mas sem ação — não um <span>,
     // que mudaria a semântica/navegação por teclado que já existia).
-    <button type="button" id={id} class={classes}>
+    <button type="button" id={id} class={classes} disabled={disabled}>
       <slot />
     </button>
   )
