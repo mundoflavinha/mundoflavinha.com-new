@@ -1,3 +1,4 @@
+import { dispensarBannerDeCookies } from "./apoio";
 import { expect, test } from "@playwright/test";
 
 /**
@@ -42,6 +43,7 @@ for (const { nome, largura } of LARGURAS) {
       test(`${rota} não rola na horizontal`, async ({ page }) => {
         await page.setViewportSize({ width: largura, height: 900 });
         await page.goto(rota, { waitUntil: "load" });
+        await dispensarBannerDeCookies(page);
 
         const medida = await page.evaluate(() => {
           const doc = document.documentElement;
@@ -69,6 +71,7 @@ for (const { nome, largura } of LARGURAS) {
 test("o menu mobile abre e fecha, e anuncia o estado", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
 
   const botao = page.getByRole("button", { name: /menu/i });
   await expect(botao).toHaveAttribute("aria-expanded", "false");
@@ -84,6 +87,7 @@ test("o menu mobile abre e fecha, e anuncia o estado", async ({ page }) => {
 test("o modal cabe na tela do celular e rola por dentro", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 });
   await page.goto("/downloads");
+  await dispensarBannerDeCookies(page);
   await page.locator('[data-material="jogo-da-reciclagem"]').click();
 
   const dialogo = page.getByRole("dialog");

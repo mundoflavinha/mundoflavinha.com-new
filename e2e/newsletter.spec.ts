@@ -1,3 +1,4 @@
+import { dispensarBannerDeCookies } from "./apoio";
 import { expect, test } from "@playwright/test";
 
 /**
@@ -21,6 +22,8 @@ test("submit antes da hidratação não navega nem põe o e-mail na URL", async 
 
   await page.goto("/blog/album-da-copa");
 
+  await dispensarBannerDeCookies(page);
+
   const form = page.locator("[data-ilha-newsletter] form");
   await expect(form).toBeVisible();
   await expect(page.locator("[data-ilha-newsletter]")).toHaveAttribute("data-hidratado", "false");
@@ -43,6 +46,8 @@ test("depois de hidratar, o envio vai por fetch com o payload certo", async ({ p
   });
 
   await page.goto("/blog/album-da-copa");
+
+  await dispensarBannerDeCookies(page);
   const casca = page.locator("[data-ilha-newsletter]");
   await casca.scrollIntoViewIfNeeded();
   await expect(casca).toHaveAttribute("data-hidratado", "true");
@@ -65,6 +70,7 @@ test("depois de hidratar, o envio vai por fetch com o payload certo", async ({ p
 
 test("a variante full exige o aceite explícito antes de habilitar o envio", async ({ page }) => {
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   const casca = page.locator("[data-ilha-newsletter]");
   await casca.scrollIntoViewIfNeeded();
   await expect(casca).toHaveAttribute("data-hidratado", "true");
@@ -86,6 +92,7 @@ test("o link da Política dentro da ilha funciona e leva à página certa", asyn
   // Dos cinco CONSENT_TEXTS, só três mencionam a Política; nenhum deles é o
   // texto das caixas de opt-in. A variante compact é onde ele aparece.
   await page.goto("/blog/album-da-copa");
+  await dispensarBannerDeCookies(page);
   const casca = page.locator("[data-ilha-newsletter]");
   await casca.scrollIntoViewIfNeeded();
   await expect(casca).toHaveAttribute("data-hidratado", "true");
@@ -105,6 +112,7 @@ test("clicar no texto de consentimento não marca a caixa por acidente", async (
   // texto, e o motivo de `comLinkPolitica` chamar stopPropagation caso um dia
   // esses textos passem a citar a Política.
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   const casca = page.locator("[data-ilha-newsletter]");
   await casca.scrollIntoViewIfNeeded();
 

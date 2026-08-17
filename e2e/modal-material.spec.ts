@@ -1,3 +1,4 @@
+import { dispensarBannerDeCookies } from "./apoio";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -12,12 +13,16 @@ import { expect, test, type Page } from "@playwright/test";
 const PRIMEIRO = "jogo-da-reciclagem";
 const SEGUNDO = "cada-tampinha-no-seu-lugar";
 
-const dialogo = (page: Page) => page.getByRole("dialog");
+// ESTE diálogo, não o painel de cookies — que também é role="dialog" e fica no
+// DOM mesmo depois de dispensado. Sem o recorte, "nenhum diálogo aberto" nunca
+// seria verdade e o teste de Escape mediria o modal errado.
+const dialogo = (page: Page) => page.locator('[data-modal="lead"]');
 
 test.describe("abertura pelo gatilho estático", () => {
   for (const rota of ["/", "/downloads"]) {
     test(`${rota}: clique abre o modal do material clicado`, async ({ page }) => {
       await page.goto(rota);
+      await dispensarBannerDeCookies(page);
       await page.locator(`[data-material="${SEGUNDO}"]`).click();
 
       await expect(dialogo(page)).toBeVisible();
@@ -31,6 +36,7 @@ test.describe("abertura pelo gatilho estático", () => {
     // clique borbulhava. Nada disso estava declarado — e o <button> dentro de
     // <button> de /downloads era HTML inválido.
     await page.goto("/");
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${PRIMEIRO}"]`).focus();
     await page.keyboard.press("Enter");
 
@@ -39,6 +45,7 @@ test.describe("abertura pelo gatilho estático", () => {
 
   test("Space também aciona", async ({ page }) => {
     await page.goto("/downloads");
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${PRIMEIRO}"]`).focus();
     await page.keyboard.press("Space");
 
@@ -62,6 +69,8 @@ test.describe("corrida de hidratação", () => {
     });
 
     await page.goto("/downloads");
+
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${SEGUNDO}"]`).click();
 
     // Enquanto o chunk não chega: nada de modal, mas o clique ficou guardado.
@@ -85,6 +94,8 @@ test.describe("corrida de hidratação", () => {
     });
 
     await page.goto("/downloads");
+
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${PRIMEIRO}"]`).click();
     await page.locator(`[data-material="${SEGUNDO}"]`).click();
     liberar();
@@ -106,6 +117,8 @@ test.describe("corrida de hidratação", () => {
     await page.route(/_astro\/.*LeadCaptureModal.*\.js/, (rota) => rota.abort());
 
     await page.goto("/downloads");
+
+    await dispensarBannerDeCookies(page);
     const gatilho = page.locator(`[data-material="${PRIMEIRO}"]`);
     await gatilho.click();
 
@@ -119,6 +132,7 @@ test.describe("corrida de hidratação", () => {
 test.describe("foco e teclado", () => {
   test("abrir move o foco para dentro; Escape fecha e devolve ao gatilho", async ({ page }) => {
     await page.goto("/downloads");
+    await dispensarBannerDeCookies(page);
     const gatilho = page.locator(`[data-material="${SEGUNDO}"]`);
     await gatilho.click();
     await expect(dialogo(page)).toBeVisible();
@@ -135,6 +149,7 @@ test.describe("foco e teclado", () => {
     // os dados preenchidos para a próxima abertura — inclusive para outra
     // pessoa no mesmo dispositivo.
     await page.goto("/downloads");
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${SEGUNDO}"]`).click();
 
     await dialogo(page).locator("#lead-nome").fill("Fulana");
@@ -156,6 +171,8 @@ test.describe("envio", () => {
     });
 
     await page.goto("/downloads");
+
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${SEGUNDO}"]`).click();
     await dialogo(page).locator("#lead-nome").fill("Fulana de Tal");
     await dialogo(page).locator("#lead-email").fill("fulana@exemplo.com");
@@ -192,6 +209,8 @@ test.describe("envio", () => {
     });
 
     await page.goto("/downloads");
+
+    await dispensarBannerDeCookies(page);
     await page.locator(`[data-material="${PRIMEIRO}"]`).click();
     await dialogo(page).locator("#lead-nome").fill("Fulana");
     await dialogo(page).locator("#lead-email").fill("fulana@exemplo.com");

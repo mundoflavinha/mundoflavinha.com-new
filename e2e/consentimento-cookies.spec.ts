@@ -1,3 +1,4 @@
+import { dispensarBannerDeCookies } from "./apoio";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -12,10 +13,11 @@ import { expect, test, type Page } from "@playwright/test";
 const cookieDeConsentimento = async (page: Page) =>
   (await page.context().cookies()).find((c) => c.name === "cc_cookie");
 
-test("primeira visita não interrompe com banner nem contata terceiros", async ({ page, baseURL }) => {
-  // Hoje o site não carrega nada de terceiro sozinho: fontes próprias,
-  // miniaturas pelo nosso servidor, player só por clique. Banner de entrada
-  // seria pedir consentimento sem ter o que coletar.
+test("a primeira visita pergunta ANTES de qualquer contato com terceiro", async ({ page, baseURL }) => {
+  // O banner passou a aparecer na entrada quando o Analytics entrou: existe
+  // coleta que começaria sozinha, sem nenhuma ação da pessoa, então a pergunta
+  // tem que vir na frente. Enquanto não havia analytics, o banner ficava
+  // desligado — perguntar sem ter o que coletar é ruído.
   const externas: string[] = [];
   page.on("request", (req) => {
     if (!req.url().startsWith(baseURL!) && !req.url().startsWith("data:")) externas.push(req.url());
@@ -23,13 +25,14 @@ test("primeira visita não interrompe com banner nem contata terceiros", async (
 
   await page.goto("/", { waitUntil: "networkidle" });
 
-  await expect(page.locator("#cc-main .cm")).toBeHidden();
-  expect(externas, `saiu do domínio: ${externas.join(", ")}`).toEqual([]);
+  await expect(page.locator("#cc-main .cm")).toBeVisible();
+  expect(externas, `saiu do domínio antes da escolha: ${externas.join(", ")}`).toEqual([]);
   expect(await cookieDeConsentimento(page), "não deve gravar cookie sem escolha").toBeUndefined();
 });
 
 test("o rodapé abre as preferências em qualquer página", async ({ page }) => {
   await page.goto("/sobre");
+  await dispensarBannerDeCookies(page);
   await page.getByRole("button", { name: "Preferências de cookies" }).click();
 
   const painel = page.locator("#cc-main .pm");
@@ -39,6 +42,7 @@ test("o rodapé abre as preferências em qualquer página", async ({ page }) => 
 
 test("recusar é tão visível quanto aceitar, e nada fica pré-marcado", async ({ page }) => {
   await page.goto("/sobre");
+  await dispensarBannerDeCookies(page);
   await page.getByRole("button", { name: "Preferências de cookies" }).click();
 
   const painel = page.locator("#cc-main .pm");
@@ -57,6 +61,7 @@ test("sem autorização, o player da home não carrega e nada vai ao Google", as
   });
 
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   await page.locator("[data-youtube-facade]").click();
 
   // O clique abre a pergunta, não o vídeo.
@@ -72,6 +77,7 @@ test("autorizando conteúdo externo, o player carrega — e só então há conta
   });
 
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   await page.locator("[data-youtube-facade]").click();
   await page.locator("#cc-main .pm").getByRole("button", { name: "Aceitar tudo" }).click();
 
@@ -81,6 +87,7 @@ test("autorizando conteúdo externo, o player carrega — e só então há conta
 
   // A escolha persiste: a segunda visita não pergunta de novo.
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   await page.locator("[data-youtube-facade]").click();
   await expect(page.locator("#cc-main .pm")).toBeHidden();
   await expect(page.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(1);
@@ -111,6 +118,7 @@ test("a galeria de /videos também respeita a escolha", async ({ page }) => {
   );
 
   await page.goto("/videos");
+  await dispensarBannerDeCookies(page);
   await page.getByRole("button", { name: /Assistir Brincadeira/ }).click();
 
   await expect(page.locator("#cc-main .pm")).toBeVisible();
@@ -124,6 +132,7 @@ test("a galeria de /videos também respeita a escolha", async ({ page }) => {
 
 test("recusar mantém tudo bloqueado, inclusive depois de recarregar", async ({ page }) => {
   await page.goto("/sobre");
+  await dispensarBannerDeCookies(page);
   await page.getByRole("button", { name: "Preferências de cookies" }).click();
   await page.locator("#cc-main .pm").getByRole("button", { name: "Recusar o que não é necessário" }).click();
 
@@ -133,6 +142,7 @@ test("recusar mantém tudo bloqueado, inclusive depois de recarregar", async ({ 
   });
 
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   await page.locator("[data-youtube-facade]").click();
   await expect(page.locator("iframe")).toHaveCount(0);
   expect(google).toEqual([]);
@@ -140,6 +150,7 @@ test("recusar mantém tudo bloqueado, inclusive depois de recarregar", async ({ 
 
 test("o cookie de cookies não se mistura com o consentimento dos formulários", async ({ page }) => {
   await page.goto("/sobre");
+  await dispensarBannerDeCookies(page);
   await page.getByRole("button", { name: "Preferências de cookies" }).click();
   await page.locator("#cc-main .pm").getByRole("button", { name: "Aceitar tudo" }).click();
 

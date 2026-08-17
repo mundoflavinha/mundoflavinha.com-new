@@ -21,7 +21,16 @@
   import { ROTAS_LEGAIS } from "@/lib/site";
 
   const categorias = Object.fromEntries(
-    CATEGORIAS_COOKIES.map((c) => [c.id, c.obrigatoria ? { enabled: true, readOnly: true } : {}]),
+    CATEGORIAS_COOKIES.map((c) => {
+      if (c.obrigatoria) return [c.id, { enabled: true, readOnly: true }];
+
+      // `autoClear` derivado do próprio catálogo: recusar ou revogar tem que
+      // APAGAR o que já foi gravado, não só parar de gravar. Sem os padrões
+      // aqui, `autoClearCookies` não tem o que casar e o identificador já
+      // criado sobrevive à revogação.
+      const padroes = c.cookies.filter((k) => k.padrao).map((k) => ({ name: k.padrao! }));
+      return [c.id, padroes.length > 0 ? { autoClear: { cookies: padroes } } : {}];
+    }),
   );
 
   const secoes = CATEGORIAS_COOKIES.map((c) => ({
@@ -36,28 +45,23 @@
     mode: "opt-in",
     revision: REVISAO_COOKIES,
 
-    // Sem banner interrompendo a primeira visita: hoje o site não carrega NADA
-    // de terceiro sozinho — as fontes são próprias, as miniaturas passam pelo
-    // nosso servidor e o player só monta por clique. Pedir consentimento sem
-    // ter o que coletar é ruído, e a ANPD desaconselha banner desnecessário. A
-    // escolha aparece no ponto em que importa (ao tentar ver um vídeo) e pelo
-    // link fixo no rodapé.
-    //
-    // Quando o Google Analytics entrar, isto vira `true` e REVISAO_COOKIES sobe:
-    // aí passa a existir coleta que começa antes de qualquer interação, e a
-    // pergunta tem que vir na frente.
-    autoShow: false,
+    // Com o Analytics no jogo, passa a existir coleta que começaria sozinha, sem
+    // nenhuma ação da pessoa — então a pergunta tem que vir na frente. Enquanto
+    // não havia analytics, o banner ficava desligado: o site não carregava nada
+    // de terceiro por conta própria e perguntar sem ter o que coletar é ruído.
+    autoShow: true,
 
     manageScriptTags: true,
     autoClearCookies: true,
 
     // Desligado de propósito. O padrão é `true` e faz a biblioteca ABORTAR por
     // inteiro quando detecta automação — inclusive `navigator.webdriver`. O que
-    // ele protege é o crawler indexar o texto do banner; como `autoShow` é
-    // false, não existe banner aberto para ninguém indexar, então a proteção
-    // não vale nada aqui. Em compensação o custo é real: com a biblioteca
-    // abortada, o botão do vídeo fica morto e sem explicação. Ver o caminho de
-    // fallback em YouTubeFacade.astro.
+    // ele protege é o crawler indexar o texto do banner — coisa que o próprio
+    // `hideFromBots` só evita se o crawler for detectado, e que custa caro
+    // quando falha: com a biblioteca abortada, o botão do vídeo fica morto e
+    // sem explicação, e o banner nunca aparece para quem foi confundido com um
+    // robô. O texto do banner ser indexado é um problema menor que o site
+    // parecer quebrado. Ver o fallback em YouTubeFacade.astro.
     hideFromBots: false,
     // Nunca bloquear a página: seria um cookie wall, e recusar não pode custar
     // o acesso ao conteúdo.

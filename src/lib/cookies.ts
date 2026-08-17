@@ -21,6 +21,13 @@
 
 export type CookieDeclarado = {
   nome: string;
+  /**
+   * Padrão que o CookieConsent usa para APAGAR o cookie quando a categoria é
+   * recusada ou revogada. Sem ele, `autoClearCookies` não tem o que casar e a
+   * revogação vira só uma promessa de não coletar MAIS — o identificador já
+   * criado continua no navegador. Aceita string ou regex.
+   */
+  padrao?: string | RegExp;
   fornecedor: string;
   finalidade: string;
   duracao: string;
@@ -41,7 +48,7 @@ export type CategoriaCookie = {
  * gravado e mostra o banner de novo: uma escolha feita sobre um conjunto antigo
  * de categorias não vale como escolha sobre um conjunto novo.
  */
-export const REVISAO_COOKIES = 1;
+export const REVISAO_COOKIES = 2;
 
 export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
   {
@@ -56,6 +63,22 @@ export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
         fornecedor: "Mundo Flavinha (primeira parte)",
         finalidade: "Guarda quais categorias você aceitou ou recusou",
         duracao: "6 meses",
+      },
+    ],
+  },
+  {
+    id: "analytics",
+    titulo: "Estatísticas",
+    descricao:
+      "Nos ajudam a entender quais páginas são úteis, de forma agregada. Nada é carregado antes de você aceitar, e recusar não muda nada no que você vê.",
+    obrigatoria: false,
+    cookies: [
+      {
+        nome: "_ga, _ga_*",
+        padrao: /^_ga/,
+        fornecedor: "Google Analytics",
+        finalidade: "Distinguir visitantes e sessões para contagem agregada de acessos",
+        duracao: "Até 2 anos",
       },
     ],
   },
@@ -79,3 +102,4 @@ export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
 /** Serviço do iframemanager e do CookieConsent. Mesma string nos dois lados. */
 export const SERVICO_YOUTUBE = "youtube";
 export const CATEGORIA_MIDIA_EXTERNA = "external_media";
+export const CATEGORIA_ESTATISTICAS = "analytics";

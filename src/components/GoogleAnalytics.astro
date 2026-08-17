@@ -1,0 +1,55 @@
+---
+/**
+ * Google Analytics com BLOQUEIO PRÉVIO.
+ *
+ * Não é "carregar e depois desligar": é NÃO CARREGAR. Enquanto a categoria
+ * `analytics` não for aceita, estas tags têm `type="text/plain"` — e o
+ * navegador não busca nem executa script de tipo não executável, então o
+ * `data-src` nunca vira requisição. Só quando a pessoa aceita é que o
+ * CookieConsent promove as tags a `text/javascript` e o Google entra em cena.
+ *
+ * TODO o bootstrap está dentro do bloqueio, não só o loader:
+ *
+ *   - o download de gtag.js (por `data-src`, jamais `src`);
+ *   - a criação de `window.dataLayer`;
+ *   - a definição de `gtag`;
+ *   - as chamadas `gtag('js')` e `gtag('config')`.
+ *
+ * Criar o `dataLayer` antes do aceite não faria rede sozinho, mas permitiria
+ * acumular eventos pré-consentimento e despachá-los depois — que é a mesma
+ * coisa por outro caminho.
+ *
+ * Sem Consent Mode: com consentimento negado, o Consent Mode avançado ainda
+ * carrega as tags e envia pings sem cookie (com timestamp, user-agent, referrer
+ * e dados da página). Isso contradiz o que o botão "Recusar" promete. Se um dia
+ * for necessário, entra na modalidade básica e só depois do aceite.
+ *
+ * `is:inline` é obrigatório aqui: sem ele o Astro processaria e reescreveria
+ * estas tags, desfazendo justamente o `type="text/plain"` que faz o bloqueio.
+ *
+ * A tag só existe se PUBLIC_GA_ID estiver definida. Deixá-la fora do ambiente
+ * de preview mantém o teste de deploy longe dos números reais — medir o próprio
+ * desenvolvimento é sujar o dado que a medição existe para produzir.
+ */
+const idDaMedicao = import.meta.env.PUBLIC_GA_ID;
+---
+
+{
+  idDaMedicao && (
+    <>
+      <script
+        is:inline
+        type="text/plain"
+        data-category="analytics"
+        data-service="Google Analytics"
+        data-src={`https://www.googletagmanager.com/gtag/js?id=${idDaMedicao}`}
+      />
+      <script is:inline type="text/plain" data-category="analytics" set:html={`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${idDaMedicao}', { anonymize_ip: true });
+      `} />
+    </>
+  )
+}

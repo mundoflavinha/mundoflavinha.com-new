@@ -1,3 +1,4 @@
+import { dispensarBannerDeCookies } from "./apoio";
 import { expect, test } from "@playwright/test";
 
 /**
@@ -37,12 +38,15 @@ for (const rota of ROTAS_SEM_TERCEIROS) {
     });
 
     await page.goto(rota, { waitUntil: "networkidle" });
+
+    await dispensarBannerDeCookies(page);
     expect(externas, `saiu do domínio: ${externas.join(", ")}`).toEqual([]);
   });
 }
 
 test("as fontes são servidas pelo próprio domínio", async ({ page }) => {
   await page.goto("/sobre");
+  await dispensarBannerDeCookies(page);
   const familias = await page.evaluate(() => {
     const h1 = document.querySelector("h1");
     return h1 ? getComputedStyle(h1).fontFamily : "";
@@ -60,6 +64,7 @@ const autorizarMidiaExterna = async (page: import("@playwright/test").Page) => {
 
 test("o clique carrega o player, e só em youtube-nocookie", async ({ page }) => {
   await page.goto("/");
+  await dispensarBannerDeCookies(page);
   await autorizarMidiaExterna(page);
   await page.locator("[data-youtube-facade]").click();
 
@@ -106,6 +111,8 @@ test("/videos não contata o YouTube ao listar", async ({ page }) => {
   });
 
   await page.goto("/videos");
+
+  await dispensarBannerDeCookies(page);
   await expect(page.getByRole("heading", { name: "Brincadeira com tampinhas" })).toBeVisible();
   expect(pedidos, `contatou sem clique: ${pedidos.join(", ")}`).toEqual([]);
 
@@ -132,6 +139,8 @@ test("/videos aguenta resposta quebrada sem sumir com a página", async ({ page 
   );
 
   await page.goto("/videos");
+
+  await dispensarBannerDeCookies(page);
   // Sem validação, `data.videos.map` estouraria e a ilha inteira sumiria — a
   // pessoa veria um buraco branco, sem explicação.
   await expect(page.getByRole("alert")).toContainText("Não foi possível carregar os vídeos");
@@ -141,5 +150,7 @@ test("/videos mostra erro quando a API falha", async ({ page }) => {
   await page.route("**/api/videos", async (rota) => rota.fulfill({ status: 500, body: "erro" }));
 
   await page.goto("/videos");
+
+  await dispensarBannerDeCookies(page);
   await expect(page.getByRole("alert")).toBeVisible();
 });

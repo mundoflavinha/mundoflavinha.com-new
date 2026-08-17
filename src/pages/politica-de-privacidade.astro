@@ -105,8 +105,12 @@ const secoes: SecaoLegal[] = [
     <LegalList>
       <li>Não pedimos CPF, RG, endereço residencial nem dados bancários</li>
       <li>Não coletamos nome, idade exata, data de nascimento, foto ou escola de nenhuma criança</li>
-      <li>Não usamos ferramentas de analytics, pixels de publicidade ou rastreadores de comportamento</li>
-      <li>Não perfilamos você nem cruzamos seu comportamento entre páginas ou entre visitas</li>
+      <li>Não usamos pixels de publicidade nem rastreadores de comportamento entre sites</li>
+      <li>
+        Usamos o Google Analytics para contagem agregada de acessos, e só se você aceitar. Enquanto não aceitar,
+        nada dele é carregado
+      </li>
+      <li>Não usamos esses números para identificar você individualmente nem para direcionar anúncios</li>
     </LegalList>
   </LegalSection>
 
@@ -143,8 +147,13 @@ const secoes: SecaoLegal[] = [
       </LegalRow>
     </LegalTable>
     <LegalP>
-      Não usamos seus dados para nenhuma finalidade além dessas, e não vendemos, alugamos nem cedemos sua base de
-      contato para terceiros.
+      Se você aceitar cookies de estatística, usamos também dados de navegação — página visitada, origem da visita,
+      tipo de navegador e região aproximada — para entender, de forma agregada, o que é útil no site. A base legal é
+      o seu consentimento (art. 7º, I), que você pode retirar quando quiser.
+    </LegalP>
+    <LegalP>
+      Fora isso, não usamos seus dados para nenhuma outra finalidade, e não vendemos, alugamos nem cedemos sua base
+      de contato para terceiros.
     </LegalP>
   </LegalSection>
 
@@ -229,8 +238,12 @@ const secoes: SecaoLegal[] = [
       </LegalRow>
       <LegalRow>
         <LegalCell>Analíticos / estatísticas</LegalCell>
-        <LegalCell>Não</LegalCell>
-        <LegalCell>Não usamos Google Analytics nem ferramenta equivalente</LegalCell>
+        <LegalCell>Só com sua autorização</LegalCell>
+        <LegalCell>
+          Google Analytics (<strong class="text-foreground">_ga</strong> e <strong class="text-foreground">_ga_*</strong>,
+          até 2 anos), para saber quais páginas são úteis. As tags só são carregadas depois do seu aceite — antes
+          disso o Google não é contatado. Ao recusar ou revogar, esses cookies são apagados.
+        </LegalCell>
       </LegalRow>
       <LegalRow>
         <LegalCell>Publicidade / marketing</LegalCell>

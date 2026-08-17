@@ -67,6 +67,11 @@ export const OPERADORES = [
       "Exibição dos vídeos incorporados, apenas depois que você autoriza conteúdo externo. A lista e as miniaturas passam pelo nosso servidor, então abrir a página de Vídeos não expõe seus dados ao Google",
     pais: "Estados Unidos",
   },
+  {
+    nome: "Google Analytics",
+    papel: "Contagem agregada de acessos, apenas depois que você aceita cookies de estatística",
+    pais: "Estados Unidos",
+  },
   { nome: "Amazon Associados", papel: "Links de recomendação de produtos", pais: "Estados Unidos" },
   { nome: "Meta / WhatsApp", papel: "Contato por WhatsApp, quando você opta por isso", pais: "Estados Unidos" },
 ] as const;

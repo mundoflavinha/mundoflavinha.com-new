@@ -136,17 +136,33 @@ const LeadCaptureModal = () => {
     setHoneypot("");
     setMaterial(null);
 
-    // Devolve o foco ao card que abriu. O Radix restaura o `activeElement` de
-    // antes da abertura, o que cobre o caso normal — mas não o caso em que o
-    // modal abriu pela caixa de entrada, já depois de o foco ter saído dali.
+    // A devolução do foco fica em onCloseAutoFocus (abaixo), não aqui: o Radix
+    // restaura o activeElement de antes da abertura, e um `focus()` nosso em
+    // requestAnimationFrame CORRIA contra ele. Enquanto o elemento anterior era
+    // sempre o próprio gatilho, os dois concordavam por acidente; bastou existir
+    // um banner de cookies antes do clique para o foco acabar no lugar errado.
+  };
+
+  const devolverFocoAoGatilho = (evento: Event) => {
     const alvo = acionador.current;
     acionador.current = null;
-    if (alvo?.isConnected) requestAnimationFrame(() => alvo.focus());
+    if (!alvo?.isConnected) return;
+    // Impede a restauração padrão do Radix e assume o controle: o destino certo
+    // é o card que abriu o modal, mesmo que o foco estivesse em outro lugar
+    // (por exemplo, se o modal foi aberto pela caixa de entrada da ponte).
+    evento.preventDefault();
+    alvo.focus();
   };
 
   return (
     <Dialog open={material !== null} onOpenChange={handleOpenChange}>
       <DialogContent
+        // Identificador explícito para os testes distinguirem ESTE diálogo do
+        // painel de cookies, que também é role="dialog". Depender do id gerado
+        // pelo Radix ou de :not() com seletor complexo é mais frágil do que
+        // dizer qual diálogo é qual.
+        data-modal="lead"
+        onCloseAutoFocus={devolverFocoAoGatilho}
         // Mantém o visual anterior: o padrão do Radix é bg-black/80, bem mais
         // duro que o overlay suave que este modal já usava.
         overlayClassName="bg-foreground/30 backdrop-blur-sm"
