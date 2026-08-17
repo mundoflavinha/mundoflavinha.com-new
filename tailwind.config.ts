@@ -5,7 +5,7 @@ export default {
   darkMode: ["class"],
   // Só `./src` existe — os globs para ./pages, ./components e ./app eram
   // convenção de Next.js herdada do template e nunca casaram com nada aqui.
-  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{astro,ts,tsx}"],
   prefix: "",
   theme: {
     container: {

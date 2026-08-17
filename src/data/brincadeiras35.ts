@@ -26,7 +26,12 @@ export type Brincadeira35 = {
   id: number;
   slug: string;
   title: string;
-  image: string;
+  /**
+   * ImageMetadata (não string): sob Astro, importar um .webp de src/ devolve
+   * um objeto com src/width/height/format. Usar `image.width`/`image.height`
+   * no <img> elimina layout shift, que o site inteiro tinha.
+   */
+  image: ImageMetadata;
   age: string;
   time: string;
   mess: string;

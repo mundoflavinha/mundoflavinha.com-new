@@ -63,6 +63,41 @@
   }
 }
 
+@layer base {
+  /* O header é sticky com h-16/h-20. Sem isto, pular para uma âncora
+     (ex: /politica-de-privacidade#direitos-do-titular) esconde o título
+     atrás dele. Em MPA o browser resolve a âncora nativamente, então basta
+     reservar a margem — não precisa mais do ScrollToTop em JS. */
+  [id] {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+@layer components {
+  /* Substitui o `whileInView` do framer-motion. O conteúdo nasce VISÍVEL:
+     a animação só aprimora. Se o JS não rodar ou o IntersectionObserver não
+     existir, nada some — que é o oposto do que uma animação de entrada mal
+     feita costuma causar. */
+  .reveal {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(1.125rem);
+      transition:
+        opacity 0.5s ease-out,
+        transform 0.5s ease-out;
+    }
+
+    .js .reveal[data-visivel="true"] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
 @layer utilities {
   .font-heading {
     font-family: var(--font-heading);

@@ -1,0 +1,133 @@
+---
+import { Icon } from "astro-icon/components";
+import { REDES_SOCIAIS, ROTAS_LEGAIS } from "@/lib/site";
+
+const navegacao = [
+  { label: "Brincadeiras", path: "/brincadeiras" },
+  { label: "Downloads Gratuitos", path: "/downloads" },
+  { label: "Vídeos", path: "/videos" },
+  { label: "Blog", path: "/blog" },
+  { label: "Loja Flavinha", path: "/loja" },
+  { label: "Sobre", path: "/sobre" },
+];
+
+const legais = [
+  { label: "Política de Privacidade", path: ROTAS_LEGAIS.privacidade },
+  { label: "Termos de Uso", path: ROTAS_LEGAIS.termos },
+  { label: "Contato", path: ROTAS_LEGAIS.contato },
+];
+
+/** Ícones das redes são desenhados à mão (não são do lucide) — vieram como estavam. */
+const ICONES_SOCIAIS: Record<string, string> = {
+  Instagram: "instagram",
+  YouTube: "youtube",
+  TikTok: "tiktok",
+};
+
+const ano = new Date().getFullYear();
+---
+
+<footer class="bg-card border-t border-border">
+  <div class="container py-12 md:py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div>
+        <h3 class="font-heading font-bold text-lg text-foreground mb-4">Mundo Flavinha</h3>
+        <p class="text-muted-foreground text-sm leading-relaxed">
+          Menos telas, mais infância, mais memórias em família. Um universo de brincadeiras, conexão e
+          afeto.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-heading font-bold text-sm text-foreground mb-4">Navegação</h4>
+        <ul class="space-y-2">
+          {
+            navegacao.map((link) => (
+              <li>
+                <a
+                  href={link.path}
+                  class="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-heading font-bold text-sm text-foreground mb-4">Redes Sociais</h4>
+        <div class="flex gap-3">
+          {
+            REDES_SOCIAIS.map((rede) => (
+              <a
+                href={rede.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-pink transition-colors"
+                aria-label={rede.label}
+              >
+                {ICONES_SOCIAIS[rede.label] === "instagram" && (
+                  <svg
+                    class="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
+                  </svg>
+                )}
+                {ICONES_SOCIAIS[rede.label] === "youtube" && (
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.95C17.92 4.78 12 4.78 12 4.78s-5.92 0-7.64.46a2.75 2.75 0 0 0-1.94 1.95A28.6 28.6 0 0 0 2 12a28.6 28.6 0 0 0 .42 4.81 2.75 2.75 0 0 0 1.94 1.95c1.72.46 7.64.46 7.64.46s5.92 0 7.64-.46a2.75 2.75 0 0 0 1.94-1.95A28.6 28.6 0 0 0 22 12a28.6 28.6 0 0 0-.42-4.81ZM10 15.25v-6.5L15.5 12 10 15.25Z" />
+                  </svg>
+                )}
+                {ICONES_SOCIAIS[rede.label] === "tiktok" && (
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M16.75 3c.25 2.15 1.47 3.52 3.55 3.66v3.1c-1.2.12-2.25-.28-3.46-1.02v5.79c0 7.36-8.03 9.66-11.25 4.38-2.07-3.39-.8-9.35 5.84-9.59v3.27c-.4.06-.82.16-1.2.29-1.15.39-1.8 1.12-1.62 2.42.35 2.49 4.92 3.23 4.54-1.64V3h3.6Z" />
+                  </svg>
+                )}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <h4 class="font-heading font-bold text-sm text-foreground mb-4">Legal</h4>
+        <ul class="space-y-2">
+          {
+            legais.map((link) => (
+              <li>
+                <a
+                  href={link.path}
+                  class="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-4 text-xs text-muted-foreground/70 leading-relaxed">
+          Alguns links deste site podem gerar comissão para o Mundo Flavinha, sem custo extra para você.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4"
+    >
+      <p class="text-xs text-muted-foreground flex items-center gap-1">
+        Feito com <Icon name="lucide:heart" class="w-3 h-3 text-pink" /> por Mundo Flavinha © {ano}
+      </p>
+    </div>
+  </div>
+</footer>
