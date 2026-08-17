@@ -68,8 +68,19 @@ describe.skipIf(arquivos.length === 0)("toda página gerada", () => {
     const { html } = conteudos.find((c) => c.rota === rota)!;
     const og = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
     expect(og).toMatch(/^https:\/\//);
-    // A imagem de OG mora em public/ de propósito: URL sem hash, estável entre
-    // deploys, porque crawler social não revalida.
+  });
+});
+
+describe.skipIf(arquivos.length === 0)("imagem de OG padrão", () => {
+  it("páginas sem imagem própria usam a imagem estável de public/, não um caminho com hash", () => {
+    // Só vale para quem usa o DEFAULT_SEO (home, institucionais, legais) — os
+    // artigos passam a própria capa como og:image de propósito (era assim no
+    // React original também), e ImageMetadata sempre resolve para /_astro/
+    // com hash. A home é o representante mais simples do caso "sem imagem
+    // própria": se ela regredir para um path com hash, é sinal de que o
+    // default parou de ser lido de public/og-default.webp.
+    const html = readFileSync(join(DIST, "index.html"), "utf-8");
+    const og = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
     expect(og).not.toMatch(/\/_astro\//);
   });
 });

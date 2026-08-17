@@ -1,0 +1,38 @@
+---
+// Reaproveita o `buttonVariants` (cva) de ui/button.tsx, o mesmo usado pelo
+// Button React que os islands da Fase 4 vão usar — nada de duas fontes de
+// estilo. Importar daqui não emite JS: frontmatter roda só no build/SSG.
+//
+// Renderiza sempre <a>: em contexto estático toda ocorrência de <Button> era,
+// na prática, um link (dentro de <Link>/<a>) ou um botão sem handler algum
+// (ver nota nas páginas onde isso já era assim antes da migração).
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { VariantProps } from "class-variance-authority";
+
+interface Props extends VariantProps<typeof buttonVariants> {
+  href?: string;
+  target?: string;
+  rel?: string;
+  class?: string;
+  id?: string;
+}
+
+const { href, variant, size, class: className, target, rel, id } = Astro.props;
+const classes = cn(buttonVariants({ variant, size, className }));
+---
+
+{
+  href ? (
+    <a href={href} target={target} rel={rel} id={id} class={classes}>
+      <slot />
+    </a>
+  ) : (
+    // Sem href: preserva o mesmo elemento e a mesma falta de comportamento do
+    // original (um <button> sem onClick, focável mas sem ação — não um <span>,
+    // que mudaria a semântica/navegação por teclado que já existia).
+    <button type="button" id={id} class={classes}>
+      <slot />
+    </button>
+  )
+}

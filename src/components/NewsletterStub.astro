@@ -1,0 +1,29 @@
+---
+// TODO(Fase 4): trocar por <NewsletterForm client:visible /> (React, ilha).
+//
+// Placeholder estático só para a Fase 2 não ficar com um buraco visual onde
+// o formulário vai entrar — este branch nunca vai a produção assim. Reproduz
+// a forma da variante "compact" de NewsletterForm.tsx (input de e-mail +
+// botão circular). Desabilitado de propósito: não fazer parecer funcional.
+import { Icon } from "astro-icon/components";
+---
+
+<div class="mt-4 flex gap-2">
+  <input
+    type="email"
+    placeholder="Seu e-mail"
+    disabled
+    aria-hidden="true"
+    tabindex="-1"
+    class="flex h-10 w-full rounded-full border border-input bg-card px-4 py-2 text-sm opacity-60"
+  />
+  <span
+    aria-hidden="true"
+    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground opacity-60"
+  >
+    <Icon name="lucide:send" class="h-4 w-4" />
+  </span>
+</div>
+<p class="mt-2 text-xs leading-relaxed text-muted-foreground/70">
+  (formulário real entra na Fase 4)
+</p>
