@@ -129,13 +129,27 @@ describe.skipIf(arquivos.length === 0)("regras específicas", () => {
     );
   });
 
-  it.each(conteudosGlobais.map((c) => c.rota))("%s só baixa JS de framework se tiver ilha", (rota) => {
+  /**
+   * A asserção é sobre o RUNTIME DE FRAMEWORK, não sobre qualquer script.
+   *
+   * `client.*.js` é o runtime que o @astrojs/react injeta para hidratar ilhas —
+   * é ele que custa os ~45 kB que a migração existe para não pagar em página
+   * estática. Scripts próprios do Astro (menu, reveal, facade de vídeo,
+   * consentimento) são vanilla, ficam na casa dos poucos kB e aparecem em
+   * páginas sem ilha nenhuma por design.
+   *
+   * A versão anterior exigia ZERO chunks fora das páginas com ilha, o que
+   * confundia as duas coisas: o primeiro `<script>` vanilla compartilhado a
+   * entrar no Layout derrubaria o teste sem nenhum framework ter voltado.
+   */
+  it.each(conteudosGlobais.map((c) => c.rota))("%s só carrega o runtime React se tiver ilha", (rota) => {
     const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
-    const chunks = [...new Set(html.match(/_astro\/[A-Za-z0-9_.-]+\.js/g) ?? [])];
+    const runtime = [...new Set(html.match(/_astro\/client\.[A-Za-z0-9_-]+\.js/g) ?? [])];
+
     if (ILHAS_ESPERADAS[rota]) {
-      expect(chunks.length, "página com ilha deveria carregar pelo menos um chunk").toBeGreaterThan(0);
+      expect(runtime.length, "página com ilha deveria carregar o runtime do React").toBeGreaterThan(0);
     } else {
-      expect(chunks, `${rota} baixa JS sem ter ilha: ${chunks.join(", ")}`).toEqual([]);
+      expect(runtime, `${rota} carrega runtime React sem ter ilha: ${runtime.join(", ")}`).toEqual([]);
     }
   });
 

@@ -30,6 +30,7 @@ const { videoId, title, start, class: className = "" } = Astro.props;
 const params = new URLSearchParams({ autoplay: "1", rel: "0" });
 if (start) params.set("start", String(start));
 const src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+const linkDireto = `https://www.youtube.com/watch?v=${videoId}${start ? `&t=${start}` : ""}`;
 ---
 
 <button
@@ -38,6 +39,7 @@ const src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString
   data-src={src}
   data-title={title}
   data-classe-iframe={className}
+  data-link-direto={linkDireto}
   aria-label={`Assistir: ${title}`}
   class:list={[
     "group relative flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-lilac/30 via-pink/25 to-baby-blue/30 transition-colors hover:from-lilac/40 hover:via-pink/35 hover:to-baby-blue/40",
@@ -53,22 +55,63 @@ const src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString
   <span class="text-xs text-foreground/60">Clique para assistir no YouTube</span>
 </button>
 
+<p data-aviso-consentimento hidden class="mt-2 text-center text-sm text-muted-foreground" role="status">
+  Não foi possível abrir as preferências de cookies neste navegador.
+  <a class="text-primary underline underline-offset-2" href={linkDireto} target="_blank" rel="noopener noreferrer">
+    Assistir direto no YouTube
+  </a>.
+</p>
+
 <script>
+  import { CATEGORIA_MIDIA_EXTERNA } from "@/lib/cookies";
+  import { podeCarregarMidiaExterna, pedirMidiaExterna } from "@/lib/consentimentoMidia";
+
+  const montarPlayer = (botao: HTMLElement) => {
+    const iframe = document.createElement("iframe");
+    iframe.src = botao.dataset.src ?? "";
+    iframe.title = botao.dataset.title ?? "";
+    // Só as classes de dimensão, como no React original: o gradiente e o
+    // layout de centralização eram do botão, não do player.
+    iframe.className = botao.dataset.classeIframe ?? "";
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.allowFullscreen = true;
+    botao.replaceWith(iframe);
+  };
+
   document.querySelectorAll<HTMLButtonElement>("[data-youtube-facade]").forEach((botao) => {
-    botao.addEventListener(
-      "click",
-      () => {
-        const iframe = document.createElement("iframe");
-        iframe.src = botao.dataset.src ?? "";
-        iframe.title = botao.dataset.title ?? "";
-        // Só as classes de dimensão, como no React original: o gradiente e o
-        // layout de centralização eram do botão, não do player.
-        iframe.className = botao.dataset.classeIframe ?? "";
-        iframe.allow = "autoplay; encrypted-media; picture-in-picture";
-        iframe.allowFullscreen = true;
-        botao.replaceWith(iframe);
-      },
-      { once: true },
-    );
+    botao.addEventListener("click", async () => {
+      // Se a pessoa já autorizou conteúdo externo, o clique carrega direto.
+      // Se não, abre o painel de preferências na categoria certa — o clique
+      // aqui é a intenção de assistir, não um consentimento tácito para tudo.
+      if (!podeCarregarMidiaExterna()) {
+        const resposta = await pedirMidiaExterna();
+        if (resposta === "indisponivel") {
+          // Nem "sim" nem "não": não deu para perguntar. Um botão que não
+          // responde é pior que uma recusa, então oferece a saída direta.
+          const aviso = botao.parentElement?.querySelector<HTMLElement>("[data-aviso-consentimento]");
+          if (aviso) aviso.hidden = false;
+          return;
+        }
+        if (resposta !== "autorizado") return;
+      }
+      montarPlayer(botao);
+    });
+
+    // Quem aceita pelo painel enquanto a página está aberta não deveria ter
+    // que clicar de novo procurando o que mudou.
+    window.addEventListener("mundoflavinha:consentimento", () => {
+      if (podeCarregarMidiaExterna() && botao.isConnected && botao.dataset.pediu === "true") {
+        montarPlayer(botao);
+      }
+    });
   });
+
+  // Marca quem já tentou assistir, para o listener acima saber a quem responder.
+  document.addEventListener("click", (evento) => {
+    const alvo = evento.target instanceof Element && evento.target.closest("[data-youtube-facade]");
+    if (alvo instanceof HTMLElement) alvo.dataset.pediu = "true";
+  });
+
+  // Referenciado para o typecheck não considerar o import morto.
+  void CATEGORIA_MIDIA_EXTERNA;
 </script>

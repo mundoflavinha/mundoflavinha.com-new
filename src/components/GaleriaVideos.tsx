@@ -3,6 +3,7 @@ import { AlertCircle, ArrowRight, Calendar, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ChannelVideo, ChannelVideosResult } from "@/lib/youtube";
+import { pedirMidiaExterna, podeCarregarMidiaExterna } from "@/lib/consentimentoMidia";
 
 /**
  * Ilha da galeria de /videos. O resto da página (banner, <head>) é estático.
@@ -120,8 +121,15 @@ const GaleriaVideos = () => {
     return dados.videos.filter((video) => video.categories.includes(categoriaAtiva));
   }, [categoriaAtiva, dados?.videos]);
 
-  const abrirVideo = (video: ChannelVideo, evento: React.MouseEvent<HTMLElement>) => {
+  // O iframe daqui é criado pelo React, então um gerenciador global de iframes
+  // não o alcançaria: a checagem tem que acontecer neste caminho também, ou o
+  // /videos viraria a porta dos fundos do bloqueio prévio.
+  const abrirVideo = async (video: ChannelVideo, evento: React.MouseEvent<HTMLElement>) => {
     acionador.current = evento.currentTarget;
+    if (!podeCarregarMidiaExterna()) {
+      const resposta = await pedirMidiaExterna();
+      if (resposta !== "autorizado") return;
+    }
     setVideoSelecionado(video);
   };
 

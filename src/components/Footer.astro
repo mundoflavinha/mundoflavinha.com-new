@@ -115,6 +115,20 @@ const ano = new Date().getFullYear();
               </li>
             ))
           }
+          <li>
+            {/*
+              Revogar precisa ser tão fácil quanto aceitar — é o que a LGPD
+              pede e o que a ANPD cobra na prática. Link fixo, em toda página.
+              É <button> porque a ação é abrir um painel, não navegar.
+            */}
+            <button
+              type="button"
+              data-abrir-preferencias
+              class="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              Preferências de cookies
+            </button>
+          </li>
         </ul>
         <p class="mt-4 text-xs text-muted-foreground/70 leading-relaxed">
           Alguns links deste site podem gerar comissão para o Mundo Flavinha, sem custo extra para você.

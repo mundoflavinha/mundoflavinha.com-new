@@ -106,6 +106,7 @@ const secoes: SecaoLegal[] = [
       <li>Não pedimos CPF, RG, endereço residencial nem dados bancários</li>
       <li>Não coletamos nome, idade exata, data de nascimento, foto ou escola de nenhuma criança</li>
       <li>Não usamos ferramentas de analytics, pixels de publicidade ou rastreadores de comportamento</li>
+      <li>Não perfilamos você nem cruzamos seu comportamento entre páginas ou entre visitas</li>
     </LegalList>
   </LegalSection>
 
@@ -172,8 +173,8 @@ const secoes: SecaoLegal[] = [
 
   <LegalSection id="compartilhamento" title="Com quem compartilhamos" numero={6}>
     <LegalP>
-      Não vendemos seus dados. Eles são processados por empresas que nos prestam serviço de infraestrutura, na
-      medida necessária para o site funcionar:
+      Não vendemos seus dados. Parte deles é processada por empresas que nos prestam serviço — umas de
+      infraestrutura, outras de conteúdo ou de recomendação de produtos — sempre na medida necessária:
     </LegalP>
     <LegalTable headers={["Empresa", "Para que", "Onde fica"]}>
       {
@@ -194,8 +195,8 @@ const secoes: SecaoLegal[] = [
     <LegalP>
       Como você percebe na tabela acima, todos os nossos fornecedores de infraestrutura ficam fora do Brasil. Isso
       significa que seus dados são armazenados e processados no exterior, o que a LGPD permite mediante garantias
-      adequadas (art. 33). Escolhemos fornecedores que adotam cláusulas contratuais de proteção de dados e padrões
-      reconhecidos de segurança.
+      adequadas (art. 33). Buscamos fornecedores que ofereçam cláusulas contratuais de proteção de dados e padrões
+      reconhecidos de segurança, conforme os termos publicados por cada um deles.
     </LegalP>
   </LegalSection>
 
@@ -206,13 +207,25 @@ const secoes: SecaoLegal[] = [
     <LegalTable headers={["Categoria", "Usamos?", "Detalhe"]}>
       <LegalRow>
         <LegalCell>Necessários</LegalCell>
-        <LegalCell>Sim, o mínimo</LegalCell>
-        <LegalCell>Apenas o essencial para o site carregar e funcionar</LegalCell>
+        <LegalCell>Sim, um</LegalCell>
+        <LegalCell>
+          <strong class="text-foreground">cc_cookie</strong>, do próprio site, guarda apenas a sua escolha nesta
+          tabela por 6 meses. Sem ele, perguntaríamos de novo a cada página.
+        </LegalCell>
       </LegalRow>
       <LegalRow>
         <LegalCell>Preferências</LegalCell>
         <LegalCell>Não</LegalCell>
         <LegalCell>Não guardamos configurações de navegação</LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Conteúdo externo</LegalCell>
+        <LegalCell>Só com sua autorização</LegalCell>
+        <LegalCell>
+          Os vídeos são hospedados no YouTube. Enquanto você não autorizar, nenhum player é carregado e o Google não
+          recebe nada. Você decide no momento em que clica para assistir, e pode mudar depois em
+          <strong class="text-foreground">Preferências de cookies</strong>, no rodapé.
+        </LegalCell>
       </LegalRow>
       <LegalRow>
         <LegalCell>Analíticos / estatísticas</LegalCell>
@@ -225,6 +238,12 @@ const secoes: SecaoLegal[] = [
         <LegalCell>Não usamos pixel do Meta, do TikTok nem de qualquer rede</LegalCell>
       </LegalRow>
     </LegalTable>
+    <LegalSubtitle>Fontes e aparência</LegalSubtitle>
+    <LegalP>
+      As fontes usadas no site são servidas por nós mesmos. Nenhuma folha de estilo, fonte ou imagem é buscada em
+      servidores de terceiros quando você navega — inclusive na primeira visita, antes de qualquer escolha sua.
+    </LegalP>
+
     <LegalSubtitle>Vídeos do YouTube</LegalSubtitle>
     <LegalP>
       Nossos vídeos são hospedados no YouTube. Os players só são carregados{" "}
@@ -232,10 +251,9 @@ const secoes: SecaoLegal[] = [
       privacidade ampliada do YouTube. Assim, enquanto você não clicar, o Google não recebe nada por meio do player.
     </LegalP>
     <LegalP>
-      Precisamos ser transparentes sobre um ponto: na página de Vídeos, a lista e as miniaturas vêm dos servidores do
-      Google assim que a página abre. Isso significa que, nessa página específica, o Google recebe o seu endereço IP
-      e informações do navegador antes de qualquer clique. Estamos trabalhando para que essa consulta passe a ser
-      feita pelo nosso servidor.
+      Na página de Vídeos, a lista e as miniaturas passam pelo nosso próprio servidor: é ele que conversa com o
+      YouTube e devolve o resultado para você. Assim, ao abrir a página, o Google não recebe o seu endereço IP nem
+      informações do seu navegador. Isso só acontece se e quando você autorizar e carregar um vídeo.
     </LegalP>
   </LegalSection>
 

@@ -52,8 +52,15 @@ test("as fontes são servidas pelo próprio domínio", async ({ page }) => {
   expect(familias).toContain("Quicksand Variable");
 });
 
+/** O player agora exige autorização de conteúdo externo — ver consentimento-cookies.spec.ts. */
+const autorizarMidiaExterna = async (page: import("@playwright/test").Page) => {
+  await page.getByRole("button", { name: "Preferências de cookies" }).first().click();
+  await page.locator("#cc-main .pm").getByRole("button", { name: "Aceitar tudo" }).click();
+};
+
 test("o clique carrega o player, e só em youtube-nocookie", async ({ page }) => {
   await page.goto("/");
+  await autorizarMidiaExterna(page);
   await page.locator("[data-youtube-facade]").click();
 
   const iframe = page.locator('iframe[src*="youtube"]');
@@ -101,6 +108,8 @@ test("/videos não contata o YouTube ao listar", async ({ page }) => {
   await page.goto("/videos");
   await expect(page.getByRole("heading", { name: "Brincadeira com tampinhas" })).toBeVisible();
   expect(pedidos, `contatou sem clique: ${pedidos.join(", ")}`).toEqual([]);
+
+  await autorizarMidiaExterna(page);
 
   // A miniatura sai pelo nosso domínio, montada a partir do id.
   await expect(page.locator("article img")).toHaveAttribute("src", "/api/thumb?id=abc123abc12");

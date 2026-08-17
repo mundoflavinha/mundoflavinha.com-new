@@ -10,8 +10,8 @@
 export const LEGAL_EM_REVISAO = true;
 
 /** Versão dos documentos legais. Bump quando o conteúdo mudar de forma relevante. */
-export const LEGAL_VERSAO = "2026-08-v1";
-export const LEGAL_ATUALIZADO_EM = "12 de agosto de 2026";
+export const LEGAL_VERSAO = "2026-08-v2";
+export const LEGAL_ATUALIZADO_EM = "17 de agosto de 2026";
 
 export const CONTROLADOR = {
   nomeFantasia: "Mundo Flavinha",
@@ -61,7 +61,12 @@ export const ROTAS_LEGAIS = {
 export const OPERADORES = [
   { nome: "Vercel", papel: "Hospedagem do site e execução das funções de servidor", pais: "Estados Unidos" },
   { nome: "Neon", papel: "Banco de dados onde ficam os cadastros", pais: "Estados Unidos" },
-  { nome: "Google / YouTube", papel: "Exibição dos vídeos incorporados e dados do canal", pais: "Estados Unidos" },
+  {
+    nome: "Google / YouTube",
+    papel:
+      "Exibição dos vídeos incorporados, apenas depois que você autoriza conteúdo externo. A lista e as miniaturas passam pelo nosso servidor, então abrir a página de Vídeos não expõe seus dados ao Google",
+    pais: "Estados Unidos",
+  },
   { nome: "Amazon Associados", papel: "Links de recomendação de produtos", pais: "Estados Unidos" },
   { nome: "Meta / WhatsApp", papel: "Contato por WhatsApp, quando você opta por isso", pais: "Estados Unidos" },
 ] as const;

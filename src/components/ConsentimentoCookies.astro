@@ -1,0 +1,122 @@
+---
+/**
+ * Banner e painel de preferências de cookies.
+ *
+ * Sem `define:vars` e sem `is:inline` de propósito: qualquer atributo faz o
+ * Astro tratar o `<script>` como inline, e script inline NÃO resolve import de
+ * pacote npm — `import("vanilla-cookieconsent")` viraria um especificador nu no
+ * navegador e quebraria em runtime, com o build passando. Como este script é
+ * processado, ele importa direto do catálogo em TypeScript e o Astro empacota
+ * biblioteca e CSS servindo pelo nosso domínio.
+ *
+ * Nada de CDN: o gerenciador roda ANTES de qualquer escolha, então buscá-lo num
+ * terceiro criaria justamente a comunicação prévia que ele existe para evitar.
+ */
+---
+
+<script>
+  import "vanilla-cookieconsent/dist/cookieconsent.css";
+  import * as CookieConsent from "vanilla-cookieconsent";
+  import { CATEGORIAS_COOKIES, REVISAO_COOKIES } from "@/lib/cookies";
+  import { ROTAS_LEGAIS } from "@/lib/site";
+
+  const categorias = Object.fromEntries(
+    CATEGORIAS_COOKIES.map((c) => [c.id, c.obrigatoria ? { enabled: true, readOnly: true } : {}]),
+  );
+
+  const secoes = CATEGORIAS_COOKIES.map((c) => ({
+    title: c.titulo,
+    description: c.descricao,
+    linkedCategory: c.id,
+  }));
+
+  CookieConsent.run({
+    // opt-in: nada opcional roda antes do aceite. É o padrão da biblioteca,
+    // declarado aqui de propósito — silêncio não é consentimento.
+    mode: "opt-in",
+    revision: REVISAO_COOKIES,
+
+    // Sem banner interrompendo a primeira visita: hoje o site não carrega NADA
+    // de terceiro sozinho — as fontes são próprias, as miniaturas passam pelo
+    // nosso servidor e o player só monta por clique. Pedir consentimento sem
+    // ter o que coletar é ruído, e a ANPD desaconselha banner desnecessário. A
+    // escolha aparece no ponto em que importa (ao tentar ver um vídeo) e pelo
+    // link fixo no rodapé.
+    //
+    // Quando o Google Analytics entrar, isto vira `true` e REVISAO_COOKIES sobe:
+    // aí passa a existir coleta que começa antes de qualquer interação, e a
+    // pergunta tem que vir na frente.
+    autoShow: false,
+
+    manageScriptTags: true,
+    autoClearCookies: true,
+
+    // Desligado de propósito. O padrão é `true` e faz a biblioteca ABORTAR por
+    // inteiro quando detecta automação — inclusive `navigator.webdriver`. O que
+    // ele protege é o crawler indexar o texto do banner; como `autoShow` é
+    // false, não existe banner aberto para ninguém indexar, então a proteção
+    // não vale nada aqui. Em compensação o custo é real: com a biblioteca
+    // abortada, o botão do vídeo fica morto e sem explicação. Ver o caminho de
+    // fallback em YouTubeFacade.astro.
+    hideFromBots: false,
+    // Nunca bloquear a página: seria um cookie wall, e recusar não pode custar
+    // o acesso ao conteúdo.
+    disablePageInteraction: false,
+
+    guiOptions: {
+      consentModal: { layout: "box", position: "bottom left", equalWeightButtons: true },
+      preferencesModal: { layout: "box", equalWeightButtons: true },
+    },
+
+    categories: categorias,
+
+    language: {
+      default: "pt",
+      translations: {
+        pt: {
+          consentModal: {
+            title: "Cookies e conteúdo externo",
+            description:
+              "Este site não usa cookies de publicidade nem rastreadores. Guardamos apenas a sua escolha aqui, e os vídeos do YouTube só carregam quando você autoriza.",
+            acceptAllBtn: "Aceitar tudo",
+            // Rótulo explícito: "Continuar sem aceitar" não deixa claro que é
+            // uma recusa, e recusar tem que ser tão evidente quanto aceitar.
+            acceptNecessaryBtn: "Recusar o que não é necessário",
+            showPreferencesBtn: "Escolher o que permitir",
+          },
+          preferencesModal: {
+            title: "Suas preferências",
+            acceptAllBtn: "Aceitar tudo",
+            acceptNecessaryBtn: "Recusar o que não é necessário",
+            savePreferencesBtn: "Salvar minhas escolhas",
+            closeIconLabel: "Fechar",
+            sections: [
+              {
+                description: `Você pode mudar isto quando quiser. Os detalhes estão na <a href="${ROTAS_LEGAIS.privacidade}#cookies" class="cc__link">Política de Privacidade</a>.`,
+              },
+              ...secoes,
+            ],
+          },
+        },
+      },
+    },
+  });
+
+  // Reemitido como evento de janela para o facade de vídeo reagir sem recarregar
+  // a página. Quem aceita pelo painel não deveria ter que caçar o que mudou.
+  // Em WINDOW, não em document: a biblioteca chama `dispatchEvent` nu dentro do
+  // módulo, o que resolve para window.dispatchEvent. Ouvir em document não
+  // recebia nada — e a falha era silenciosa, com o player simplesmente não
+  // aparecendo depois do aceite.
+  const avisar = () => window.dispatchEvent(new CustomEvent("mundoflavinha:consentimento"));
+  window.addEventListener("cc:onConsent", avisar);
+  window.addEventListener("cc:onChange", avisar);
+
+  // Link fixo do rodapé: revogar tão fácil quanto aceitar.
+  document.querySelectorAll("[data-abrir-preferencias]").forEach((botao) =>
+    botao.addEventListener("click", (evento) => {
+      evento.preventDefault();
+      CookieConsent.showPreferences();
+    }),
+  );
+</script>
