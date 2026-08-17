@@ -24,6 +24,7 @@ import { describe, expect, it } from "vitest";
 const ARQUIVOS_DA_API = [
   "api/lead.ts",
   "api/videos.ts",
+  "api/thumb.ts",
   "src/lib/consent.ts",
   "src/lib/leadSchema.ts",
   "src/lib/youtubeFetcher.ts",

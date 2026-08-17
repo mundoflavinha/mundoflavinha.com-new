@@ -29,22 +29,42 @@ const formatarData = (valor: string) => {
   return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(data);
 };
 
+/** IDs do YouTube são 11 caracteres de base64url. */
+const ID_VALIDO = /^[A-Za-z0-9_-]{11}$/;
+
+/**
+ * O `embedUrl` e o `thumbnailUrl` são DERIVADOS do id, nunca lidos da resposta.
+ *
+ * A versão anterior aceitava `embedUrl` como veio da API, exigindo apenas que
+ * fosse string. Uma resposta comprometida — ou um bug no fetcher — colocaria um
+ * iframe de host arbitrário dentro da página, com a credibilidade do nosso
+ * domínio. O id passa por um formato estreito e o resto é montado aqui.
+ */
+const urlDoEmbed = (id: string) => `https://www.youtube-nocookie.com/embed/${id}`;
+const urlDaMiniatura = (id: string) => `/api/thumb?id=${encodeURIComponent(id)}`;
+
 const ehVideo = (valor: unknown): valor is ChannelVideo => {
   if (typeof valor !== "object" || valor === null) return false;
   const v = valor as Record<string, unknown>;
   return (
     typeof v.id === "string" &&
+    ID_VALIDO.test(v.id) &&
     typeof v.title === "string" &&
-    typeof v.embedUrl === "string" &&
     typeof v.publishedAt === "string" &&
-    Array.isArray(v.categories)
+    Array.isArray(v.categories) &&
+    v.categories.every((c) => typeof c === "string")
   );
 };
 
 const ehResposta = (valor: unknown): valor is ChannelVideosResult => {
   if (typeof valor !== "object" || valor === null) return false;
   const v = valor as Record<string, unknown>;
-  return Array.isArray(v.videos) && v.videos.every(ehVideo) && Array.isArray(v.categories);
+  return (
+    Array.isArray(v.videos) &&
+    v.videos.every(ehVideo) &&
+    Array.isArray(v.categories) &&
+    v.categories.every((c) => typeof c === "string")
+  );
 };
 
 const Esqueleto = () => (
@@ -159,9 +179,12 @@ const GaleriaVideos = () => {
                     aria-label={`Assistir ${video.title}`}
                   >
                     <div className="relative aspect-video overflow-hidden bg-foreground/5">
-                      {video.thumbnailUrl && (
-                        <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
-                      )}
+                      <img
+                        src={urlDaMiniatura(video.id)}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
                       <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
                         <div className="w-14 h-14 rounded-full bg-primary-foreground/90 flex items-center justify-center shadow-sm">
                           <Play className="w-7 h-7 text-primary ml-0.5" />
@@ -228,7 +251,7 @@ const GaleriaVideos = () => {
                     src/lib/youtubeFetcher.ts. */}
                 <iframe
                   key={videoSelecionado.id}
-                  src={`${videoSelecionado.embedUrl}?autoplay=1&rel=0`}
+                  src={`${urlDoEmbed(videoSelecionado.id)}?autoplay=1&rel=0`}
                   title={videoSelecionado.title}
                   className="h-full w-full"
                   allow="autoplay; encrypted-media; picture-in-picture"

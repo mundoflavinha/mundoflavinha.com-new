@@ -75,12 +75,17 @@ test("/videos não contata o YouTube ao listar", async ({ page }) => {
         categories: ["Todos", "Brincadeiras"],
         videos: [
           {
-            id: "abc123",
+            id: "abc123abc12",
             title: "Brincadeira com tampinhas",
             url: "https://www.youtube.com/watch?v=abc123",
-            embedUrl: "https://www.youtube-nocookie.com/embed/abc123",
+            // URL de embed HOSTIL: a galeria não pode usar o que a API mandar.
+            embedUrl: "https://exemplo-malicioso.invalido/embed/abc123abc12",
             publishedAt: "2026-08-01T12:00:00Z",
-            thumbnailUrl: "",
+            // Miniatura REALISTA, apontando para o Google. A fixture antiga
+            // usava string vazia, então a asserção "não contata o YouTube"
+            // passava sem exercitar o caminho que importa. A galeria deve
+            // ignorar este campo e derivar a URL do id, pelo nosso /api/thumb.
+            thumbnailUrl: "https://i.ytimg.com/vi/abc123abc12/maxresdefault.jpg",
             categories: ["Brincadeiras"],
           },
         ],
@@ -97,8 +102,14 @@ test("/videos não contata o YouTube ao listar", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Brincadeira com tampinhas" })).toBeVisible();
   expect(pedidos, `contatou sem clique: ${pedidos.join(", ")}`).toEqual([]);
 
+  // A miniatura sai pelo nosso domínio, montada a partir do id.
+  await expect(page.locator("article img")).toHaveAttribute("src", "/api/thumb?id=abc123abc12");
+
   await page.getByRole("button", { name: /Assistir Brincadeira com tampinhas/ }).click();
-  await expect(page.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(1);
+  const player = page.locator("iframe");
+  await expect(player).toHaveCount(1);
+  // Ignora o embedUrl hostil da resposta e usa o derivado do id.
+  await expect(player).toHaveAttribute("src", /^https:\/\/www\.youtube-nocookie\.com\/embed\/abc123abc12\?/);
 
   // Fechar precisa DESMONTAR o iframe: um player escondido continua tocando e
   // continua falando com o Google.
