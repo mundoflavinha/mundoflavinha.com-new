@@ -1,0 +1,84 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import PageBanner from "@/components/PageBanner.astro";
+import { Icon } from "astro-icon/components";
+import { LEGAL_ATUALIZADO_EM, LEGAL_EM_REVISAO, LEGAL_VERSAO } from "@/lib/site";
+
+export interface SecaoLegal {
+  /** Vira âncora (#id). Manter estável: pode ser citado em e-mail. */
+  id: string;
+  title: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  subtitle?: string;
+  bgColor?: string;
+  /** Só id+title: o conteúdo entra como <LegalSection> no slot. */
+  sections: SecaoLegal[];
+  /** Documentos com força jurídica mostram versão/data; Contato não precisa. */
+  showVersion?: boolean;
+}
+
+const {
+  title,
+  description,
+  subtitle,
+  bgColor = "bg-lilac/15",
+  sections,
+  showVersion = true,
+} = Astro.props;
+---
+
+<Layout title={title} description={description}>
+  <PageBanner title={title} subtitle={subtitle} bgColor={bgColor} />
+
+  <section class="py-12 md:py-16">
+    <div class="container max-w-3xl">
+      {
+        LEGAL_EM_REVISAO && showVersion && (
+          <div class="mb-8 flex gap-3 rounded-xl border border-amber-400/40 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+            <Icon name="lucide:triangle-alert" class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <p>
+              <strong class="font-heading font-bold">Documento em revisão.</strong> Este texto é uma
+              versão preliminar, ainda em análise jurídica, e alguns dados de identificação estão
+              pendentes de preenchimento. Se algo aqui não estiver claro, fale com a gente antes de
+              enviar seus dados.
+            </p>
+          </div>
+        )
+      }
+
+      {
+        showVersion && (
+          <p class="text-xs text-muted-foreground">
+            Última atualização: {LEGAL_ATUALIZADO_EM} · Versão {LEGAL_VERSAO}
+          </p>
+        )
+      }
+
+      {
+        sections.length > 1 && (
+          <nav aria-label="Índice" class="mt-8 rounded-2xl bg-secondary/40 p-5">
+            <h2 class="font-heading text-sm font-bold text-foreground">Nesta página</h2>
+            <ol class="mt-3 space-y-1.5">
+              {sections.map((secao, i) => (
+                <li class="text-sm">
+                  <a
+                    href={`#${secao.id}`}
+                    class="text-muted-foreground underline-offset-2 transition-colors hover:text-primary hover:underline"
+                  >
+                    {i + 1}. {secao.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      <div class="mt-10 space-y-10"><slot /></div>
+    </div>
+  </section>
+</Layout>

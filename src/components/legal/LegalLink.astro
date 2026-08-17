@@ -1,0 +1,7 @@
+---
+// Era <Link> do react-router. Vira <a> nativo: em MPA não há Router, e um
+// island que renderizasse <Link> estouraria em runtime.
+interface Props { href: string }
+const { href } = Astro.props;
+---
+<a href={href} class="text-primary underline underline-offset-2 hover:opacity-80 transition-opacity"><slot /></a>

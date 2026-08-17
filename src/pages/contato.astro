@@ -1,0 +1,82 @@
+---
+import LegalPage, { type SecaoLegal } from "@/layouts/LegalPage.astro";
+import LegalSection from "@/components/legal/LegalSection.astro";
+import LegalExternalLink from "@/components/legal/LegalExternalLink.astro";
+import LegalHighlight from "@/components/legal/LegalHighlight.astro";
+import LegalLink from "@/components/legal/LegalLink.astro";
+import LegalList from "@/components/legal/LegalList.astro";
+import LegalMailto from "@/components/legal/LegalMailto.astro";
+import LegalP from "@/components/legal/LegalP.astro";
+import { CONTATO, REDES_SOCIAIS, ROTAS_LEGAIS } from "@/lib/site";
+
+const secoes: SecaoLegal[] = [
+  { id: "fale-com-a-gente", title: "Fale com a gente" },
+  { id: "privacidade-e-dados", title: "Privacidade e seus dados" },
+  { id: "por-que-sem-formulario", title: "Por que não temos formulário de contato" },
+  { id: "parcerias", title: "Parcerias e recomendações" },
+];
+---
+
+<LegalPage
+  title="Contato"
+  description="Fale com o Mundo Flavinha ou exerça seus direitos sobre os dados que você compartilhou."
+  subtitle="Dúvidas, sugestões, parcerias ou pedidos sobre seus dados."
+  bgColor="bg-baby-blue/20"
+  sections={secoes}
+  showVersion={false}
+>
+  <LegalSection id="fale-com-a-gente" title="Fale com a gente" numero={1}>
+    <LegalP>
+      A melhor forma de falar com o Mundo Flavinha é por e-mail: <LegalMailto email={CONTATO.email} />. Lemos todas
+      as mensagens e respondemos assim que possível.
+    </LegalP>
+    <LegalP>
+      Você também nos encontra nas redes, onde postamos com mais frequência:
+    </LegalP>
+    <LegalList>
+      {
+        REDES_SOCIAIS.map((rede) => (
+          <li>
+            {rede.label}: <LegalExternalLink href={rede.href}>{rede.href.replace("https://www.", "")}</LegalExternalLink>
+          </li>
+        ))
+      }
+    </LegalList>
+  </LegalSection>
+
+  <LegalSection id="privacidade-e-dados" title="Privacidade e seus dados" numero={2}>
+    <LegalHighlight>
+      Para pedidos sobre seus dados pessoais — acesso, correção, exclusão ou descadastro —, escreva para{" "}
+      <LegalMailto email={CONTATO.emailPrivacidade} />. Respondemos em até {CONTATO.prazoRespostaDias} dias.
+    </LegalHighlight>
+    <LegalP>Para agilizar, conte no e-mail:</LegalP>
+    <LegalList>
+      <li>O que você quer (por exemplo: “parar de receber e-mails” ou “apagar meus dados”)</li>
+      <li>O e-mail que você usou ao se cadastrar, se for diferente do que está escrevendo</li>
+    </LegalList>
+    <LegalP>
+      Podemos pedir alguma informação para confirmar que é você mesmo — é o que impede que outra pessoa acesse ou
+      apague seus dados. Detalhes de como tratamos tudo isso estão na{" "}
+      <LegalLink href={ROTAS_LEGAIS.privacidade}>Política de Privacidade</LegalLink>.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="por-que-sem-formulario" title="Por que não temos formulário de contato" numero={3}>
+    <LegalP>
+      De propósito: um formulário nos faria coletar e armazenar mais dados seus do que o necessário. Um e-mail direto
+      resolve igual, e o conteúdo fica só entre você e a nossa caixa de entrada.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="parcerias" title="Parcerias e recomendações" numero={4}>
+    <LegalP>
+      Para propostas de parceria, publicidade ou divulgação de produtos, escreva para{" "}
+      <LegalMailto email={CONTATO.email} /> com o assunto “Parceria”.
+    </LegalP>
+    <LegalP>
+      Vale saber: parte das recomendações do site usa links de afiliado, e podemos receber comissão por compras
+      feitas através deles, sem custo adicional para quem compra. As condições estão nos{" "}
+      <LegalLink href={ROTAS_LEGAIS.termos}>Termos de Uso</LegalLink>.
+    </LegalP>
+  </LegalSection>
+</LegalPage>
