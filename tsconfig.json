@@ -12,7 +12,16 @@
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "types": ["astro/client"]
+    "types": ["astro/client"],
+    // `astro/tsconfigs/strict` NÃO liga isto. Sem elas, uma variável ou import
+    // não usado no frontmatter de um `.astro` é rebaixado a "hint" pelo
+    // `astro check` — severidade que não afeta o exit code de `npm run
+    // typecheck`. Confirmado por mutação: sem estas duas linhas, injetar uma
+    // variável morta num `.astro` real passa verde; com elas, vira `error` e
+    // quebra o build. É a checagem mais barata que existe para o único ponto
+    // cego que nem o ESLint (que hoje ignora `.astro` por completo) cobria.
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
   "include": [".astro/types.d.ts", "src/**/*", "*.config.*"],
   "exclude": ["dist", "node_modules", "api"]

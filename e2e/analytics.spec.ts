@@ -9,9 +9,12 @@ import { expect, test, type Page } from "@playwright/test";
  * `_ga` aparece mesmo depois da recusa. Nada disso quebra a página, então só um
  * teste que observe a REDE percebe.
  *
- * Estes testes só rodam com PUBLIC_GA_ID definida no build — o mesmo mecanismo
- * que mantém o Analytics fora dos deploys de preview. Sem ela não há tag para
- * testar, e pular é honesto: o que precisaria ser provado não existe.
+ * Estes testes só rodam com PUBLIC_GA_ID definida no build. Em CI o valor é
+ * sempre passado (ver .github/workflows/ci.yml) — então lá, a tag ausente NÃO
+ * é "nada para testar", é uma REGRESSÃO (a variável parou de chegar ao build, o
+ * componente quebrou, etc.) e o teste tem que FALHAR, não pular em silêncio.
+ * Fora de CI (`npm run test:e2e` local sem a variável), aí sim pular é honesto:
+ * a pessoa não pediu para testar isso agora.
  */
 
 const DOMINIOS_DE_MEDICAO = /(googletagmanager\.com|google-analytics\.com|analytics\.google\.com)/;
@@ -19,13 +22,28 @@ const DOMINIOS_DE_MEDICAO = /(googletagmanager\.com|google-analytics\.com|analyt
 const temTagDeAnalytics = async (page: Page) =>
   (await page.locator('script[type="text/plain"][data-category="analytics"]').count()) > 0;
 
+/**
+ * Substitui `test.skip(!tag, ...)`. Em CI, ausência da tag é falha; fora de
+ * CI, é pulo. Chamar depois de um `page.goto()`.
+ */
+const exigirTagDeAnalytics = async (page: Page) => {
+  const tem = await temTagDeAnalytics(page);
+  if (!tem && process.env.CI) {
+    throw new Error(
+      "PUBLIC_GA_ID não chegou ao build em CI — os testes de bloqueio prévio do Analytics não têm o que verificar. " +
+        "Isso é uma regressão de configuração, não ausência de cenário: conferir o passo de build em ci.yml.",
+    );
+  }
+  test.skip(!tem, "build sem PUBLIC_GA_ID (rodando fora de CI)");
+};
+
 const cookiesDoGa = async (page: Page) =>
   (await page.context().cookies()).filter((c) => c.name.startsWith("_ga"));
 
 test.describe("bloqueio prévio", () => {
   test("a tag existe no HTML mas nasce inerte", async ({ page }) => {
     await page.goto("/");
-    test.skip(!(await temTagDeAnalytics(page)), "build sem PUBLIC_GA_ID");
+    await exigirTagDeAnalytics(page);
 
     const loader = page.locator('script[data-category="analytics"][data-src]');
     await expect(loader).toHaveCount(1);
@@ -43,7 +61,7 @@ test.describe("bloqueio prévio", () => {
     });
 
     await page.goto("/", { waitUntil: "networkidle" });
-    test.skip(!(await temTagDeAnalytics(page)), "build sem PUBLIC_GA_ID");
+    await exigirTagDeAnalytics(page);
 
     // O banner precisa estar na frente: agora existe coleta que começaria sozinha.
     await expect(page.locator("#cc-main .cm")).toBeVisible();
@@ -61,7 +79,7 @@ test.describe("bloqueio prévio", () => {
 
   test("recusar mantém tudo bloqueado, inclusive ao navegar e recarregar", async ({ page }) => {
     await page.goto("/");
-    test.skip(!(await temTagDeAnalytics(page)), "build sem PUBLIC_GA_ID");
+    await exigirTagDeAnalytics(page);
 
     await page.locator("#cc-main .cm").getByRole("button", { name: "Recusar o que não é necessário" }).click();
 
@@ -81,7 +99,7 @@ test.describe("bloqueio prévio", () => {
 
   test("aceitar libera — e o primeiro contato é depois do clique", async ({ page }) => {
     await page.goto("/");
-    test.skip(!(await temTagDeAnalytics(page)), "build sem PUBLIC_GA_ID");
+    await exigirTagDeAnalytics(page);
 
     const medicao: string[] = [];
     page.on("request", (req) => {
@@ -97,7 +115,7 @@ test.describe("bloqueio prévio", () => {
 
   test("revogar apaga os cookies do Google", async ({ page }) => {
     await page.goto("/");
-    test.skip(!(await temTagDeAnalytics(page)), "build sem PUBLIC_GA_ID");
+    await exigirTagDeAnalytics(page);
 
     await page.locator("#cc-main .cm").getByRole("button", { name: "Aceitar tudo" }).click();
     await expect.poll(async () => (await cookiesDoGa(page)).length, { timeout: 10_000 }).toBeGreaterThan(0);

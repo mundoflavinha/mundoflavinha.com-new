@@ -22,7 +22,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? "github" : "list",
+  // Em CI, os dois reporters: "github" para anotar a PR inline, "html" para
+  // produzir de fato a pasta que o workflow sobe como artefato quando falha.
+  // Antes era só "github" — esse reporter NÃO gera playwright-report/, então
+  // o upload-artifact do CI sempre mirava uma pasta inexistente. Sem falha
+  // "no files found" (o step só roda com `if: failure()`), então isso nunca
+  // tinha sido notado: o buraco só aparece na hora em que mais importa, com
+  // um teste quebrado e nenhum relatório para diagnosticar.
+  reporter: process.env.CI ? [["github"], ["html", { outputFolder: "playwright-report", open: "never" }]] : "list",
   use: {
     baseURL: "http://localhost:4322",
     trace: "on-first-retry",
@@ -33,7 +40,13 @@ export default defineConfig({
     // sai assim que sobe) e ignora --port quando já existe um daemon de outra
     // execução. O Playwright precisa de um processo vivo e de porta previsível.
     // Ver o comentário em scripts/servir-dist.mjs.
-    command: "npm run build && node scripts/servir-dist.mjs 4322",
+    //
+    // Em CI NÃO builda de novo: o workflow já rodou `npm run build` com
+    // PUBLIC_GA_ID antes deste passo, e reconstruir aqui geraria um dist/
+    // diferente daquele que `test:html` acabou de validar — os dois deixariam
+    // de estar checando o mesmo artefato. Localmente, "build && serve" continua
+    // conveniente para rodar `npm run test:e2e` isoladamente.
+    command: process.env.CI ? "node scripts/servir-dist.mjs 4322" : "npm run build && node scripts/servir-dist.mjs 4322",
     url: "http://localhost:4322",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
