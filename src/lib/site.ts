@@ -15,8 +15,12 @@ export const LEGAL_ATUALIZADO_EM = "17 de agosto de 2026";
 
 export const CONTROLADOR = {
   nomeFantasia: "Mundo Flavinha",
-  razaoSocial: "[RAZÃO SOCIAL]",
-  cnpj: "[CNPJ]",
+  // MEI de Flávia Silva Guimarães — a razão social "{8 primeiros dígitos do
+  // CNPJ} {nome completo}" é o formato padrão de Empresário Individual,
+  // confirmado consultando o CNPJ abaixo (situação ATIVA).
+  razaoSocial: "49.736.565 FLAVIA SILVA GUIMARAES",
+  cnpj: "49.736.565/0001-20",
+  // Endereço fica pendente de propósito — ver LEGAL_EM_REVISAO.
   endereco: "[ENDEREÇO COMPLETO]",
 } as const;
 
