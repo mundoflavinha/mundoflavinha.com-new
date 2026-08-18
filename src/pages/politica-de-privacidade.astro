@@ -362,10 +362,20 @@ const secoes: SecaoLegal[] = [
   </LegalSection>
 
   <LegalSection id="encarregado" title="Encarregado pelo tratamento de dados" numero={13}>
-    <LegalP>
-      Encarregado (DPO): {CONTATO.encarregado} — <LegalMailto email={CONTATO.emailPrivacidade} />. É a pessoa
-      responsável por receber comunicações de titulares e da ANPD.
-    </LegalP>
+    {
+      CONTATO.encarregado ? (
+        <LegalP>
+          Encarregado (DPO): {CONTATO.encarregado} — <LegalMailto email={CONTATO.emailPrivacidade} />. É a pessoa
+          responsável por receber comunicações de titulares e da ANPD.
+        </LegalP>
+      ) : (
+        <LegalP>
+          O Mundo Flavinha se declara agente de tratamento de pequeno porte, regime em que a ANPD dispensa a
+          indicação formal de uma pessoa encarregada — o próprio canal de contato cumpre esse papel. Comunicações de
+          titulares e da ANPD podem ser enviadas para <LegalMailto email={CONTATO.emailPrivacidade} />.
+        </LegalP>
+      )
+    }
   </LegalSection>
 
   <LegalSection id="alteracoes" title="Alterações desta política" numero={14}>

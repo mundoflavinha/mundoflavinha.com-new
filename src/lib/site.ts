@@ -21,12 +21,19 @@ export const CONTROLADOR = {
 } as const;
 
 export const CONTATO = {
-  /** Contato geral do público. */
-  email: "[E-MAIL DE CONTATO]",
-  /** Canal para exercer direitos da LGPD (art. 18). Pode ser o mesmo do geral. */
-  emailPrivacidade: "[E-MAIL DE PRIVACIDADE]",
-  /** Encarregado / DPO. Facultativo para pequenos agentes, mas se houver, declare. */
-  encarregado: "[NOME DO ENCARREGADO]",
+  /** Contato geral do público. Mesmo endereço já em uso no site anterior. */
+  email: "contato@mundoflavinha.com",
+  /** Canal para exercer direitos da LGPD (art. 18). Mesmo endereço do geral. */
+  emailPrivacidade: "contato@mundoflavinha.com",
+  /**
+   * Encarregado / DPO. Deixado em branco de propósito, não é placeholder
+   * pendente: o Mundo Flavinha se declara agente de pequeno porte, regime em
+   * que a ANPD dispensa nomear uma pessoa formalmente — o próprio canal de
+   * contato cumpre o papel. Ver o parágrafo condicional em
+   * politica-de-privacidade.astro. Se isso mudar (a empresa crescer, alguém
+   * assumir a função formalmente), preencha aqui.
+   */
+  encarregado: "",
   prazoRespostaDias: 15,
 } as const;
 
