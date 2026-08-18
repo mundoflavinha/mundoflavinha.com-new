@@ -1,0 +1,20 @@
+---
+import BrincadeiraDetalheLayout from "@/layouts/BrincadeiraDetalheLayout.astro";
+import { brincadeirasFamilia, getBrincadeiraFamiliaBySlug } from "@/data/brincadeirasFamilia";
+
+export function getStaticPaths() {
+  return brincadeirasFamilia.map((b) => ({ params: { slug: b.slug } }));
+}
+
+const { slug } = Astro.params;
+const brincadeira = getBrincadeiraFamiliaBySlug(slug)!;
+---
+
+<BrincadeiraDetalheLayout
+  brincadeira={brincadeira}
+  backHref="/brincadeiras/em-familia"
+  backLabel="em família"
+  heroBgClass="bg-pink/15"
+  badgeIcon="lucide:heart-handshake"
+  cortarNoPonto
+/>

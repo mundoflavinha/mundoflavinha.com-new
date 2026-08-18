@@ -1,0 +1,19 @@
+---
+import BrincadeiraDetalheLayout from "@/layouts/BrincadeiraDetalheLayout.astro";
+import { brincadeiras35, getBrincadeira35BySlug } from "@/data/brincadeiras35";
+
+export function getStaticPaths() {
+  return brincadeiras35.map((b) => ({ params: { slug: b.slug } }));
+}
+
+const { slug } = Astro.params;
+const brincadeira = getBrincadeira35BySlug(slug)!;
+---
+
+<BrincadeiraDetalheLayout
+  brincadeira={brincadeira}
+  backHref="/brincadeiras/3-a-5-anos"
+  backLabel="de 3 a 5 anos"
+  heroBgClass="bg-secondary/50"
+  badgeIcon="lucide:sparkles"
+/>

@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import PageBanner from "@/components/PageBanner.astro";
+import GaleriaVideos from "@/components/GaleriaVideos";
+---
+
+<Layout
+  title="Vídeos do Canal"
+  description="Toda segunda e quinta tem vídeo novo no canal Mundo Flavinha: brincadeiras, ideias e conversas sobre infância sem telas."
+>
+  <PageBanner
+    title="Vídeos do Canal"
+    subtitle="Toda segunda e quinta tem vídeo novo no canal Mundo Flavinha"
+    bgColor="bg-pink/15"
+  />
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      {/* client:visible: a galeria está abaixo do banner, então hidrata quando
+          entra na tela. Diferente do modal, aqui não há clique a perder antes
+          da hidratação — o conteúdo só existe depois dela. */}
+      <GaleriaVideos client:visible />
+    </div>
+  </section>
+</Layout>

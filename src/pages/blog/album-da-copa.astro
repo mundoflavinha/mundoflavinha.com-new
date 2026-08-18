@@ -1,0 +1,77 @@
+---
+import ArtigoLayout from "@/layouts/ArtigoLayout.astro";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
+import momentosNatacao from "@/assets/Artigo/Momentos-Natação.webp";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.webp";
+import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.webp";
+
+const articleUrl = "https://mundoflavinha.com/blog/album-da-copa";
+const articleTitle = "Eu tinha prometido para mim mesma que NÃO iria comprar o álbum da Copa.";
+
+const tags = [
+  "álbum da copa",
+  "álbum da copa 2026",
+  "figurinhas da copa",
+  "infância",
+  "maternidade",
+  "parentalidade",
+  "memória afetiva",
+  "consumo consciente",
+  "família",
+  "infância e tecnologia",
+  "filhos",
+  "experiências em família",
+  "educação infantil",
+  "copa do mundo",
+  "rotina com filhos",
+];
+
+const relatedPosts = [
+  {
+    title: "Presença se constrói nos pequenos momentos.",
+    category: "Reflexão",
+    image: momentosNatacao,
+    href: "/blog/presenca-pequenos-momentos",
+  },
+  {
+    title: "O dia em que meus filhos criaram uma lojinha no prédio.",
+    category: "Reflexão",
+    image: empreendedorismoInfantil,
+    href: "/blog/empreendedorismo-infantil",
+  },
+  {
+    title: "No carro da minha infância não existia tela. Existia conversa.",
+    category: "Reflexão",
+    image: brincadeiraNoCarro,
+    href: "/blog/brincadeira-no-carro",
+  },
+];
+
+const articleParagraphs = [
+  "Na minha cabeça, era só mais um gasto. Mais uma febre infantil. Mais uma coisa que começaria pequena e depois viraria exagero.",
+  "Inclusive, no começo, pedi para ninguém comentar sobre o álbum com as crianças. O que, sinceramente, era impossível. Porque o assunto já estava em todo lugar: na escola, no bairro, entre amigos, grupos de família...",
+  "E então eu lembrei de mim mesma quando era pequena. Do quanto eu amava colecionar figurinhas. Da emoção de abrir um pacotinho. Da surpresa de encontrar uma figurinha diferente. Da troca das repetidas. Da sensação de participar de algo junto com todo mundo.",
+  "E percebi uma coisa: talvez a questão não seja evitar toda febre. Talvez seja ensinar como viver essas experiências com equilíbrio.",
+  "Nós compramos o álbum. Mas sem neurose. Sem obsessão para completar. Sem transformar isso em consumo sem limite.",
+  "A ideia é simples: abrir alguns pacotinhos, brincar, trocar figurinhas, viver o momento. Talvez um pacote essa semana. Outro na próxima. Pouco a pouco. Porque também existe aprendizado na espera.",
+  "As crianças não precisam ter tudo. Mas também não precisam ficar de fora de tudo. E acho que esse é um dos desafios da parentalidade hoje: encontrar equilíbrio entre limite e pertencimento.",
+  "No final, percebi que eu não estava comprando apenas figurinhas. Eu estava comprando memória afetiva.",
+  "E vocês? Também viveram alguma febre de infância que hoje entendem de outro jeito como pais?",
+];
+---
+
+<ArtigoLayout
+  url={articleUrl}
+  title={articleTitle}
+  subtitle="Entre figurinhas repetidas, pacotinhos e memórias afetivas, entendi que o álbum da Copa vai muito além do consumo. Um texto sobre infância, equilíbrio e experiências em família."
+  category="Reflexão"
+  readingTime="3 min de leitura"
+  date="30 de maio de 2026"
+  heroImage={albumDaCopa}
+  pullQuote={'"As crianças não precisam ter tudo. Mas também não precisam ficar de fora de tudo."'}
+  paragraphs={articleParagraphs}
+  youtubeUrl="https://youtu.be/XbKScLm5R5U"
+  tags={tags}
+  relatedPosts={relatedPosts}
+  next={{ to: "/blog/presenca-pequenos-momentos", label: "Presença se constrói nos pequenos momentos" }}
+/>

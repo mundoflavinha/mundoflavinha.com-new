@@ -1,0 +1,125 @@
+/*
+ * Fontes auto-hospedadas, servidas pelo próprio domínio.
+ *
+ * Antes vinham de fonts.googleapis.com por @import. Isso fazia TODA visita, em
+ * todas as 122 páginas, contatar o Google antes de qualquer consentimento: uma
+ * requisição ao googleapis para o CSS e mais duas ao gstatic para os arquivos
+ * .woff2 — medido no navegador, não suposto. O visitante entregava IP,
+ * user-agent e Referer ao Google só por abrir o site.
+ *
+ * Isso contradizia frontalmente a postura do próprio projeto, que faz facade no
+ * player do YouTube justamente para não contatar o Google sem escolha. E o
+ * Google não estava (nem está) declarado como operador de fontes na Política.
+ *
+ * Variável (`wght.css`): um arquivo cobre 200–1000, então some a lista de pesos
+ * fixos do @import antigo. Só o estilo normal — o site não usa itálico.
+ */
+@import '@fontsource-variable/nunito/wght.css';
+@import '@fontsource-variable/quicksand/wght.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 33% 98%;
+    --foreground: 270 15% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 270 15% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 15% 25%;
+
+    --primary: 270 40% 72%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 340 45% 88%;
+    --secondary-foreground: 270 15% 25%;
+
+    --muted: 210 30% 95%;
+    --muted-foreground: 270 10% 50%;
+
+    --accent: 180 35% 85%;
+    --accent-foreground: 270 15% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 270 20% 92%;
+    --input: 270 20% 92%;
+    --ring: 270 40% 72%;
+
+    --radius: 1rem;
+
+    --lilac: 270 40% 72%;
+    --pink: 340 45% 88%;
+    --baby-blue: 200 60% 85%;
+    --pastel-yellow: 45 70% 88%;
+    --mint: 160 35% 82%;
+    --warm-white: 30 33% 98%;
+
+    --font-heading: 'Quicksand Variable', 'Quicksand', sans-serif;
+    --font-body: 'Nunito Variable', 'Nunito', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer base {
+  /* O header é sticky com h-16/h-20. Sem isto, pular para uma âncora
+     (ex: /politica-de-privacidade#direitos-do-titular) esconde o título
+     atrás dele. Em MPA o browser resolve a âncora nativamente, então basta
+     reservar a margem — não precisa mais do ScrollToTop em JS. */
+  [id] {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+@layer components {
+  /* Substitui o `whileInView` do framer-motion. O conteúdo nasce VISÍVEL:
+     a animação só aprimora. Se o JS não rodar ou o IntersectionObserver não
+     existir, nada some — que é o oposto do que uma animação de entrada mal
+     feita costuma causar. */
+  .reveal {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(1.125rem);
+      transition:
+        opacity 0.5s ease-out,
+        transform 0.5s ease-out;
+    }
+
+    .js .reveal[data-visivel="true"] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
+}

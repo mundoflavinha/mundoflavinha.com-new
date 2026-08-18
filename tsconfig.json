@@ -1,11 +1,28 @@
 {
-  // Solution file: só aponta para os projetos reais. As opções de compilação
-  // vivem em cada tsconfig.*.json — declarar `compilerOptions` aqui seria letra
-  // morta, porque nenhum dos projetos abaixo faz `extends` deste arquivo.
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.api.json" }
-  ]
+  // O Astro lê ESTE arquivo para resolver `@/` dentro de .astro — por isso ele
+  // deixou de ser um solution file vazio e passou a declarar compilerOptions.
+  // `api/` fica de fora de propósito: as Vercel Functions têm o próprio
+  // tsconfig.api.json, que é o guarda-corpo de que elas só importam módulos
+  // livres de UI (ver src/test/apiEsm.test.ts).
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["astro/client"],
+    // `astro/tsconfigs/strict` NÃO liga isto. Sem elas, uma variável ou import
+    // não usado no frontmatter de um `.astro` é rebaixado a "hint" pelo
+    // `astro check` — severidade que não afeta o exit code de `npm run
+    // typecheck`. Confirmado por mutação: sem estas duas linhas, injetar uma
+    // variável morta num `.astro` real passa verde; com elas, vira `error` e
+    // quebra o build. É a checagem mais barata que existe para o único ponto
+    // cego que nem o ESLint (que hoje ignora `.astro` por completo) cobria.
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "*.config.*"],
+  "exclude": ["dist", "node_modules", "api"]
 }

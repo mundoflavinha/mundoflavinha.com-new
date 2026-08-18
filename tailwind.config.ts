@@ -5,7 +5,7 @@ export default {
   darkMode: ["class"],
   // Só `./src` existe — os globs para ./pages, ./components e ./app eram
   // convenção de Next.js herdada do template e nunca casaram com nada aqui.
-  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{astro,ts,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -17,8 +17,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Quicksand', 'sans-serif'],
-        body: ['Nunito', 'sans-serif'],
+        // Nomes das famílias VARIÁVEIS do @fontsource — 'Quicksand Variable' e
+        // 'Nunito Variable' são o que os @font-face declaram. O nome sem
+        // sufixo cairia direto no fallback sans-serif, sem erro nenhum.
+        heading: ['Quicksand Variable', 'Quicksand', 'sans-serif'],
+        body: ['Nunito Variable', 'Nunito', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

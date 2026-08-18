@@ -12,6 +12,11 @@ export type Achadinho = {
   eyebrow?: string;
   description: string;
   recommendedAge: string;
-  image: string;
+  /**
+   * ImageMetadata (não string): sob Astro, importar um .webp de src/ devolve
+   * um objeto com src/width/height/format. Usar `image.width`/`image.height`
+   * no <img> elimina layout shift, que o site inteiro tinha.
+   */
+  image: ImageMetadata;
   link?: string;
 };

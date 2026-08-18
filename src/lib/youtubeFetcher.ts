@@ -89,14 +89,6 @@ export type YouTubeFetchConfig = {
   maxResults: number;
 };
 
-const getBestThumbnailUrl = (snippet: YouTubeSnippet) =>
-  snippet.thumbnails.maxres?.url ||
-  snippet.thumbnails.standard?.url ||
-  snippet.thumbnails.high?.url ||
-  snippet.thumbnails.medium?.url ||
-  snippet.thumbnails.default?.url ||
-  "";
-
 const requestYouTube = async <T>(path: string, params: Record<string, string | number>) => {
   const url = new URL(`${YOUTUBE_API_BASE_URL}/${path}`);
 
@@ -227,7 +219,11 @@ export const fetchChannelVideos = async (config: YouTubeFetchConfig): Promise<Ch
         title: item.snippet.title,
         description: item.snippet.description || "",
         publishedAt: item.contentDetails?.videoPublishedAt || item.snippet.publishedAt,
-        thumbnailUrl: getBestThumbnailUrl(item.snippet),
+        // Miniatura pelo NOSSO domínio, não por i.ytimg.com. Sem isto, abrir
+        // /videos faz o navegador baixar dezenas de imagens do Google antes de
+        // qualquer clique ou aceite — o facade do player adia o iframe, não as
+        // miniaturas. Ver api/thumb.ts.
+        thumbnailUrl: `/api/thumb?id=${encodeURIComponent(id)}`,
         url: `https://www.youtube.com/watch?v=${id}`,
         // nocookie = modo de privacidade ampliada do YouTube. O player só é
         // montado quando alguém abre o modal do vídeo (ver Videos.tsx).

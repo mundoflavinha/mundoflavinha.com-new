@@ -1,0 +1,123 @@
+---
+import { Icon } from "astro-icon/components";
+import Layout from "@/layouts/Layout.astro";
+import Button from "@/components/Button.astro";
+
+/**
+ * Layout compartilhado das 4 listagens de brincadeiras por faixa etária
+ * (0-2, 3-5, 6-8, em família). Eram ~90% idênticas no React; a única
+ * diferença real de comportamento é que 6-8 e em-família cortam idade/tempo
+ * no primeiro ponto (o dataset delas guarda frase completa) e 6-8 usa
+ * object-contain na imagem do card (as outras, object-cover).
+ */
+
+interface Item {
+  id: number;
+  slug: string;
+  title: string;
+  image: ImageMetadata;
+  age: string;
+  time: string;
+  summary: string;
+}
+
+interface Props {
+  items: Item[];
+  baseHref: string;
+  heroKicker: string;
+  heroIcon: string;
+  heroTitle: string;
+  heroDescription: string;
+  description: string;
+  imageFit?: "cover" | "contain";
+  cortarNoPonto?: boolean;
+}
+
+const {
+  items,
+  baseHref,
+  heroKicker,
+  heroIcon,
+  heroTitle,
+  heroDescription,
+  description,
+  imageFit = "cover",
+  cortarNoPonto = false,
+} = Astro.props;
+
+const primeiraFrase = (s: string) => (cortarNoPonto ? s.split(".")[0] : s);
+---
+
+<Layout title={heroTitle} description={description}>
+  <section class="bg-pink/20 py-8 md:py-10">
+    <div class="container">
+      <div class="mx-auto max-w-4xl text-center">
+        <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-heading font-bold text-primary">
+          <Icon name={heroIcon} class="h-4 w-4" />
+          {heroKicker}
+        </span>
+        <h1 class="mt-3 font-heading text-3xl font-bold leading-tight text-foreground md:text-4xl lg:text-5xl">
+          {heroTitle}
+        </h1>
+        <p class="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
+          {heroDescription}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-6 pb-12 md:pt-8 md:pb-16">
+    <div class="container">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {
+          items.map((item) => (
+            <article class="reveal overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow hover:shadow-md">
+              <a href={`${baseHref}/${item.slug}`} class="block">
+                <div class="aspect-[4/3] overflow-hidden bg-secondary">
+                  <img
+                    src={item.image.src}
+                    width={item.image.width}
+                    height={item.image.height}
+                    alt={item.title}
+                    class:list={[
+                      "h-full w-full transition-transform duration-300 hover:scale-105",
+                      imageFit === "contain" ? "object-contain p-1" : "object-cover",
+                    ]}
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+              <div class="p-5">
+                <div class="mb-3 flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-heading font-bold text-primary">
+                    Card {String(item.id).padStart(2, "0")}
+                  </span>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-pastel-yellow/60 px-2.5 py-1 text-xs font-heading font-bold text-foreground">
+                    <Icon name="lucide:star" class="h-3 w-3" />
+                    {primeiraFrase(item.age)}
+                  </span>
+                </div>
+                <h2 class="font-heading text-xl font-bold leading-tight text-foreground">{item.title}</h2>
+                <p class="mt-2 min-h-[48px] text-sm leading-relaxed text-muted-foreground">{item.summary}</p>
+                <div class="mt-4 flex items-center justify-between gap-3">
+                  <span class="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                    <Icon name="lucide:clock" class="h-3.5 w-3.5" />
+                    {primeiraFrase(item.time)}
+                  </span>
+                  <Button
+                    href={`${baseHref}/${item.slug}`}
+                    size="sm"
+                    class="gap-1 rounded-full bg-primary font-heading font-bold text-primary-foreground"
+                  >
+                    Ver brincadeira
+                    <Icon name="lucide:arrow-right" class="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

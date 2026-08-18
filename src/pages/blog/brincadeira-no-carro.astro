@@ -1,0 +1,76 @@
+---
+import ArtigoLayout from "@/layouts/ArtigoLayout.astro";
+import albumDaCopa from "@/assets/Artigo/Album-da-Copa.webp";
+import momentosNatacao from "@/assets/Artigo/Momentos-Natação.webp";
+import empreendedorismoInfantil from "@/assets/Artigo/Empreendedorismo-Infantil.webp";
+import brincadeiraNoCarro from "@/assets/Artigo/brincadeira-no-carro.webp";
+
+const articleUrl = "https://mundoflavinha.com/blog/brincadeira-no-carro";
+const articleTitle = "No carro da minha infância não existia tela. Existia conversa.";
+
+const tags = [
+  "Maternidade",
+  "Infância",
+  "Brincadeiras no Carro",
+  "Brincadeiras Sem Telas",
+  "Memórias Afetivas",
+  "Tempo de Qualidade",
+  "Presença dos Pais",
+  "Vínculo Familiar",
+  "Infância Sem Telas",
+  "Mundo Flavinha",
+];
+
+const relatedPosts = [
+  {
+    title: "Eu tinha prometido para mim mesma que NÃO iria comprar o álbum da Copa.",
+    category: "Reflexão",
+    image: albumDaCopa,
+    href: "/blog/album-da-copa",
+  },
+  {
+    title: "Presença se constrói nos pequenos momentos.",
+    category: "Reflexão",
+    image: momentosNatacao,
+    href: "/blog/presenca-pequenos-momentos",
+  },
+  {
+    title: "O dia em que meus filhos criaram uma lojinha no prédio.",
+    category: "Reflexão",
+    image: empreendedorismoInfantil,
+    href: "/blog/empreendedorismo-infantil",
+  },
+];
+
+const articleParagraphs = [
+  "Eu publiquei um vídeo mostrando algumas brincadeiras que fazemos dentro do carro com meus filhos. E enquanto editava aquelas cenas, percebi uma coisa: eu não estava apenas ensinando brincadeiras. Eu estava repetindo memórias.",
+  "Quando eu era criança, também brincava no carro com meus pais. Não existia tablet preso no banco. Não existia desenho passando na tela. Não existia silêncio digital.",
+  "Existia janela aberta, paisagem, conversa, música e imaginação.",
+  "A gente brincava de falar nomes com a letra A, depois B, C, D... procurar números nas placas, cantar músicas com palavras escolhidas, inventar histórias e observar o mundo passando pela janela.",
+  "E sem perceber, aqueles momentos simples criavam conexão.",
+  "Hoje, anos depois, faço exatamente isso com Lucas e Bárbara.",
+  "E não estou aqui dizendo que a tecnologia é vilã. Ela faz parte da nossa vida e do mundo em que nossos filhos estão crescendo. Mas às vezes me pergunto: quantos momentos estamos terceirizando para as telas sem perceber?",
+  "Para muitas famílias, o carro acabou se tornando um dos poucos momentos de pausa juntos no meio da correria do dia a dia.",
+  "Momentos para conversar sem distrações, ouvir as crianças de verdade, rir juntos e criar memórias.",
+  "E talvez seja justamente nesses pequenos trajetos que grandes vínculos acontecem.",
+  "O mais curioso é que esse vídeo é antigo. Lucas tinha 7 anos e Bárbara 5. Hoje eles cresceram. Mas as brincadeiras no carro continuam fazendo parte da nossa rotina.",
+  "É quase automático: a gente entra no carro... e logo começa uma brincadeira, uma conversa, uma música ou alguma invenção boba que faz todo mundo rir.",
+  "No fim, talvez as crianças nem se lembrem de quantos quilômetros percorremos. Mas provavelmente vão lembrar de como se sentiam durante o caminho.",
+];
+---
+
+<ArtigoLayout
+  url={articleUrl}
+  title={articleTitle}
+  subtitle="Uma reflexão sobre como brincadeiras simples no carro podem criar conexão, memórias afetivas e momentos de presença entre pais e filhos."
+  category="Reflexão"
+  readingTime="3 min de leitura"
+  date="30 de maio de 2026"
+  heroImage={brincadeiraNoCarro}
+  pullQuote={'"No fim, talvez as crianças nem se lembrem de quantos quilômetros percorremos. Mas provavelmente vão lembrar de como se sentiam durante o caminho."'}
+  paragraphs={articleParagraphs}
+  youtubeUrl="https://youtu.be/4bPpf4jUnQY"
+  tags={tags}
+  relatedPosts={relatedPosts}
+  next={{ to: "/blog/20-reais-shopping", label: "Dei R$20 para cada filho meu no shopping" }}
+/>

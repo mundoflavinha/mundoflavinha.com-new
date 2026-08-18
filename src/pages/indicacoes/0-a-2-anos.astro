@@ -1,0 +1,170 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import PageBanner from "@/components/PageBanner.astro";
+import Button from "@/components/Button.astro";
+import { Icon } from "astro-icon/components";
+import { products } from "@/data/achadinhos02";
+
+const benefitHighlights = [
+  { label: "Desenvolvimento Cognitivo", icon: "lucide:brain" },
+  { label: "Coordenação Motora", icon: "lucide:baby" },
+  { label: "Vínculo Familiar", icon: "lucide:heart" },
+  { label: "Estímulo Sensorial", icon: "lucide:palette" },
+  { label: "Linguagem", icon: "lucide:message-circle" },
+];
+
+const developmentItems = [
+  "Coordenação motora",
+  "Percepção de cores e formas",
+  "Linguagem e comunicação",
+  "Exploração sensorial",
+  "Atenção e concentração",
+  "Autonomia",
+  "Vínculo afetivo com os pais",
+];
+
+const favoriteProducts = products.slice(0, 3);
+---
+
+<Layout
+  title="Brinquedos de 0 a 2 anos"
+  description="Primeiras descobertas, estímulos sensoriais e muita diversão para os pequenos exploradores."
+>
+  <PageBanner
+    title="Brinquedos de 0 a 2 anos"
+    subtitle="Primeiras descobertas, estímulos sensoriais e muita diversão para os pequenos exploradores."
+    bgColor="bg-pastel-yellow/20"
+  />
+
+  <section class="pt-6 pb-12 md:pt-8 md:pb-16">
+    <div class="container">
+      <div class="mx-auto max-w-6xl rounded-3xl bg-card p-5 md:p-8 shadow-sm mb-12">
+        <div class="grid lg:grid-cols-[1fr_1.1fr] gap-8 items-center">
+          <div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {
+                benefitHighlights.map(({ label, icon }) => (
+                  <div class="flex items-center gap-3 rounded-2xl bg-secondary px-4 py-3">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Icon name={icon} class="h-5 w-5" />
+                    </span>
+                    <span class="font-heading font-bold text-sm text-foreground">{label}</span>
+                  </div>
+                ))
+              }
+            </div>
+            <p class="mt-6 text-lg font-heading font-semibold text-foreground">Veja os brinquedos recomendados</p>
+            <Button
+              href="#produtos"
+              class="mt-4 rounded-full bg-primary text-primary-foreground font-heading font-bold gap-2"
+            >
+              Ver todos os brinquedos <Icon name="lucide:arrow-down" class="w-4 h-4" />
+            </Button>
+          </div>
+
+          <div>
+            <p class="font-heading font-semibold text-primary">
+              Selecionados por Flavinha para estimular o desenvolvimento dos pequenos.
+            </p>
+            <div class="mt-2 flex items-center gap-1 text-pastel-yellow">
+              {Array.from({ length: 5 }).map(() => <Icon name="lucide:star" class="h-5 w-5 fill-current" />)}
+              <span class="ml-2 text-sm font-heading font-semibold text-foreground">Favoritos das famílias</span>
+            </div>
+            <div class="mt-5 grid grid-cols-3 gap-3">
+              {
+                favoriteProducts.map((item) => (
+                  <a href={item.link} target="_blank" rel="noopener noreferrer" class="group">
+                    <div class="aspect-square rounded-2xl bg-white p-3 shadow-sm transition-transform group-hover:-translate-y-1">
+                      <img
+                        src={item.image.src}
+                        width={item.image.width}
+                        height={item.image.height}
+                        alt={item.title}
+                        class="h-full w-full object-contain"
+                      />
+                    </div>
+                    <p class="mt-2 line-clamp-2 text-center text-xs font-heading font-bold text-foreground">{item.title}</p>
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mx-auto max-w-4xl text-center mb-10">
+        <h2 class="font-heading font-bold text-2xl md:text-3xl text-foreground">Por que investir em brinquedos nessa fase?</h2>
+        <div class="mt-5 space-y-4 text-muted-foreground leading-relaxed">
+          <p>Os primeiros anos de vida são uma das fases mais importantes para o desenvolvimento infantil.</p>
+          <p>
+            É através das brincadeiras que os bebês descobrem o mundo, aprendem a resolver problemas, desenvolvem a
+            coordenação motora, estimulam a linguagem e fortalecem vínculos com as pessoas que amam.
+          </p>
+          <p>
+            Mais do que brinquedos, cada indicação desta página representa uma oportunidade de aprendizado, afeto e
+            conexão.
+          </p>
+          <p>
+            Aqui você encontrará brinquedos que estimulam os sentidos, incentivam a exploração e ajudam os pequenos a
+            aprender brincando, exatamente como a infância deve ser.
+          </p>
+          <p class="font-heading font-semibold text-foreground">Porque brincar não é apenas diversão. É desenvolvimento.</p>
+        </div>
+      </div>
+
+      <div class="mx-auto max-w-4xl rounded-2xl bg-secondary p-6 md:p-8 mb-12 shadow-sm">
+        <h3 class="font-heading font-bold text-xl md:text-2xl text-foreground text-center">
+          O que as crianças desenvolvem dos 0 aos 2 anos?
+        </h3>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {
+            developmentItems.map((item) => (
+              <div class="flex items-center gap-3 rounded-xl bg-card px-4 py-3 text-sm font-heading font-semibold text-foreground">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
+                  ✓
+                </span>
+                {item}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div id="produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 scroll-mt-28">
+        {
+          products.map((item) => (
+            <article class="reveal bg-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+              <div class="aspect-square bg-white rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                <img
+                  src={item.image.src}
+                  width={item.image.width}
+                  height={item.image.height}
+                  alt={item.title}
+                  class="h-full w-full object-contain p-3"
+                />
+              </div>
+              <h2 class="font-heading font-bold text-lg text-foreground">{item.title}</h2>
+              <p class="text-xs font-heading font-semibold text-primary mt-2">{item.eyebrow}</p>
+              <p class="text-sm text-muted-foreground mt-2 leading-relaxed flex-1">{item.description}</p>
+              <p class="mt-4 rounded-full bg-secondary px-3 py-2 text-xs font-heading font-semibold text-foreground">
+                Idade recomendada: {item.recommendedAge}
+              </p>
+              <Button
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-5 rounded-full bg-primary text-primary-foreground font-heading font-semibold gap-2 w-full"
+              >
+                Ver mais <Icon name="lucide:external-link" class="w-4 h-4" />
+              </Button>
+            </article>
+          ))
+        }
+      </div>
+
+      <p class="text-center mt-8 text-xs text-muted-foreground/70">
+        Alguns links desta página podem gerar comissão sem custo extra para você.
+      </p>
+    </div>
+  </section>
+</Layout>

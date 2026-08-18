@@ -1,0 +1,117 @@
+---
+import { Icon } from "astro-icon/components";
+
+/**
+ * Player do YouTube com "facade": até o clique, nada é carregado do Google.
+ *
+ * Porta o YouTubeEmbed.tsx sem virar ilha — era um componente React inteiro a
+ * serviço de um único `useState` booleano. Aqui são ~10 linhas de JS.
+ *
+ * Por que importa: um <iframe> do YouTube montado junto com a página faz o
+ * navegador do visitante contatar o Google — e receber cookies de terceiros —
+ * mesmo de quem nunca quis assistir. Com o facade, isso só acontece por escolha
+ * de quem visita. Usamos youtube-nocookie.com, o modo de privacidade ampliada.
+ *
+ * INTERINO: na Fase 5 o `iframemanager` (companheiro do vanilla-cookieconsent)
+ * assume este papel e amarra a ativação à categoria de consentimento aceita,
+ * em vez de só adiar o contato até o clique.
+ */
+
+interface Props {
+  videoId: string;
+  title: string;
+  /** Segundo em que o vídeo começa. */
+  start?: number;
+  class?: string;
+}
+
+const { videoId, title, start, class: className = "" } = Astro.props;
+
+const params = new URLSearchParams({ autoplay: "1", rel: "0" });
+if (start) params.set("start", String(start));
+const src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+const linkDireto = `https://www.youtube.com/watch?v=${videoId}${start ? `&t=${start}` : ""}`;
+---
+
+<button
+  type="button"
+  data-youtube-facade
+  data-src={src}
+  data-title={title}
+  data-classe-iframe={className}
+  data-link-direto={linkDireto}
+  aria-label={`Assistir: ${title}`}
+  class:list={[
+    "group relative flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-lilac/30 via-pink/25 to-baby-blue/30 transition-colors hover:from-lilac/40 hover:via-pink/35 hover:to-baby-blue/40",
+    className,
+  ]}
+>
+  <span class="flex h-16 w-16 items-center justify-center rounded-full bg-card shadow-lg transition-transform group-hover:scale-110">
+    <Icon name="lucide:play" class="ml-1 h-7 w-7 text-primary" />
+  </span>
+  <span class="max-w-[80%] text-center font-heading text-sm font-bold text-foreground md:text-base">
+    {title}
+  </span>
+  <span class="text-xs text-foreground/60">Clique para assistir no YouTube</span>
+</button>
+
+<p data-aviso-consentimento hidden class="mt-2 text-center text-sm text-muted-foreground" role="status">
+  Não foi possível abrir as preferências de cookies neste navegador.
+  <a class="text-primary underline underline-offset-2" href={linkDireto} target="_blank" rel="noopener noreferrer">
+    Assistir direto no YouTube
+  </a>.
+</p>
+
+<script>
+  import { CATEGORIA_MIDIA_EXTERNA } from "@/lib/cookies";
+  import { podeCarregarMidiaExterna, pedirMidiaExterna } from "@/lib/consentimentoMidia";
+
+  const montarPlayer = (botao: HTMLElement) => {
+    const iframe = document.createElement("iframe");
+    iframe.src = botao.dataset.src ?? "";
+    iframe.title = botao.dataset.title ?? "";
+    // Só as classes de dimensão, como no React original: o gradiente e o
+    // layout de centralização eram do botão, não do player.
+    iframe.className = botao.dataset.classeIframe ?? "";
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.allowFullscreen = true;
+    botao.replaceWith(iframe);
+  };
+
+  document.querySelectorAll<HTMLButtonElement>("[data-youtube-facade]").forEach((botao) => {
+    botao.addEventListener("click", async () => {
+      // Se a pessoa já autorizou conteúdo externo, o clique carrega direto.
+      // Se não, abre o painel de preferências na categoria certa — o clique
+      // aqui é a intenção de assistir, não um consentimento tácito para tudo.
+      if (!podeCarregarMidiaExterna()) {
+        const resposta = await pedirMidiaExterna();
+        if (resposta === "indisponivel") {
+          // Nem "sim" nem "não": não deu para perguntar. Um botão que não
+          // responde é pior que uma recusa, então oferece a saída direta.
+          const aviso = botao.parentElement?.querySelector<HTMLElement>("[data-aviso-consentimento]");
+          if (aviso) aviso.hidden = false;
+          return;
+        }
+        if (resposta !== "autorizado") return;
+      }
+      montarPlayer(botao);
+    });
+
+    // Quem aceita pelo painel enquanto a página está aberta não deveria ter
+    // que clicar de novo procurando o que mudou.
+    window.addEventListener("mundoflavinha:consentimento", () => {
+      if (podeCarregarMidiaExterna() && botao.isConnected && botao.dataset.pediu === "true") {
+        montarPlayer(botao);
+      }
+    });
+  });
+
+  // Marca quem já tentou assistir, para o listener acima saber a quem responder.
+  document.addEventListener("click", (evento) => {
+    const alvo = evento.target instanceof Element && evento.target.closest("[data-youtube-facade]");
+    if (alvo instanceof HTMLElement) alvo.dataset.pediu = "true";
+  });
+
+  // Referenciado para o typecheck não considerar o import morto.
+  void CATEGORIA_MIDIA_EXTERNA;
+</script>

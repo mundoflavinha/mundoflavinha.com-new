@@ -1,0 +1,389 @@
+---
+import LegalPage, { type SecaoLegal } from "@/layouts/LegalPage.astro";
+import LegalSection from "@/components/legal/LegalSection.astro";
+import LegalCell from "@/components/legal/LegalCell.astro";
+import LegalExternalLink from "@/components/legal/LegalExternalLink.astro";
+import LegalHighlight from "@/components/legal/LegalHighlight.astro";
+import LegalLink from "@/components/legal/LegalLink.astro";
+import LegalList from "@/components/legal/LegalList.astro";
+import LegalMailto from "@/components/legal/LegalMailto.astro";
+import LegalP from "@/components/legal/LegalP.astro";
+import LegalRow from "@/components/legal/LegalRow.astro";
+import LegalSubtitle from "@/components/legal/LegalSubtitle.astro";
+import LegalTable from "@/components/legal/LegalTable.astro";
+import { CONTATO, CONTROLADOR, OPERADORES, ROTAS_LEGAIS } from "@/lib/site";
+
+const secoes: SecaoLegal[] = [
+  { id: "quem-somos", title: "Quem é responsável pelos seus dados" },
+  { id: "escopo", title: "A quem esta política se aplica" },
+  { id: "dados-coletados", title: "Quais dados coletamos" },
+  { id: "finalidades", title: "Para que usamos seus dados e com qual base legal" },
+  { id: "consentimento", title: "Como funciona o seu consentimento" },
+  { id: "compartilhamento", title: "Com quem compartilhamos" },
+  { id: "cookies", title: "Cookies e tecnologias semelhantes" },
+  { id: "retencao", title: "Por quanto tempo guardamos" },
+  { id: "direitos-do-titular", title: "Seus direitos" },
+  { id: "criancas", title: "Crianças e adolescentes" },
+  { id: "links-de-terceiros", title: "Links para outros sites e recomendações de produtos" },
+  { id: "seguranca", title: "Segurança" },
+  { id: "encarregado", title: "Encarregado pelo tratamento de dados" },
+  { id: "alteracoes", title: "Alterações desta política" },
+];
+---
+
+<LegalPage
+  title="Política de Privacidade"
+  description="Como o Mundo Flavinha coleta, usa e protege os seus dados."
+  subtitle="Como o Mundo Flavinha trata os seus dados pessoais — em português claro."
+  sections={secoes}
+>
+  <LegalSection id="quem-somos" title="Quem é responsável pelos seus dados" numero={1}>
+    <LegalP>
+      O <strong class="text-foreground">{CONTROLADOR.nomeFantasia}</strong> é o controlador dos dados pessoais
+      tratados neste site — ou seja, é quem decide para que os dados são usados e responde por esse uso.
+    </LegalP>
+    <LegalList>
+      <li>Razão social: {CONTROLADOR.razaoSocial}</li>
+      <li>CNPJ: {CONTROLADOR.cnpj}</li>
+      <li>Endereço: {CONTROLADOR.endereco}</li>
+      <li>
+        E-mail para assuntos de privacidade: <LegalMailto email={CONTATO.emailPrivacidade} />
+      </li>
+    </LegalList>
+  </LegalSection>
+
+  <LegalSection id="escopo" title="A quem esta política se aplica" numero={2}>
+    <LegalP>
+      Esta política vale para o site mundoflavinha.com e para os formulários dele. Ela não vale para os sites e
+      aplicativos de terceiros que você acessa a partir daqui — como YouTube, Instagram, TikTok, WhatsApp e Amazon —,
+      que têm políticas próprias.
+    </LegalP>
+    <LegalP>
+      Este site é dirigido a <strong class="text-foreground">pessoas adultas</strong>: mães, pais, responsáveis e
+      educadores. Ele não é destinado ao uso direto por crianças. Veja a seção sobre crianças e adolescentes mais
+      abaixo.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="dados-coletados" title="Quais dados coletamos" numero={3}>
+    <LegalSubtitle>Dados que você nos fornece</LegalSubtitle>
+    <LegalP>Somente quando você preenche um dos nossos formulários:</LegalP>
+    <LegalList>
+      <li>
+        <strong class="text-foreground">Nome</strong> — para nos dirigirmos a você
+      </li>
+      <li>
+        <strong class="text-foreground">E-mail</strong> — para liberar o material e, se você autorizar, enviar
+        novidades
+      </li>
+      <li>
+        <strong class="text-foreground">WhatsApp</strong> — opcional. Só coletamos se você preencher, e só
+        usamos para mensagens se você marcar essa autorização
+      </li>
+      <li>
+        <strong class="text-foreground">Faixa etária de interesse</strong> — opcional. É a sua preferência de
+        conteúdo (0 a 2, 3 a 5, 6 a 8 anos ou brincadeiras em família), não um dado sobre uma criança específica
+      </li>
+      <li>
+        <strong class="text-foreground">Perfil</strong> — opcional. Se você é mãe/pai, avó/avô, educador(a) ou
+        outro, para enviarmos conteúdo mais adequado
+      </li>
+    </LegalList>
+
+    <LegalSubtitle>Dados coletados automaticamente</LegalSubtitle>
+    <LegalP>
+      Quando você envia um formulário, registramos também o endereço IP, o navegador utilizado (user-agent), a data
+      e hora e a página de origem. Isso serve para dois fins: comprovar que o consentimento foi dado e proteger o
+      site contra envios automatizados e abuso.
+    </LegalP>
+    <LegalP>
+      Nossos provedores de hospedagem também mantêm registros técnicos de acesso, conforme descrito na seção sobre
+      compartilhamento.
+    </LegalP>
+
+    <LegalSubtitle>O que não coletamos</LegalSubtitle>
+    <LegalList>
+      <li>Não pedimos CPF, RG, endereço residencial nem dados bancários</li>
+      <li>Não coletamos nome, idade exata, data de nascimento, foto ou escola de nenhuma criança</li>
+      <li>Não usamos pixels de publicidade nem rastreadores de comportamento entre sites</li>
+      <li>
+        Usamos o Google Analytics para contagem agregada de acessos, e só se você aceitar. Enquanto não aceitar,
+        nada dele é carregado
+      </li>
+      <li>Não usamos esses números para identificar você individualmente nem para direcionar anúncios</li>
+    </LegalList>
+  </LegalSection>
+
+  <LegalSection id="finalidades" title="Para que usamos seus dados e com qual base legal" numero={4}>
+    <LegalP>
+      A LGPD exige que todo tratamento de dados tenha uma finalidade específica e uma base legal. As nossas são
+      estas:
+    </LegalP>
+    <LegalTable headers={["O que fazemos", "Dados usados", "Base legal (Lei 13.709/2018)"]}>
+      <LegalRow>
+        <LegalCell>Liberar e enviar o material gratuito que você pediu</LegalCell>
+        <LegalCell>Nome, e-mail</LegalCell>
+        <LegalCell>Execução de procedimento preliminar a seu pedido (art. 7º, V)</LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Enviar novidades, brincadeiras e materiais por e-mail</LegalCell>
+        <LegalCell>Nome, e-mail, faixa etária, perfil</LegalCell>
+        <LegalCell>Seu consentimento (art. 7º, I)</LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Enviar mensagens por WhatsApp</LegalCell>
+        <LegalCell>Nome, WhatsApp</LegalCell>
+        <LegalCell>Seu consentimento (art. 7º, I)</LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Comprovar que o consentimento foi dado</LegalCell>
+        <LegalCell>IP, user-agent, data/hora, texto aceito</LegalCell>
+        <LegalCell>Cumprimento de obrigação legal e exercício regular de direitos (art. 7º, II e VI)</LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Proteger o site contra spam e envios automatizados</LegalCell>
+        <LegalCell>IP (de forma codificada), data/hora</LegalCell>
+        <LegalCell>Legítimo interesse na segurança do serviço (art. 7º, IX)</LegalCell>
+      </LegalRow>
+    </LegalTable>
+    <LegalP>
+      Se você aceitar cookies de estatística, usamos também dados de navegação — página visitada, origem da visita,
+      tipo de navegador e região aproximada — para entender, de forma agregada, o que é útil no site. A base legal é
+      o seu consentimento (art. 7º, I), que você pode retirar quando quiser.
+    </LegalP>
+    <LegalP>
+      Fora isso, não usamos seus dados para nenhuma outra finalidade, e não vendemos, alugamos nem cedemos sua base
+      de contato para terceiros.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="consentimento" title="Como funciona o seu consentimento" numero={5}>
+    <LegalP>
+      Nenhuma caixa de autorização vem marcada por padrão neste site. Você escolhe, separadamente, se quer receber
+      e-mails e se quer receber mensagens no WhatsApp — e pode aceitar um e recusar o outro.
+    </LegalP>
+    <LegalHighlight>
+      <strong class="font-heading font-bold">Baixar um material gratuito não exige aceitar receber
+      publicidade.</strong>{" "}
+      Precisamos do seu nome e e-mail para liberar o material que você pediu, e é só isso que é obrigatório.
+    </LegalHighlight>
+    <LegalP>
+      Guardamos o texto exato que apareceu na sua tela no momento em que você autorizou, junto com a data, hora e
+      versão do documento. Isso protege você tanto quanto a nós: se um dia houver dúvida sobre o que foi autorizado,
+      existe um registro fiel — e não apenas a nossa palavra.
+    </LegalP>
+    <LegalSubtitle>Como retirar o consentimento</LegalSubtitle>
+    <LegalP>
+      A qualquer momento, sem precisar justificar, escreva para <LegalMailto email={CONTATO.emailPrivacidade} />{" "}
+      pedindo para parar de receber e-mails, mensagens de WhatsApp, ou ambos. Retirar o consentimento não apaga
+      automaticamente seu cadastro — se quiser a exclusão completa, peça também isso, e nós faremos.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="compartilhamento" title="Com quem compartilhamos" numero={6}>
+    <LegalP>
+      Não vendemos seus dados. Parte deles é processada por empresas que nos prestam serviço — umas de
+      infraestrutura, outras de conteúdo ou de recomendação de produtos — sempre na medida necessária:
+    </LegalP>
+    <LegalTable headers={["Empresa", "Para que", "Onde fica"]}>
+      {
+        OPERADORES.map((operador) => (
+          <LegalRow>
+            <LegalCell>{operador.nome}</LegalCell>
+            <LegalCell>{operador.papel}</LegalCell>
+            <LegalCell>{operador.pais}</LegalCell>
+          </LegalRow>
+        ))
+      }
+    </LegalTable>
+    <LegalP>
+      Podemos também compartilhar dados quando formos legalmente obrigados, por ordem judicial ou requisição de
+      autoridade competente.
+    </LegalP>
+    <LegalSubtitle>Transferência internacional</LegalSubtitle>
+    <LegalP>
+      Como você percebe na tabela acima, todos os nossos fornecedores de infraestrutura ficam fora do Brasil. Isso
+      significa que seus dados são armazenados e processados no exterior, o que a LGPD permite mediante garantias
+      adequadas (art. 33). Buscamos fornecedores que ofereçam cláusulas contratuais de proteção de dados e padrões
+      reconhecidos de segurança, conforme os termos publicados por cada um deles.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="cookies" title="Cookies e tecnologias semelhantes" numero={7}>
+    <LegalP>
+      Cookies são pequenos arquivos que um site guarda no seu navegador. Nosso uso hoje é bastante limitado:
+    </LegalP>
+    <LegalTable headers={["Categoria", "Usamos?", "Detalhe"]}>
+      <LegalRow>
+        <LegalCell>Necessários</LegalCell>
+        <LegalCell>Sim, um</LegalCell>
+        <LegalCell>
+          <strong class="text-foreground">cc_cookie</strong>, do próprio site, guarda apenas a sua escolha nesta
+          tabela por 6 meses. Sem ele, perguntaríamos de novo a cada página.
+        </LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Preferências</LegalCell>
+        <LegalCell>Não</LegalCell>
+        <LegalCell>Não guardamos configurações de navegação</LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Conteúdo externo</LegalCell>
+        <LegalCell>Só com sua autorização</LegalCell>
+        <LegalCell>
+          Os vídeos são hospedados no YouTube. Enquanto você não autorizar, nenhum player é carregado e o Google não
+          recebe nada. Você decide no momento em que clica para assistir, e pode mudar depois em
+          <strong class="text-foreground">Preferências de cookies</strong>, no rodapé.
+        </LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Analíticos / estatísticas</LegalCell>
+        <LegalCell>Só com sua autorização</LegalCell>
+        <LegalCell>
+          Google Analytics (<strong class="text-foreground">_ga</strong> e <strong class="text-foreground">_ga_*</strong>,
+          até 2 anos), para saber quais páginas são úteis. As tags só são carregadas depois do seu aceite — antes
+          disso o Google não é contatado. Ao recusar ou revogar, esses cookies são apagados.
+        </LegalCell>
+      </LegalRow>
+      <LegalRow>
+        <LegalCell>Publicidade / marketing</LegalCell>
+        <LegalCell>Não</LegalCell>
+        <LegalCell>Não usamos pixel do Meta, do TikTok nem de qualquer rede</LegalCell>
+      </LegalRow>
+    </LegalTable>
+    <LegalSubtitle>Fontes e aparência</LegalSubtitle>
+    <LegalP>
+      As fontes usadas no site são servidas por nós mesmos. Nenhuma folha de estilo, fonte ou imagem é buscada em
+      servidores de terceiros quando você navega — inclusive na primeira visita, antes de qualquer escolha sua.
+    </LegalP>
+
+    <LegalSubtitle>Vídeos do YouTube</LegalSubtitle>
+    <LegalP>
+      Nossos vídeos são hospedados no YouTube. Os players só são carregados{" "}
+      <strong class="text-foreground">depois que você clica para assistir</strong>, e usamos o modo de
+      privacidade ampliada do YouTube. Assim, enquanto você não clicar, o Google não recebe nada por meio do player.
+    </LegalP>
+    <LegalP>
+      Na página de Vídeos, a lista e as miniaturas passam pelo nosso próprio servidor: é ele que conversa com o
+      YouTube e devolve o resultado para você. Assim, ao abrir a página, o Google não recebe o seu endereço IP nem
+      informações do seu navegador. Isso só acontece se e quando você autorizar e carregar um vídeo.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="retencao" title="Por quanto tempo guardamos" numero={8}>
+    <LegalList>
+      <li>
+        <strong class="text-foreground">Cadastro e contato:</strong> enquanto você quiser receber nossas
+        comunicações. Se retirar o consentimento, excluímos em até 6 meses, salvo se precisarmos manter algo por
+        obrigação legal
+      </li>
+      <li>
+        <strong class="text-foreground">Registros de consentimento:</strong> por até 5 anos após o fim do
+        relacionamento, porque é o que nos permite comprovar que a autorização existiu
+      </li>
+      <li>
+        <strong class="text-foreground">Registros de proteção contra spam:</strong> algumas horas, e são
+        descartados automaticamente
+      </li>
+    </LegalList>
+    <LegalP>
+      Se você pedir exclusão, apagamos seus dados dos nossos sistemas, mantendo apenas o registro de que o pedido
+      existiu e foi atendido — sem os dados que identificam você.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="direitos-do-titular" title="Seus direitos" numero={9}>
+    <LegalP>A LGPD (art. 18) garante a você o direito de pedir, a qualquer momento:</LegalP>
+    <LegalList>
+      <li>Confirmação de que tratamos seus dados, e acesso a eles</li>
+      <li>Correção de dados incompletos, inexatos ou desatualizados</li>
+      <li>Anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade</li>
+      <li>Portabilidade dos seus dados a outro fornecedor</li>
+      <li>Eliminação dos dados tratados com base no seu consentimento</li>
+      <li>Informação sobre com quem compartilhamos seus dados</li>
+      <li>Informação sobre a possibilidade de não consentir, e o que acontece se você não consentir</li>
+      <li>Revogação do consentimento</li>
+    </LegalList>
+    <LegalHighlight>
+      Para exercer qualquer um deles, escreva para <LegalMailto email={CONTATO.emailPrivacidade} />. Respondemos em
+      até {CONTATO.prazoRespostaDias} dias. Podemos pedir informações para confirmar sua identidade — é uma proteção
+      contra alguém tentar acessar ou apagar dados que não são dele.
+    </LegalHighlight>
+    <LegalP>
+      Você também pode apresentar reclamação à Autoridade Nacional de Proteção de Dados (ANPD) se entender que seus
+      direitos não foram respeitados.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="criancas" title="Crianças e adolescentes" numero={10}>
+    <LegalP>
+      Nosso conteúdo é sobre infância, mas nossos formulários são feitos para adultos responsáveis. Por isso:
+    </LegalP>
+    <LegalList>
+      <li>
+        <strong class="text-foreground">Não coletamos dados de crianças.</strong> Não pedimos nome, idade
+        exata, data de nascimento, foto ou escola de nenhuma criança
+      </li>
+      <li>
+        O campo de <strong class="text-foreground">faixa etária de interesse</strong> é uma preferência de
+        conteúdo de quem preenche o formulário — indica que tipo de brincadeira a pessoa quer receber, e não
+        constitui cadastro de uma criança
+      </li>
+      <li>Os cadastros devem ser feitos por pessoas maiores de 18 anos</li>
+    </LegalList>
+    <LegalP>
+      Se você é responsável por uma criança e acredita que dados dela chegaram até nós de alguma forma, escreva para{" "}
+      <LegalMailto email={CONTATO.emailPrivacidade} /> e eliminaremos com prioridade.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="links-de-terceiros" title="Links para outros sites e recomendações de produtos" numero={11}>
+    <LegalP>
+      Nas páginas de recomendações, usamos links de afiliado da Amazon. Se você comprar por eles, podemos receber uma
+      comissão, <strong class="text-foreground">sem custo adicional para você</strong>. Só recomendamos o que
+      faz sentido para a proposta do site.
+    </LegalP>
+    <LegalP>
+      Ao clicar nesses links, você sai do nosso site e passa a ser regido pela política de privacidade do destino.
+      Não temos controle sobre quais dados a Amazon, o YouTube, o Instagram, o TikTok ou o WhatsApp coletam de você
+      nas plataformas deles. Recomendamos ler as políticas de cada um.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="seguranca" title="Segurança" numero={12}>
+    <LegalP>
+      Adotamos medidas técnicas para proteger seus dados: comunicação criptografada (HTTPS), banco de dados com
+      acesso restrito por credencial, validação dos dados recebidos e proteção contra envios automatizados.
+    </LegalP>
+    <LegalP>
+      Ainda assim, nenhum sistema é totalmente imune. Se ocorrer um incidente de segurança que possa acarretar risco
+      relevante a você, comunicaremos você e a ANPD, como determina a lei.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="encarregado" title="Encarregado pelo tratamento de dados" numero={13}>
+    <LegalP>
+      Encarregado (DPO): {CONTATO.encarregado} — <LegalMailto email={CONTATO.emailPrivacidade} />. É a pessoa
+      responsável por receber comunicações de titulares e da ANPD.
+    </LegalP>
+  </LegalSection>
+
+  <LegalSection id="alteracoes" title="Alterações desta política" numero={14}>
+    <LegalP>
+      Podemos atualizar esta política. Quando isso acontecer, mudamos a data e a versão indicadas no topo da página.
+      Se a mudança for significativa e afetar como usamos seus dados, avisaremos pelos canais que você autorizou.
+    </LegalP>
+    <LegalP>
+      Alterações nesta política não modificam retroativamente o que você autorizou: guardamos a versão do texto
+      vigente no momento de cada consentimento.
+    </LegalP>
+    <LegalP>
+      Veja também os nossos <LegalLink href={ROTAS_LEGAIS.termos}>Termos de Uso</LegalLink> e a página de{" "}
+      <LegalLink href={ROTAS_LEGAIS.contato}>Contato</LegalLink>. Esta política é regida pela lei brasileira, em
+      especial pela{" "}
+      <LegalExternalLink href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+        >Lei nº 13.709/2018 (LGPD)</LegalExternalLink
+      >.
+    </LegalP>
+  </LegalSection>
+</LegalPage>

@@ -1,0 +1,32 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import PageBanner from "@/components/PageBanner.astro";
+import BotaoMaterial from "@/components/BotaoMaterial.astro";
+import LeadModal from "@/components/LeadModal.astro";
+import { MATERIAIS } from "@/data/materiais";
+---
+
+<Layout
+  title="Materiais gratuitos para imprimir e brincar"
+  description="Atividades educativas prontas para famílias, professores e escolas incentivarem o aprendizado de forma lúdica."
+>
+  <PageBanner
+    title="Materiais gratuitos para imprimir e brincar"
+    subtitle="Atividades educativas prontas para famílias, professores e escolas incentivarem o aprendizado de forma lúdica."
+    bgColor="bg-baby-blue/20"
+  />
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      <div class="mb-8 text-center">
+        <p class="text-sm font-medium text-muted-foreground">{MATERIAIS.length} materiais disponíveis</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {MATERIAIS.map((material) => <BotaoMaterial material={material} variant="downloads" />)}
+      </div>
+    </div>
+  </section>
+
+  <LeadModal />
+</Layout>

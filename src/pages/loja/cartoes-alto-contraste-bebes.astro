@@ -1,0 +1,452 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Button from "@/components/Button.astro";
+import { Icon } from "astro-icon/components";
+import babyCards01 from "@/assets/loja flavinha/01 monocromatico.webp";
+import babyCards02 from "@/assets/loja flavinha/02 monocromatico.webp";
+import preview01 from "@/assets/loja flavinha/monocromatico01.webp";
+import preview02 from "@/assets/loja flavinha/monocromatico02.webp";
+import preview03 from "@/assets/loja flavinha/monocromatico03.webp";
+import preview04 from "@/assets/loja flavinha/monocromatico04.webp";
+
+const checkoutUrl = "#comprar";
+
+const benefits = [
+  { title: "Estimula o olhar", text: "Ajuda o bebê a observar formas simples, contrastantes e marcantes.", icon: "lucide:eye" },
+  { title: "Favorece a atenção", text: "Pequenos momentos de observação ajudam o bebê a manter o foco visual por alguns segundos.", icon: "lucide:sparkles" },
+  { title: "Fortalece o vínculo", text: "O adulto mostra o cartão, conversa, sorri e transforma o estímulo em um momento de conexão.", icon: "lucide:heart" },
+];
+
+const kitItems = [
+  ["PDF com 6 cartões por folha", "Versão econômica para imprimir, recortar e plastificar."],
+  ["PDF com 1 cartão por folha", "Versão ampliada, ideal para tummy time, parede, trocador ou tapetinho."],
+  ["Cartões individuais", "Arquivos separados para imprimir apenas os modelos que quiser."],
+  ["Guia de uso para os pais", "Explicação simples sobre como apresentar os cartões ao bebê."],
+  ["Orientação por idade", "Sugestões de uso para diferentes fases do bebê, com orientações simples e práticas."],
+  ["Sugestões de atividades", "Ideias para usar no colo, no trocador, no carrinho, no tapetinho e no tummy time."],
+  ["Cuidados de segurança", "Orientações importantes para usar o material com tranquilidade."],
+  ["Bônus checklist de uso", "Uma página para acompanhar quais cartões chamaram mais atenção do bebê."],
+];
+
+const steps = [
+  "Imprima os cartões em casa ou em uma gráfica.",
+  "Recorte e, se quiser, plastifique para durar mais.",
+  "Mostre um cartão por vez, a uma distância confortável do rosto do bebê.",
+  "Observe a reação do bebê e respeite o tempo dele.",
+  "Use em momentos simples da rotina, como no trocador, no tapetinho, no colo ou no tummy time.",
+];
+
+const phases = [
+  ["0 a 2 meses", "Primeiros estímulos visuais com cartões parados e formas simples."],
+  ["2 a 4 meses", "Momentos de observação e acompanhamento visual."],
+  ["4 a 6 meses", "Uso no tummy time e na rotina de estímulos."],
+  ["6 meses ou mais", "Exploração dos cartões com supervisão."],
+];
+
+const desireItems = [
+  "Fácil de imprimir",
+  "Pronto para usar",
+  "Sem telas",
+  "Econômico",
+  "Pode ser usado em diferentes momentos da rotina",
+  "Ideal para os primeiros meses do bebê",
+  "Ajuda a criar momentos de conexão",
+];
+
+const audienceItems = [
+  "Mães e pais de bebês de 0 a 6 meses",
+  "Famílias que buscam atividades sem telas",
+  "Cuidadores e berçaristas",
+  "Professoras de berçário",
+  "Gestantes que querem preparar estímulos para a chegada do bebê",
+  "Quem procura um presente simples, útil e afetivo para recém-nascidos",
+];
+
+const bonuses = [
+  ["Checklist de uso dos cartões", "Uma página para acompanhar quais cartões o bebê observou e quais chamaram mais atenção."],
+  ["Mini guia de estímulos sem telas", "Ideias simples para estimular o bebê no dia a dia com presença, carinho e recursos acessíveis."],
+  ["Capinha imprimível para guardar os cartões", "Uma opção prática para organizar os cartões depois de imprimir e recortar."],
+];
+
+const faqs = [
+  ["O produto é físico ou digital?", "É um produto digital. Você recebe os arquivos para imprimir em casa ou em uma gráfica."],
+  ["Preciso imprimir colorido?", "Não. Os cartões são em preto e branco, pensados justamente para alto contraste."],
+  ["Para qual idade é indicado?", "É indicado principalmente para bebês de 0 a 6 meses, mas também pode ser usado com bebês maiores, sempre com supervisão."],
+  ["Posso plastificar?", "Sim. Plastificar ajuda a aumentar a durabilidade dos cartões."],
+  ["Posso deixar no berço?", "Os cartões devem ser usados sempre com supervisão. Não é recomendado deixar objetos soltos no berço durante o sono."],
+  ["Recebo o material na hora?", "Sim. Após a confirmação da compra, o acesso ao material digital é liberado pela plataforma."],
+];
+---
+
+<Layout
+  title="Cartões de Alto Contraste para Bebês"
+  description="Um kit imprimível para estimular os primeiros olhares do bebê de forma simples, segura, afetiva e sem telas."
+>
+  <section class="overflow-hidden bg-[hsl(32,70%,97%)] py-10 md:py-16">
+    <div class="container">
+      <div class="grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center">
+        <div>
+          <span class="inline-flex items-center gap-2 rounded-full bg-lilac/30 px-4 py-2 text-sm font-heading font-bold text-foreground">
+            <Icon name="lucide:baby" class="h-4 w-4 text-primary" />
+            Imprima e use
+          </span>
+          <h1 class="mt-4 font-heading text-4xl font-bold leading-tight text-foreground md:text-6xl">
+            Cartões de Alto Contraste para Bebês
+          </h1>
+          <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            Um kit imprimível para estimular os primeiros olhares do bebê de forma simples, segura, afetiva e sem
+            telas.
+          </p>
+          <p class="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
+            Nos primeiros meses de vida, o bebê ainda está descobrindo o mundo através do olhar. Imagens em preto e
+            branco, com formas simples e alto contraste, ajudam a chamar a atenção visual do bebê e transformam
+            pequenos momentos da rotina em oportunidades de estímulo, conexão e carinho.
+          </p>
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Button
+              href={checkoutUrl}
+              class="rounded-full bg-primary px-6 font-heading font-bold text-primary-foreground shadow-sm"
+            >
+              Quero os cartões para o meu bebê
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+            <Button
+              href="#kit"
+              variant="outline"
+              class="rounded-full border-primary/30 font-heading font-bold text-foreground hover:bg-primary/10"
+            >
+              Ver o que vem no kit
+              <Icon name="lucide:chevron-down" class="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-pastel-yellow/60"></div>
+          <div class="absolute -bottom-5 -left-5 h-20 w-20 rounded-full bg-pink/30"></div>
+          <div class="relative overflow-hidden rounded-[2rem] bg-white p-3 shadow-xl">
+            <img
+              src={babyCards02.src}
+              width={babyCards02.width}
+              height={babyCards02.height}
+              alt="Bebê observando cartões de alto contraste"
+              class="aspect-[4/3] w-full rounded-[1.5rem] object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">
+          Por que esses cartões chamam tanto a atenção dos bebês?
+        </h2>
+        <p class="mt-4 text-muted-foreground leading-relaxed">
+          Nos primeiros meses, a visão do bebê ainda está em desenvolvimento. Por isso, figuras muito coloridas,
+          pequenas ou cheias de detalhes podem não chamar tanta atenção. Já as imagens em preto e branco, com formas
+          grandes e bem definidas, são mais fáceis de perceber e observar.
+        </p>
+      </div>
+      <p class="mx-auto mb-8 max-w-3xl text-center leading-relaxed text-muted-foreground">
+        Esses cartões foram pensados para criar pequenos momentos de estímulo visual na rotina do bebê, sem excesso
+        de informação, sem telas e sem complicação.
+      </p>
+      <div class="grid gap-5 md:grid-cols-3">
+        {
+          benefits.map((benefit) => (
+            <div class="rounded-3xl bg-card p-6 shadow-sm">
+              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Icon name={benefit.icon} class="h-6 w-6" />
+              </div>
+              <h3 class="font-heading text-xl font-bold text-foreground">{benefit.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{benefit.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-lilac/10 py-12 md:py-16">
+    <div class="container">
+      <div class="grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-center">
+        <div class="overflow-hidden rounded-[2rem] bg-white p-3 shadow-lg">
+          <img
+            src={babyCards01.src}
+            width={babyCards01.width}
+            height={babyCards01.height}
+            alt="Bebê interagindo com cartões de alto contraste"
+            class="aspect-[4/3] w-full rounded-[1.5rem] object-cover"
+          />
+        </div>
+        <div>
+          <h2 class="font-heading text-3xl font-bold text-foreground md:text-4xl">
+            Um estímulo simples que cabe na rotina
+          </h2>
+          <p class="mt-4 leading-relaxed text-muted-foreground">
+            Você não precisa de brinquedos caros, aparelhos eletrônicos ou atividades complicadas para estimular o
+            seu bebê. Às vezes, um recurso simples, apresentado com carinho e presença, já transforma o momento do
+            trocador, do tapetinho ou do colo em uma oportunidade de desenvolvimento.
+          </p>
+          <p class="mt-4 leading-relaxed text-muted-foreground">
+            Os cartões de alto contraste são práticos, acessíveis e fáceis de usar. Basta imprimir, recortar e
+            apresentar ao bebê por poucos minutos, sempre com supervisão e respeitando o tempo dele.
+          </p>
+          <div class="mt-6">
+            <Button
+              href={checkoutUrl}
+              class="rounded-full bg-primary px-6 font-heading font-bold text-primary-foreground shadow-sm"
+            >
+              Quero estimular sem telas
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="kit" class="py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-heading font-bold text-primary">
+          <Icon name="lucide:sparkles" class="h-4 w-4" />
+          Material digital
+        </span>
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">
+          O que você recebe ao comprar
+        </h2>
+      </div>
+      <div class="grid gap-8 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+        <div class="grid gap-4 sm:grid-cols-2">
+          {
+            kitItems.map(([title, text], index) => (
+              <div class="rounded-3xl bg-card p-5 shadow-sm">
+                <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-pastel-yellow/60 font-heading font-bold text-foreground">
+                  {index + 1}
+                </div>
+                <h3 class="font-heading text-lg font-bold text-foreground">{title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
+              </div>
+            ))
+          }
+        </div>
+        <div class="rounded-[2rem] bg-lilac/10 p-4 shadow-sm">
+          <div class="grid grid-cols-2 gap-3">
+            {
+              [preview01, preview02, preview03, preview04].map((preview, index) => (
+                <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-white shadow-sm">
+                  <img
+                    src={preview.src}
+                    width={preview.width}
+                    height={preview.height}
+                    alt={`Prévia parcial dos cartões ${index + 1}`}
+                    class="h-full w-full scale-110 object-cover opacity-45 blur-[1px]"
+                    loading="lazy"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-br from-white/15 via-white/45 to-lilac/40" />
+                  <div class="absolute left-1/2 top-1/2 w-[150%] -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-primary/80 py-2 text-center font-heading text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground">
+                    Prévia
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+          <p class="mt-4 text-center text-xs leading-relaxed text-muted-foreground">
+            Prévia parcial do material. O conteúdo completo é liberado após a compra.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-secondary/40 py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">
+          Como usar os cartões com o bebê
+        </h2>
+      </div>
+      <div class="grid gap-4 md:grid-cols-5">
+        {
+          steps.map((step, index) => (
+            <div class="rounded-3xl bg-card p-5 shadow-sm">
+              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary font-heading font-bold text-primary-foreground">
+                {index + 1}
+              </div>
+              <p class="text-sm leading-relaxed text-muted-foreground">{step}</p>
+            </div>
+          ))
+        }
+      </div>
+      <div class="mx-auto mt-6 max-w-3xl rounded-3xl bg-white p-5 text-center text-sm font-medium text-foreground shadow-sm">
+        Use sempre com supervisão de um adulto. Não deixe cartões soltos no berço durante o sono.
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">
+          Você também recebe orientação por fase do bebê
+        </h2>
+        <p class="mt-4 text-muted-foreground leading-relaxed">
+          Dentro do kit, você encontra um guia simples explicando como usar os cartões de acordo com a fase do bebê
+          - desde os primeiros olhares até momentos de tummy time e exploração com supervisão.
+        </p>
+      </div>
+      <div class="grid gap-5 md:grid-cols-4">
+        {
+          phases.map(([title, text]) => (
+            <div class="rounded-3xl bg-card p-5 text-center shadow-sm">
+              <h3 class="font-heading text-lg font-bold text-primary">{title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="mx-auto mt-6 max-w-3xl text-center font-heading text-lg font-bold text-foreground">
+        O passo a passo completo fica dentro do material, para você usar com segurança e tranquilidade no dia a dia.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-[hsl(32,70%,97%)] py-12 md:py-16">
+    <div class="container">
+      <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+        <div>
+          <h2 class="font-heading text-3xl font-bold text-foreground md:text-4xl">
+            Para mães que querem estimular sem complicar
+          </h2>
+          <p class="mt-4 leading-relaxed text-muted-foreground">
+            Esse kit é para você que deseja oferecer estímulos ao seu bebê, mas não quer depender de telas,
+            brinquedos caros ou atividades difíceis de preparar.
+          </p>
+          <p class="mt-4 leading-relaxed text-muted-foreground">
+            É um material pronto, imprimível e fácil de usar, pensado para mães, pais, cuidadores, berçaristas e
+            famílias que querem criar momentos de desenvolvimento com leveza, presença e afeto.
+          </p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {
+            desireItems.map((item) => (
+              <div class="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm">
+                <Icon name="lucide:check" class="h-5 w-5 shrink-0 text-primary" />
+                <span class="text-sm font-medium text-foreground">{item}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">
+          Esse kit é ideal para:
+        </h2>
+      </div>
+      <div class="mx-auto grid max-w-5xl gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {
+          audienceItems.map((item) => (
+            <div class="rounded-3xl bg-card p-5 shadow-sm">
+              <Icon name="lucide:check" class="mb-3 h-5 w-5 text-primary" />
+              <p class="font-medium leading-relaxed text-foreground">{item}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-pink/10 py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-heading font-bold text-primary">
+          <Icon name="lucide:sparkles" class="h-4 w-4" />
+          Extras
+        </span>
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">Bônus especiais</h2>
+        <p class="mt-4 text-muted-foreground leading-relaxed">
+          Além dos cartões, você recebe materiais extras para organizar o uso e aproveitar melhor cada momento com o
+          bebê.
+        </p>
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+        {
+          bonuses.map(([title, text]) => (
+            <div class="rounded-3xl bg-white p-6 shadow-sm">
+              <Icon name="lucide:layers" class="mb-4 h-7 w-7 text-primary" />
+              <h3 class="font-heading text-xl font-bold text-foreground">{title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="comprar" class="py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto max-w-4xl rounded-[2rem] bg-primary p-8 text-center text-primary-foreground shadow-lg md:p-12">
+        <Icon name="lucide:printer" class="mx-auto mb-4 h-10 w-10" />
+        <h2 class="font-heading text-3xl font-bold md:text-4xl">
+          Comece hoje a estimular os primeiros olhares do seu bebê
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl leading-relaxed opacity-95">
+          Com o Kit Cartões de Alto Contraste para Bebês, você imprime, recorta e já pode usar em momentos simples da
+          rotina. Um recurso delicado, acessível e sem telas para estimular, encantar e criar conexão com o bebê.
+        </p>
+        <div class="mt-6">
+          {/* Sem href no original: clicar não fazia nada. Preservado. */}
+          <Button class="rounded-full bg-white px-8 font-heading font-bold text-primary hover:bg-white/90">
+            Quero comprar agora
+            <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+        <p class="mt-3 text-xs opacity-90">
+          Compra segura pela Hotmart. Acesso imediato ao material digital após a confirmação do pagamento.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-secondary/40 py-12 md:py-16">
+    <div class="container">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <h2 class="mt-3 font-heading text-2xl font-bold leading-tight text-foreground md:text-4xl">
+          Perguntas frequentes
+        </h2>
+      </div>
+      <div class="mx-auto max-w-4xl space-y-4">
+        {
+          faqs.map(([question, answer]) => (
+            <div class="rounded-3xl bg-card p-5 shadow-sm">
+              <h3 class="font-heading text-lg font-bold text-foreground">{question}</h3>
+              <p class="mt-2 leading-relaxed text-muted-foreground">{answer}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="py-10">
+    <div class="container">
+      <div class="mx-auto max-w-2xl text-center">
+        <Icon name="lucide:shield-check" class="mx-auto mb-3 h-8 w-8 text-primary" />
+        <h2 class="font-heading text-2xl font-bold text-foreground">Mundo Flavinha</h2>
+        <p class="mt-2 text-muted-foreground">Brincadeiras, desenvolvimento e memórias afetivas para a infância.</p>
+        <Button href="/loja" variant="ghost" class="mt-4 rounded-full font-heading font-bold text-foreground">
+          Voltar para a loja
+        </Button>
+      </div>
+    </div>
+  </section>
+</Layout>

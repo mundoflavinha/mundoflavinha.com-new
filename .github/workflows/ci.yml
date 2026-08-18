@@ -35,5 +35,38 @@ jobs:
       - name: Testes
         run: npm test
 
+      # PUBLIC_GA_ID aqui, não só no passo de e2e: antes cada um rodava seu
+      # PRÓPRIO build — este passo sem a variável, e o webServer do Playwright
+      # reconstruindo com ela (definida só no env daquele step). Resultado: dois
+      # dist/ diferentes, e "Testes sobre o HTML gerado" nunca via as tags do
+      # Analytics. Com um build só, os dois validam exatamente o mesmo artefato,
+      # e é este `dist/` que o webServer do Playwright serve (não reconstrói —
+      # ver playwright.config.ts). O valor é público (aparece no HTML de
+      # qualquer site com GA), então não é segredo de CI.
       - name: Build
         run: npm run build
+        env:
+          PUBLIC_GA_ID: G-452LR8P42T
+
+      # Depende do build: estas asserções leem o HTML realmente gerado em dist/.
+      - name: Testes sobre o HTML gerado
+        run: npm run test:html
+
+      # As quatro classes de defeito que nada acima alcança: corrida de
+      # hidratação, foco/teclado, chunk que não carrega e submissão de
+      # formulário antes de o JavaScript assumir. Vitest roda em Node, sem
+      # navegador; os testes de dist/ leem HTML parado. Nenhum dos dois vê
+      # hidratação acontecer — e é exatamente ali que mora a ponte do modal.
+      - name: Instalar navegador do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Testes de ponta a ponta
+        run: npm run test:e2e
+
+      - name: Guardar o relatório quando falhar
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

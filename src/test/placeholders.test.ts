@@ -60,6 +60,9 @@ describe("placeholders legais pendentes exigem o aviso de revisão", () => {
  * despercebido.
  */
 describe("código-fonte não contém os placeholders literais conhecidos", () => {
+  // .astro entrou no filtro abaixo junto com a migração: a maior parte da
+  // cópia do site mora lá agora, e sem isso este teste continuaria passando
+  // sem proteger nada.
   const PROIBIDOS = ["5500000000000", "chat.whatsapp.com/example"];
 
   const arquivosFonte = (dir: string): string[] => {
@@ -69,7 +72,7 @@ describe("código-fonte não contém os placeholders literais conhecidos", () =>
       const caminho = join(dir, nome);
       const info = statSync(caminho);
       if (info.isDirectory()) resultado.push(...arquivosFonte(caminho));
-      else if (/\.(ts|tsx)$/.test(nome)) resultado.push(caminho);
+      else if (/\.(ts|tsx|astro)$/.test(nome)) resultado.push(caminho);
     }
     return resultado;
   };

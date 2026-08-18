@@ -1,0 +1,115 @@
+---
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import WhatsAppButton from "@/components/WhatsAppButton.astro";
+import ConsentimentoCookies from "@/components/ConsentimentoCookies.astro";
+import GoogleAnalytics from "@/components/GoogleAnalytics.astro";
+import "@/styles/global.css";
+
+/**
+ * Layout único do site. Substitui Layout.tsx + Seo.tsx + react-helmet-async:
+ * o <head> é montado no servidor, então o título/description por rota existem
+ * no HTML cru — o que resolve a prévia de link em WhatsApp/Facebook, coisa que
+ * o helmet não conseguia (ver issue #10).
+ *
+ * Cada página passa seu title/description no frontmatter. Não há mais tabela
+ * central de rotas: em MPA isso é redundante.
+ */
+
+const TITULO_PADRAO = "Mundo Flavinha — Menos telas, mais infância";
+const DESCRICAO_PADRAO =
+  "Brincadeiras, atividades, vídeos e materiais para famílias que querem menos telas e mais memórias em família. Por Flávia, mãe do Lucas e da Bárbara.";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Caminho relativo ou absoluto. Default: public/og-default.webp. */
+  image?: string;
+  noIndex?: boolean;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, image, noIndex = false, jsonLd } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// A home não ganha sufixo — o título dela já é o nome do site.
+const tituloPagina = title ?? TITULO_PADRAO;
+const tituloCompleto =
+  tituloPagina === TITULO_PADRAO ? tituloPagina : `${tituloPagina} | Mundo Flavinha`;
+
+const descricao = description ?? DESCRICAO_PADRAO;
+
+/**
+ * A imagem de OG vive em public/ de propósito: URL estável, sem hash que muda
+ * a cada build. Crawler social não revalida, então um hash novo a cada deploy
+ * quebraria a prévia de links já compartilhados.
+ */
+const imagemOg = new URL(image ?? "/og-default.webp", Astro.site).href;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descricao} />
+    <link rel="canonical" href={canonical} />
+    {noIndex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:site_name" content="Mundo Flavinha" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imagemOg} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    {/*
+      No Layout, e não no slot de cada rota: centralizar impede que uma página
+      insira sua própria tag do Google fora do bloqueio.
+    */}
+    <GoogleAnalytics />
+
+    <slot name="head" />
+  </head>
+
+  <body class="min-h-screen flex flex-col">
+    <Header />
+    <main class="flex-1"><slot /></main>
+    <Footer />
+    <WhatsAppButton />
+    <ConsentimentoCookies />
+
+    <script>
+      // Marca que o JS está ativo: sem isso o .reveal fica visível por padrão
+      // (ver global.css). A classe entra antes do observer para não haver
+      // um frame com o conteúdo já animado.
+      document.documentElement.classList.add("js");
+
+      const alvos = document.querySelectorAll<HTMLElement>(".reveal");
+      if (alvos.length > 0 && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entradas) => {
+            for (const entrada of entradas) {
+              if (!entrada.isIntersecting) continue;
+              entrada.target.setAttribute("data-visivel", "true");
+              observer.unobserve(entrada.target);
+            }
+          },
+          { rootMargin: "0px 0px -10% 0px" },
+        );
+        alvos.forEach((alvo) => observer.observe(alvo));
+      } else {
+        // Sem IntersectionObserver, revela tudo de uma vez.
+        alvos.forEach((alvo) => alvo.setAttribute("data-visivel", "true"));
+      }
+    </script>
+  </body>
+</html>

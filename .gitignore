@@ -9,11 +9,21 @@ lerna-debug.log*
 
 node_modules
 dist
+
+# Reinclui public/ explicitamente. O ~/.gitignore_global desta máquina tem uma
+# regra `public` que excluía a pasta INTEIRA — e o .gitignore do repositório tem
+# precedência sobre o global. Sem isto, arquivo novo em public/ nunca entra num
+# commit e ninguém percebe: o build local funciona (o arquivo está no disco) e o
+# da Vercel, que parte do git, serve 404. Foi o que aconteceu com
+# og-default.webp, referenciado como og:image em todas as páginas: a prévia de
+# link no WhatsApp/Facebook — motivo central da migração — ficaria sem imagem.
+!public/
+
+# Tipos gerados pelo `astro sync` a cada build.
+.astro/
 dist-ssr
 *.local
 
-# Gerado por scripts/generate-sitemap.mjs a cada build — não é fonte.
-public/sitemap.xml
 .env
 .env.*
 !.env.example
@@ -28,3 +38,9 @@ public/sitemap.xml
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
