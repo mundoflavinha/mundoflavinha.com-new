@@ -1,0 +1,8 @@
+# Redirects temporários (302, não 301) para páginas do site antigo que
+# podem voltar a existir aqui — nada do site novo linka mais para elas
+# internamente, mas links externos antigos (redes sociais, buscadores)
+# ainda podem apontar direto. Remover a linha quando a página real existir
+# de novo neste projeto.
+/jogo-olhou-achou /
+/roda-de-conversa-em-familia /
+/dia-dos-pais /
