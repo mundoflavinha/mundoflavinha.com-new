@@ -7,11 +7,11 @@
  */
 
 /** Vira `false` quando os placeholders forem preenchidos e o texto revisado juridicamente. */
-export const LEGAL_EM_REVISAO = true;
+export const LEGAL_EM_REVISAO = false;
 
 /** Versão dos documentos legais. Bump quando o conteúdo mudar de forma relevante. */
-export const LEGAL_VERSAO = "2026-08-v2";
-export const LEGAL_ATUALIZADO_EM = "17 de agosto de 2026";
+export const LEGAL_VERSAO = "2026-08-v3";
+export const LEGAL_ATUALIZADO_EM = "18 de agosto de 2026";
 
 export const CONTROLADOR = {
   nomeFantasia: "Mundo Flavinha",
@@ -20,8 +20,10 @@ export const CONTROLADOR = {
   // confirmado consultando o CNPJ abaixo (situação ATIVA).
   razaoSocial: "49.736.565 FLAVIA SILVA GUIMARAES",
   cnpj: "49.736.565/0001-20",
-  // Endereço fica pendente de propósito — ver LEGAL_EM_REVISAO.
-  endereco: "[ENDEREÇO COMPLETO]",
+  // Decisão do controlador: não divulgar endereço físico publicamente (MEI
+  // individual). O e-mail de privacidade abaixo é o canal para exercício de
+  // direitos do art. 18 — não é um placeholder pendente de preenchimento.
+  endereco: "Não divulgado publicamente, por se tratar de empreendedora individual (MEI)",
 } as const;
 
 export const CONTATO = {
