@@ -68,7 +68,7 @@
     disablePageInteraction: false,
 
     guiOptions: {
-      consentModal: { layout: "box", position: "bottom left", equalWeightButtons: true },
+      consentModal: { layout: "box", position: "bottom right", equalWeightButtons: true },
       preferencesModal: { layout: "box", equalWeightButtons: true },
     },
 
@@ -124,3 +124,54 @@
     }),
   );
 </script>
+
+<style is:global>
+  /*
+   * A biblioteca só expõe tema via variáveis CSS (--cc-*), sem esquema de
+   * cores próprio — por padrão sai cinza-chumbo genérico, destoando do resto
+   * do site. Mapeando para os tokens de src/styles/global.css (mesmos nomes
+   * usados pelo Tailwind via hsl(var(--x))), o banner e o painel de
+   * preferências (que reaproveitam as mesmas variáveis de botão) herdam a
+   * paleta e a tipografia do site automaticamente.
+   */
+  #cc-main {
+    --cc-font-family: var(--font-body);
+    --cc-bg: hsl(var(--card));
+    --cc-primary-color: hsl(var(--foreground));
+    --cc-secondary-color: hsl(var(--muted-foreground));
+    --cc-modal-border-radius: var(--radius);
+    --cc-btn-border-radius: 9999px;
+    --cc-separator-border-color: hsl(var(--border));
+
+    /* "Aceitar" e "Recusar" usam a mesma variável de propósito — o código
+       pede equalWeightButtons porque recusar tem que parecer tão legítimo
+       quanto aceitar, não uma opção secundária. */
+    --cc-btn-primary-bg: hsl(var(--primary));
+    --cc-btn-primary-color: hsl(var(--primary-foreground));
+    --cc-btn-primary-border-color: hsl(var(--primary));
+    --cc-btn-primary-hover-bg: hsl(var(--primary) / 0.88);
+    --cc-btn-primary-hover-color: hsl(var(--primary-foreground));
+    --cc-btn-primary-hover-border-color: hsl(var(--primary) / 0.88);
+
+    --cc-btn-secondary-bg: hsl(var(--secondary));
+    --cc-btn-secondary-color: hsl(var(--secondary-foreground));
+    --cc-btn-secondary-border-color: hsl(var(--secondary));
+    --cc-btn-secondary-hover-bg: hsl(var(--secondary) / 0.75);
+    --cc-btn-secondary-hover-color: hsl(var(--secondary-foreground));
+    --cc-btn-secondary-hover-border-color: hsl(var(--secondary) / 0.75);
+
+    /* Estas três dependem de --cc-btn-primary-* por var() indireto, mas a
+       biblioteca as declara no :root dela — fora do escopo de #cc-main. Como
+       propriedade customizada herda o valor JÁ RESOLVIDO no ancestral (não a
+       referência), repetir aqui é necessário; senão ficam presas no cinza
+       padrão mesmo com --cc-btn-primary-bg sobrescrito acima. */
+    --cc-toggle-on-bg: hsl(var(--primary));
+    --cc-link-color: hsl(var(--primary));
+    --cc-webkit-scrollbar-hover-bg: hsl(var(--primary) / 0.88);
+  }
+
+  #cc-main .cm__title,
+  #cc-main .pm__title {
+    font-family: var(--font-heading);
+  }
+</style>
