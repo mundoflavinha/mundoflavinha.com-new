@@ -1,0 +1,16 @@
+# Config da Cloudflare Pages. Quando este arquivo existe, ele vira a fonte
+# de verdade — as configurações equivalentes no dashboard (build output
+# directory, compatibility date/flags) deixam de ser lidas.
+name = "mundoflavinha"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-08-19"
+
+# Nenhuma das 3 functions usa API específica do Node (node:crypto virou Web
+# Crypto em functions/api/lead.ts; thumb.ts usa ArrayBuffer puro, não
+# Buffer) — nada aqui depende de `nodejs_compat`. Se algo voltar a precisar
+# de um módulo node:*, adicione compatibility_flags = ["nodejs_compat"].
+
+# DATABASE_URL, YOUTUBE_API_KEY, YOUTUBE_CHANNEL_ID, YOUTUBE_HANDLE,
+# YOUTUBE_MAX_RESULTS: configuradas como variáveis/segredos no dashboard do
+# projeto na Cloudflare Pages (Settings → Environment variables), não aqui —
+# nunca comitar segredo em wrangler.toml.

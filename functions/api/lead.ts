@@ -1,23 +1,31 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createHash } from "node:crypto";
-import { neon } from "@neondatabase/serverless";
+import type { PagesFunction } from "@cloudflare/workers-types";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import type { z } from "zod";
 import {
   getConsentTexts,
   type AcaoConsentimento,
   type Finalidade,
   // Extensão .js explícita: package.json tem "type": "module", e sob ESM
-  // nativo do Node um import relativo sem extensão falha com
+  // nativo do Node/Workers um import relativo sem extensão falha com
   // ERR_MODULE_NOT_FOUND (é o arquivo compilado .js que existe em runtime,
   // mesmo a fonte sendo .ts — convenção padrão de projeto ESM/NodeNext).
-} from "../src/lib/consent.js";
-import { payloadSchema, legacySchema } from "../src/lib/leadSchema.js";
+} from "../../src/lib/consent.js";
+import { payloadSchema, legacySchema } from "../../src/lib/leadSchema.js";
 
-const sql = neon(process.env.DATABASE_URL!);
+interface Env {
+  DATABASE_URL: string;
+  THROTTLE_PEPPER?: string;
+}
+
+// Instanciado explicitamente: `ReturnType<typeof neon>` sobre uma função
+// genérica não instanciada resolve para os CONSTRAINTS dos type params
+// (`NeonQueryFunction<boolean, boolean>`), não para os defaults (`false,
+// false`) — e o `sql` de verdade, criado com `neon(url)` dentro do handler,
+// vem tipado `<false, false>`. Passar um nos parâmetros do outro quebra por
+// causa do método `transaction` (contravariante nos type params).
+type Sql = NeonQueryFunction<false, false>;
 
 /** Sem pepper o hash de um IPv4 é reversível por força bruta em segundos. */
-const PEPPER = process.env.THROTTLE_PEPPER ?? "mundoflavinha-sem-pepper";
-
 const JANELA_SEGUNDOS = 600; // 10 min
 const LIMITE_POR_IP = 8;
 const LIMITE_POR_EMAIL = 3;
@@ -27,21 +35,38 @@ const MAX_PREENCHIMENTO_MS = 12 * 60 * 60 * 1000;
 
 type EventoConsentimento = { finalidade: Finalidade; acao: AcaoConsentimento; texto: string };
 
-const hashBucket = (prefixo: string, valor: string) =>
-  `${prefixo}:${createHash("sha256").update(`${PEPPER}:${valor}`).digest("hex").slice(0, 32)}`;
+/**
+ * Web Crypto (`crypto.subtle`), não `node:crypto`: é global nativo do runtime
+ * de Workers, sem exigir a flag `nodejs_compat` nem puxar os tipos globais do
+ * Node (que colidiriam com Request/Response de @cloudflare/workers-types —
+ * ver tsconfig.functions.json). Mesmo algoritmo (SHA-256 de `pepper:valor`,
+ * hex, primeiros 32 chars): saída idêntica à versão anterior.
+ */
+const hashBucket = async (pepper: string, prefixo: string, valor: string) => {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${pepper}:${valor}`));
+  const hex = Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `${prefixo}:${hex.slice(0, 32)}`;
+};
 
-const getIp = (req: VercelRequest): string | null => {
-  const real = req.headers["x-real-ip"];
-  if (typeof real === "string" && real.trim()) return real.trim();
+const getIp = (request: Request): string | null => {
+  // CF-Connecting-IP é o cabeçalho que a própria Cloudflare garante conter o
+  // IP real do visitante — não pode ser forjado pelo cliente. Os outros dois
+  // seguem como fallback (útil rodando fora da borda da Cloudflare).
+  const cf = request.headers.get("cf-connecting-ip");
+  if (cf) return cf.trim();
 
-  const forwarded = req.headers["x-forwarded-for"];
-  const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-  const first = raw?.split(",")[0]?.trim();
+  const real = request.headers.get("x-real-ip");
+  if (real) return real.trim();
+
+  const forwarded = request.headers.get("x-forwarded-for");
+  const first = forwarded?.split(",")[0]?.trim();
   return first || null;
 };
 
-const originPermitida = (req: VercelRequest): boolean => {
-  const origin = req.headers.origin || req.headers.referer;
+const originPermitida = (request: Request): boolean => {
+  const origin = request.headers.get("origin") || request.headers.get("referer");
   // Chamadas server-to-server e curl não mandam Origin; não é sinal de ataque
   // por si só, e as demais camadas (honeypot, throttle, Zod) seguem valendo.
   if (!origin) return true;
@@ -51,7 +76,7 @@ const originPermitida = (req: VercelRequest): boolean => {
     return (
       hostname === "mundoflavinha.com" ||
       hostname === "www.mundoflavinha.com" ||
-      hostname.endsWith(".vercel.app") ||
+      hostname.endsWith(".pages.dev") ||
       hostname === "localhost" ||
       hostname === "127.0.0.1"
     );
@@ -60,12 +85,18 @@ const originPermitida = (req: VercelRequest): boolean => {
   }
 };
 
-/** Sucesso falso: o bot não aprende que foi barrado e não tenta variar a tática. */
-const sucessoSilencioso = (res: VercelResponse) => res.status(201).json({ ok: true });
+const json = (body: unknown, status: number, extraHeaders?: Record<string, string>) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json", ...extraHeaders },
+  });
 
-async function estourouLimite(ip: string | null, email: string): Promise<boolean> {
-  const buckets = [hashBucket("email", email)];
-  if (ip) buckets.push(hashBucket("ip", ip));
+/** Sucesso falso: o bot não aprende que foi barrado e não tenta variar a tática. */
+const sucessoSilencioso = () => json({ ok: true }, 201);
+
+async function estourouLimite(sql: Sql, pepper: string, ip: string | null, email: string): Promise<boolean> {
+  const buckets = [await hashBucket(pepper, "email", email)];
+  if (ip) buckets.push(await hashBucket(pepper, "ip", ip));
 
   // jsonb em vez de text[]: não depende de como o driver HTTP do Neon
   // serializa um array JS para tipo array do Postgres.
@@ -89,7 +120,7 @@ async function estourouLimite(ip: string | null, email: string): Promise<boolean
 }
 
 /** Purga oportunista: evita criar um cron job e mais um segredo só para isso. */
-async function purgarThrottleEventualmente() {
+async function purgarThrottleEventualmente(sql: Sql) {
   if (Math.random() > 0.02) return;
   try {
     await sql`delete from request_throttle where janela_inicio < now() - interval '2 hours'`;
@@ -98,21 +129,24 @@ async function purgarThrottleEventualmente() {
   }
 }
 
-async function gravar(params: {
-  email: string;
-  nome: string | null;
-  whatsapp: string | null;
-  faixaEtaria: string | null;
-  perfil: string | null;
-  optInEmail: boolean;
-  optInWhatsapp: boolean;
-  eventos: EventoConsentimento[];
-  versao: string;
-  origem: string;
-  material: string | null;
-  ip: string | null;
-  userAgent: string | null;
-}) {
+async function gravar(
+  sql: Sql,
+  params: {
+    email: string;
+    nome: string | null;
+    whatsapp: string | null;
+    faixaEtaria: string | null;
+    perfil: string | null;
+    optInEmail: boolean;
+    optInWhatsapp: boolean;
+    eventos: EventoConsentimento[];
+    versao: string;
+    origem: string;
+    material: string | null;
+    ip: string | null;
+    userAgent: string | null;
+  },
+) {
   const {
     email,
     nome,
@@ -196,50 +230,73 @@ async function gravar(params: {
   `;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // --- Checagens baratas primeiro: nada aqui toca o banco. ---
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Method not allowed" });
+export const onRequest: PagesFunction<Env> = async (context) => {
+  if (context.request.method !== "POST") {
+    return json({ error: "Method not allowed" }, 405, { Allow: "POST" });
+  }
+  return onRequestPost(context);
+};
+
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  const { request, env } = context;
+
+  if (!originPermitida(request)) {
+    return json({ error: "Origem não permitida" }, 403);
   }
 
-  if (!originPermitida(req)) {
-    return res.status(403).json({ error: "Origem não permitida" });
-  }
+  // JSON malformado ou corpo ausente cai no mesmo "Dados inválidos" que um
+  // payload que não bate com o schema — o Zod já cobria isso quando o corpo
+  // vinha pronto de req.body; aqui o parse pode lançar antes de chegar lá.
+  const body = await request
+    .json()
+    .catch(() => undefined);
 
-  const parsed = payloadSchema.safeParse(req.body);
+  // `neon()` lança SÍNCRONO (não só na primeira query) quando a connection
+  // string está ausente ou malformada — sem o try/catch aqui, isso escapava
+  // como exceção não tratada e o Worker devolvia stack trace bruto ao
+  // cliente em vez do JSON de erro padrão do resto deste endpoint.
+  let sql: Sql;
+  try {
+    sql = neon(env.DATABASE_URL);
+  } catch (err) {
+    console.error("falha ao criar cliente Neon", err);
+    return json({ error: "Não foi possível salvar seus dados. Tente novamente." }, 500);
+  }
+  const pepper = env.THROTTLE_PEPPER ?? "mundoflavinha-sem-pepper";
+
+  const parsed = payloadSchema.safeParse(body);
 
   if (!parsed.success) {
-    const legacy = legacySchema.safeParse(req.body);
+    const legacy = legacySchema.safeParse(body);
     if (!legacy.success) {
-      return res.status(400).json({ error: "Dados inválidos" });
+      return json({ error: "Dados inválidos" }, 400);
     }
-    return handleLegacy(req, res, legacy.data);
+    return handleLegacy(request, sql, pepper, legacy.data);
   }
 
   const data = parsed.data;
 
   // Honeypot preenchido ou preenchimento rápido/velho demais: sucesso falso.
-  if (data.hp) return sucessoSilencioso(res);
+  if (data.hp) return sucessoSilencioso();
   if (
     data.elapsedMs !== undefined &&
     (data.elapsedMs < MIN_PREENCHIMENTO_MS || data.elapsedMs > MAX_PREENCHIMENTO_MS)
   ) {
-    return sucessoSilencioso(res);
+    return sucessoSilencioso();
   }
 
   const textos = getConsentTexts(data.consentVersion);
   if (!textos) {
-    return res.status(400).json({ error: "Versão de consentimento desconhecida" });
+    return json({ error: "Versão de consentimento desconhecida" }, 400);
   }
 
   // --- A partir daqui há I/O. ---
-  const ip = getIp(req);
-  const userAgent = typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : null;
+  const ip = getIp(request);
+  const userAgent = request.headers.get("user-agent");
 
   try {
-    if (await estourouLimite(ip, data.email)) {
-      return res.status(429).json({ error: "Muitas tentativas. Tente novamente em alguns minutos." });
+    if (await estourouLimite(sql, pepper, ip, data.email)) {
+      return json({ error: "Muitas tentativas. Tente novamente em alguns minutos." }, 429);
     }
 
     const eventos: EventoConsentimento[] = [];
@@ -268,7 +325,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    await gravar({
+    await gravar(sql, {
       email: data.email,
       nome: data.nome ?? null,
       whatsapp: data.whatsapp ?? null,
@@ -284,28 +341,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userAgent,
     });
 
-    await purgarThrottleEventualmente();
-    return res.status(201).json({ ok: true });
+    await purgarThrottleEventualmente(sql);
+    return json({ ok: true }, 201);
   } catch (err) {
     console.error("falha ao gravar lead", err);
-    return res.status(500).json({ error: "Não foi possível salvar seus dados. Tente novamente." });
+    return json({ error: "Não foi possível salvar seus dados. Tente novamente." }, 500);
   }
-}
+};
 
-async function handleLegacy(
-  req: VercelRequest,
-  res: VercelResponse,
-  data: z.infer<typeof legacySchema>,
-) {
-  const ip = getIp(req);
-  const userAgent = typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : null;
+async function handleLegacy(request: Request, sql: Sql, pepper: string, data: z.infer<typeof legacySchema>) {
+  const ip = getIp(request);
+  const userAgent = request.headers.get("user-agent");
 
   try {
-    if (await estourouLimite(ip, data.email)) {
-      return res.status(429).json({ error: "Muitas tentativas. Tente novamente em alguns minutos." });
+    if (await estourouLimite(sql, pepper, ip, data.email)) {
+      return json({ error: "Muitas tentativas. Tente novamente em alguns minutos." }, 429);
     }
 
-    await gravar({
+    await gravar(sql, {
       email: data.email,
       nome: data.nome ?? null,
       whatsapp: data.whatsapp ?? null,
@@ -328,9 +381,9 @@ async function handleLegacy(
       userAgent,
     });
 
-    return res.status(201).json({ ok: true });
+    return json({ ok: true }, 201);
   } catch (err) {
     console.error("falha ao gravar lead (legado)", err);
-    return res.status(500).json({ error: "Não foi possível salvar seus dados. Tente novamente." });
+    return json({ error: "Não foi possível salvar seus dados. Tente novamente." }, 500);
   }
 }
