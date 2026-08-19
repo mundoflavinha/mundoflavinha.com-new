@@ -1,6 +1,6 @@
 # Mundo Flavinha
 
-Site em [Astro](https://astro.build) (`output: 'static'`, sem adapter) + Tailwind. 31 rotas, 122 páginas geradas — a maior parte HTML puro, sem JS de framework. Só 3 pontos viram ilha React: o formulário de newsletter, o modal de captura de material gratuito e a galeria de `/videos`. O backend (`api/`) é Vercel Serverless Functions, escrito à parte do Astro.
+Site em [Astro](https://astro.build) (`output: 'static'`, sem adapter) + Tailwind. 31 rotas, 122 páginas geradas — a maior parte HTML puro, sem JS de framework. Só 3 pontos viram ilha React: o formulário de newsletter, o modal de captura de material gratuito e a galeria de `/videos`. O backend (`functions/api/`) é Cloudflare Pages Functions, escrito à parte do Astro. Hospedado na [Cloudflare Pages](https://pages.cloudflare.com/) — ver `wrangler.toml`.
 
 ## Rodar localmente
 
@@ -15,15 +15,30 @@ O servidor local (`astro dev`) sobe em:
 http://localhost:4321/
 ```
 
-**`astro dev` não executa `api/`.** Ele nem tenta: fora do Astro, `api/*.ts` é só convenção de pasta que a Vercel reconhece no deploy. Pedir `/api/videos` ao `astro dev` devolve o *código-fonte* do arquivo como texto (o dev server do Vite serve qualquer arquivo do projeto por caminho), não o handler executado — e `/api/lead` cai direto no 404 do site. Para rodar as functions de verdade em localhost, use `vercel dev` (ele builda `api/` e Astro juntos).
+**`astro dev` não executa `functions/`.** Ele nem tenta: fora do Astro, `functions/api/*.ts` é só convenção de pasta que a Cloudflare Pages reconhece no deploy. Pedir `/api/videos` ao `astro dev` cai direto no 404 do site (o dev server do Vite não conhece essa rota). Para rodar as functions de verdade em localhost:
+
+```bash
+npm run build
+npx wrangler pages dev dist
+```
+
+Isso builda o Astro (`dist/`) e serve estático + functions juntos em `http://localhost:8788`, lendo variáveis de ambiente de um `.dev.vars` na raiz do projeto (mesmo papel do `.env.local`, mas é a convenção própria do wrangler — nome fixo, não cai no glob `.env.*` do `.gitignore`, por isso tem entrada própria):
+
+```env
+# .dev.vars
+DATABASE_URL=postgresql://usuario:senha@SEU-HOST-pooler.../neondb?sslmode=require
+YOUTUBE_API_KEY=sua_chave_da_youtube_data_api
+```
+
+Sem hot-reload do Astro nesse modo — para trabalhar em UI/conteúdo, use `npm run dev` normalmente e só suba o `wrangler pages dev` quando precisar testar `/api/*` de verdade.
 
 ## Scripts
 
 ```bash
-npm run dev         # astro dev — o site, sem api/
+npm run dev         # astro dev — o site, sem functions/
 npm run build       # astro build — gera dist/
 npm run preview     # astro preview — serve o build de dist/ localmente
-npm run typecheck   # astro check (inclui .astro) + tsc sobre api/
+npm run typecheck   # astro check (inclui .astro) + tsc sobre functions/
 npm run lint        # eslint . — cobre .ts/.tsx/.astro/configs
 npm test            # vitest — testes unitários (dados, Zod, consentimento)
 npm run test:html   # vitest — asserções sobre o HTML real em dist/ (exige build antes)
@@ -44,7 +59,7 @@ Crie um `.env.local` — ver `.env.example` para a lista completa e os comentár
 
 ## YouTube
 
-A busca dos vídeos do canal roda em `api/videos.ts` (Vercel Serverless Function), nunca no navegador.
+A busca dos vídeos do canal roda em `functions/api/videos.ts` (Cloudflare Pages Function), nunca no navegador.
 
 ```env
 YOUTUBE_API_KEY=sua_chave_da_youtube_data_api
@@ -55,11 +70,11 @@ YOUTUBE_MAX_RESULTS=
 
 A página de vídeos usa as playlists do canal como categorias. Deixe `YOUTUBE_MAX_RESULTS` vazio para carregar todos os vídeos enviados pelo canal.
 
-A resposta de `/api/videos` fica em cache por 30 min na CDN da Vercel (`Cache-Control: s-maxage=1800`) — a maioria das visitas nem chega a chamar o YouTube, o que reduz o consumo de cota da API. As miniaturas passam por `/api/thumb` (proxy pelo próprio domínio) — o navegador nunca contata o Google diretamente para carregar `/videos`, só quando a pessoa autoriza conteúdo externo no banner de cookies e clica para assistir.
+A resposta de `/api/videos` fica em cache por 30 min na CDN da Cloudflare (`Cache-Control: s-maxage=1800`) — a maioria das visitas nem chega a chamar o YouTube, o que reduz o consumo de cota da API. As miniaturas passam por `/api/thumb` (proxy pelo próprio domínio) — o navegador nunca contata o Google diretamente para carregar `/videos`, só quando a pessoa autoriza conteúdo externo no banner de cookies e clica para assistir.
 
 ## Captura de leads (Neon)
 
-Os formulários de newsletter e de download de material gravam no Postgres do Neon via `api/lead.ts` (Vercel Serverless Function).
+Os formulários de newsletter e de download de material gravam no Postgres do Neon via `functions/api/lead.ts` (Cloudflare Pages Function).
 
 1. Rode, nesta ordem, no SQL Editor do projeto Neon:
    - `sql/migrations/001_lgpd.sql` — cria `contacts`, `consent_events` (prova de consentimento, append-only) e `material_requests`. É o schema que a API usa hoje.
@@ -72,19 +87,17 @@ DATABASE_URL=postgresql://usuario:senha@SEU-HOST-pooler.../neondb?sslmode=requir
 
 Use o **Pooler host** do Neon (não o host direto) — a function é serverless e abre conexões curtas.
 
-3. Configure a mesma `DATABASE_URL` nas Environment Variables do projeto na Vercel (Production, Preview e Development).
-4. Para rodar a function localmente, use `vercel dev` (`astro dev` não executa `api/` — ver "Rodar localmente" acima).
+3. Configure a mesma `DATABASE_URL` nas Environment variables do projeto na Cloudflare Pages (Settings → Environment variables), no ambiente de Production.
+4. Para rodar a function localmente, use `wrangler pages dev` com um `.dev.vars` (`astro dev` não executa `functions/` — ver "Rodar localmente" acima).
 
 ### Materiais para download
 
-Os botões "Baixar agora" apontam para o PDF declarado em `src/data/materiais.ts` — o catálogo único que também alimenta os cards de `/downloads` e da home. Suba os arquivos reais em `public/materiais/`:
+Os botões "Baixar agora" apontam para o PDF declarado em `src/data/materiais.ts` — o catálogo único que também alimenta os cards de `/downloads` e da home. Os 4 arquivos reais já estão em `public/materiais/`:
 
 - `jogo-da-reciclagem.pdf`
 - `cada-tampinha-no-seu-lugar.pdf`
 - `semaforo-do-toque.pdf`
 - `colete-educativo.pdf`
-
-**Hoje esses 4 arquivos são placeholders de marcação** (gerados por `scripts/gerar-pdfs-placeholder.mjs`, cada um dizendo "ARQUIVO DE TESTE" bem grande) — o funil de captura funciona de ponta a ponta, mas quem baixar recebe o aviso, não o material. `npm test` imprime um lembrete a cada execução enquanto isso não for trocado. Depois de subir os PDFs reais, apague o script.
 
 ### Operação LGPD (acesso, revogação, exclusão)
 
@@ -96,15 +109,15 @@ O banner (`vanilla-cookieconsent`) e o Analytics ficam em `src/components/Consen
 
 **Este consentimento é diferente do consentimento de formulário** (`src/lib/consent.ts`, `consent_events` no banco) — são dois registros com bases legais distintas e não devem se misturar. Ver o comentário no topo de `src/lib/cookies.ts`.
 
-Configure `PUBLIC_GA_ID` (formato `G-XXXXXXXXXX`) só no ambiente **Production** da Vercel — deixe vazio em Preview e Development, senão a medição fica contaminada com tráfego de teste.
+Configure `PUBLIC_GA_ID` (formato `G-XXXXXXXXXX`) só no ambiente **Production** do projeto na Cloudflare Pages — deixe vazio em Preview e Development, senão a medição fica contaminada com tráfego de teste.
 
 ## Dados institucionais e revisão jurídica
 
-`src/lib/site.ts` centraliza razão social, CNPJ, endereço, e-mails de contato e `LEGAL_EM_REVISAO`. Enquanto esse flag for `true`, os textos legais (`Política de Privacidade`, `Termos de Uso`, `Contato`) ainda têm placeholders entre colchetes — substitua todos e vire o flag para `false` só depois de revisão jurídica.
+`src/lib/site.ts` centraliza razão social, CNPJ, endereço, e-mails de contato e `LEGAL_EM_REVISAO`. Enquanto esse flag for `true`, os textos legais (`Política de Privacidade`, `Termos de Uso`, `Contato`) ainda têm placeholders entre colchetes — substitua todos e vire o flag para `false` só depois de revisão jurídica. `src/test/placeholders.test.ts` trava qualquer combinação inconsistente entre os dois.
 
 ## Docker (opcional)
 
-`docker-compose.yml` sobe o ambiente de dev (não é imagem de produção — o site é estático e vai para a Vercel via `astro build`):
+`docker-compose.yml` sobe o ambiente de dev (não é imagem de produção — o site é estático e vai para a Cloudflare Pages via `astro build`):
 
 ```bash
 docker compose up

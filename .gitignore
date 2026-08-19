@@ -28,6 +28,14 @@ dist-ssr
 .env.*
 !.env.example
 
+# Segredos locais do wrangler (equivalente ao .env.local, convenção própria
+# da Cloudflare — não bate no glob .env.* acima).
+.dev.vars
+.dev.vars.*
+
+# Cache/artefatos do wrangler.
+.wrangler/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

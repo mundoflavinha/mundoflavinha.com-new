@@ -92,14 +92,15 @@ export default defineConfig(
     },
   },
 
-  // Funções serverless, scripts e configs: rodam no Node, não no navegador.
-  // `*.config.mjs`/`*.config.cjs` entraram junto de `*.config.{ts,js}` — sem
-  // eles `astro.config.mjs` não batia em glob nenhum e ficava tão fora do
-  // lint quanto os `.astro` estavam antes desta mudança (confirmado com
-  // `eslint --print-config astro.config.mjs`: zero regras aplicadas).
+  // Funções serverless, scripts e configs: rodam no Node/Workers, não no
+  // navegador. `*.config.mjs`/`*.config.cjs` entraram junto de
+  // `*.config.{ts,js}` — sem eles `astro.config.mjs` não batia em glob
+  // nenhum e ficava tão fora do lint quanto os `.astro` estavam antes desta
+  // mudança (confirmado com `eslint --print-config astro.config.mjs`: zero
+  // regras aplicadas).
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["api/**/*.ts", "scripts/**/*.mjs", "*.config.{ts,js,mjs,cjs}"],
+    files: ["functions/**/*.ts", "scripts/**/*.mjs", "*.config.{ts,js,mjs,cjs}"],
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.node,

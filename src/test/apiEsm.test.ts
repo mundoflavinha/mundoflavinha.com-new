@@ -3,28 +3,28 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * Trava de resolução ESM das Vercel Functions.
+ * Trava de resolução ESM das Cloudflare Pages Functions.
  *
- * `package.json` tem `"type": "module"`, então os arquivos de `api/` rodam sob
- * ESM NATIVO do Node — onde um import relativo sem extensão explícita estoura
+ * `package.json` tem `"type": "module"`, então os arquivos de `functions/`
+ * rodam sob ESM — onde um import relativo sem extensão explícita estoura
  * `ERR_MODULE_NOT_FOUND` em runtime. Nada disso é pego por typecheck, lint ou
  * pelos outros testes: todos usam resolução de bundler (`moduleResolution:
  * "bundler"` no tsconfig, Vite no Vitest), que aceita import sem extensão.
  *
  * Foi exatamente assim que `POST /api/lead` foi para produção quebrado: ao
- * extrair `leadSchema.ts` de `api/lead.ts`, o import de `./consent` ficou sem
- * `.js`. CI verde, 100 testes passando, endpoint retornando 500
- * FUNCTION_INVOCATION_FAILED a cada cadastro.
+ * extrair `leadSchema.ts` de `api/lead.ts` (antes da migração para
+ * Cloudflare), o import de `./consent` ficou sem `.js`. CI verde, 100 testes
+ * passando, endpoint retornando 500 a cada cadastro.
  *
  * Este teste varre os arquivos que a API de fato carrega e exige extensão
  * explícita em todo import relativo.
  */
 
-/** Os mesmos arquivos listados em tsconfig.api.json — o que a `api/` carrega. */
+/** Os mesmos arquivos listados em tsconfig.functions.json — o que `functions/` carrega. */
 const ARQUIVOS_DA_API = [
-  "api/lead.ts",
-  "api/videos.ts",
-  "api/thumb.ts",
+  "functions/api/lead.ts",
+  "functions/api/videos.ts",
+  "functions/api/thumb.ts",
   "src/lib/consent.ts",
   "src/lib/leadSchema.ts",
   "src/lib/youtubeFetcher.ts",
@@ -56,16 +56,16 @@ describe("resolução ESM dos arquivos carregados pela api/", () => {
     ).toEqual([]);
   });
 
-  it("a lista aqui cobre o mesmo que tsconfig.api.json inclui", () => {
+  it("a lista aqui cobre o mesmo que tsconfig.functions.json inclui", () => {
     // Se alguém adicionar um módulo ao include da API e esquecer deste teste, a
     // trava deixa de cobrir esse arquivo silenciosamente.
-    const tsconfig = readFileSync(join(process.cwd(), "tsconfig.api.json"), "utf-8");
+    const tsconfig = readFileSync(join(process.cwd(), "tsconfig.functions.json"), "utf-8");
     const include: string[] = JSON.parse(tsconfig.replace(/\/\/.*$/gm, "")).include;
 
     const declaradosEmSrc = include.filter((i) => i.endsWith(".ts")).sort();
     const cobertosEmSrc = ARQUIVOS_DA_API.filter((a) => a.startsWith("src/")).sort();
 
-    expect(cobertosEmSrc, "ARQUIVOS_DA_API divergiu do include de tsconfig.api.json").toEqual(
+    expect(cobertosEmSrc, "ARQUIVOS_DA_API divergiu do include de tsconfig.functions.json").toEqual(
       declaradosEmSrc,
     );
   });

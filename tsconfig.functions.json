@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    // Workers, não Node: "node" traria o Request/Response/fetch global do
+    // undici, que conflita em tipo com o da @cloudflare/workers-types (usado
+    // por PagesFunction). Módulos como "node:crypto" continuam resolvendo por
+    // resolução normal — o array `types` só controla globais ambientes.
+    "types": ["@cloudflare/workers-types"]
+  },
+  "include": ["functions", "src/lib/consent.ts", "src/lib/youtubeFetcher.ts", "src/lib/leadSchema.ts"]
+}

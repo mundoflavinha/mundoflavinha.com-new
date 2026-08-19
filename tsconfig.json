@@ -1,9 +1,9 @@
 {
   // O Astro lê ESTE arquivo para resolver `@/` dentro de .astro — por isso ele
   // deixou de ser um solution file vazio e passou a declarar compilerOptions.
-  // `api/` fica de fora de propósito: as Vercel Functions têm o próprio
-  // tsconfig.api.json, que é o guarda-corpo de que elas só importam módulos
-  // livres de UI (ver src/test/apiEsm.test.ts).
+  // `functions/` fica de fora de propósito: as Cloudflare Pages Functions têm
+  // o próprio tsconfig.functions.json, que é o guarda-corpo de que elas só
+  // importam módulos livres de UI (ver src/test/apiEsm.test.ts).
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "baseUrl": ".",
@@ -24,5 +24,5 @@
     "noUnusedParameters": true
   },
   "include": [".astro/types.d.ts", "src/**/*", "*.config.*"],
-  "exclude": ["dist", "node_modules", "api"]
+  "exclude": ["dist", "node_modules", "functions"]
 }

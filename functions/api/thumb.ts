@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { PagesFunction } from "@cloudflare/workers-types";
 
 /**
  * Serve a miniatura de um vídeo do YouTube pelo NOSSO domínio.
@@ -28,6 +28,12 @@ const QUALIDADES = ["maxresdefault", "hqdefault", "mqdefault", "default"] as con
 const TAMANHO_MAXIMO_BYTES = 2 * 1024 * 1024;
 const TIMEOUT_MS = 5_000;
 
+const json = (body: unknown, status: number, extraHeaders?: Record<string, string>) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json", ...extraHeaders },
+  });
+
 const buscarUpstream = async (id: string) => {
   for (const qualidade of QUALIDADES) {
     const controle = new AbortController();
@@ -47,7 +53,7 @@ const buscarUpstream = async (id: string) => {
       const tamanho = Number(resposta.headers.get("content-length") ?? "0");
       if (tamanho > TAMANHO_MAXIMO_BYTES) continue;
 
-      const bytes = Buffer.from(await resposta.arrayBuffer());
+      const bytes = await resposta.arrayBuffer();
       // O YouTube devolve 200 com um placeholder cinza de 120x90 quando a
       // qualidade pedida não existe. O corte por tamanho o descarta e cai para
       // a próxima qualidade.
@@ -63,26 +69,32 @@ const buscarUpstream = async (id: string) => {
   return null;
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
-    return res.status(405).json({ error: "Method not allowed" });
+export const onRequest: PagesFunction = async (context) => {
+  if (context.request.method !== "GET") {
+    return json({ error: "Method not allowed" }, 405, { Allow: "GET" });
   }
+  return onRequestGet(context);
+};
 
-  const id = typeof req.query.id === "string" ? req.query.id : "";
+export const onRequestGet: PagesFunction = async ({ request }) => {
+  const id = new URL(request.url).searchParams.get("id") ?? "";
   if (!ID_VALIDO.test(id)) {
-    return res.status(400).json({ error: "id inválido" });
+    return json({ error: "id inválido" }, 400);
   }
 
   const imagem = await buscarUpstream(id);
   if (!imagem) {
-    return res.status(502).json({ error: "Não foi possível carregar a miniatura." });
+    return json({ error: "Não foi possível carregar a miniatura." }, 502);
   }
 
   // Miniatura de vídeo publicado praticamente não muda. Cache longo na CDN faz
   // a maioria das visitas nem chegar a esta função — o custo de banda e
   // invocação fica restrito ao primeiro acesso de cada vídeo.
-  res.setHeader("Cache-Control", "public, s-maxage=604800, stale-while-revalidate=86400, max-age=3600");
-  res.setHeader("Content-Type", imagem.tipo);
-  return res.status(200).send(imagem.bytes);
-}
+  return new Response(imagem.bytes, {
+    status: 200,
+    headers: {
+      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400, max-age=3600",
+      "Content-Type": imagem.tipo,
+    },
+  });
+};
