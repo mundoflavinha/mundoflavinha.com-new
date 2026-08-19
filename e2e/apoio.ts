@@ -14,8 +14,19 @@ import type { Page } from "@playwright/test";
  */
 export const dispensarBannerDeCookies = async (page: Page) => {
   const banner = page.locator("#cc-main .cm");
-  if (await banner.isVisible().catch(() => false)) {
-    await banner.getByRole("button", { name: "Recusar o que não é necessário" }).click();
-    await banner.waitFor({ state: "hidden" });
-  }
+
+  // `isVisible()` checado uma única vez corre contra a animação de entrada da
+  // biblioteca: no instante do goto() o banner ainda não apareceu, a checagem
+  // dá falso e a função sai sem clicar em nada — o banner aparece alguns
+  // instantes depois e passa a interceptar cliques do teste que só queria
+  // testar outra coisa. `waitFor` dá à animação o tempo de terminar antes de
+  // decidir que não há banner nenhum.
+  const apareceu = await banner
+    .waitFor({ state: "visible", timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!apareceu) return;
+
+  await banner.getByRole("button", { name: "Recusar o que não é necessário" }).click();
+  await banner.waitFor({ state: "hidden" });
 };
