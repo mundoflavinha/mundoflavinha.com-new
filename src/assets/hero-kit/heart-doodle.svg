@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 160" role="img" aria-labelledby="title desc">
+  <title id="title">Coração desenhado à mão</title>
+  <desc id="desc">Rabisco de coração rosa em traço duplo.</desc>
+  <g data-part="doodle" fill="none" stroke="var(--mf-pink, #ed91ad)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M94 135C78 117 35 90 33 55 31 25 69 14 91 47c20-35 63-21 65 9 2 34-40 62-62 79Z" stroke-width="7" stroke-dasharray="2 4"/>
+    <path d="M91 129C72 108 42 84 42 57c0-20 26-28 39-10 6 8 8 15 10 24 2-9 7-19 14-25 17-14 41-2 41 18 0 23-33 50-55 65Z" stroke-width="3.5" opacity=".62"/>
+  </g>
+</svg>

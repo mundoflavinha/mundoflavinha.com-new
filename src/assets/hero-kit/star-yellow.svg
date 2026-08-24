@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 170" role="img" aria-labelledby="title desc">
+  <title id="title">Estrela amarela</title>
+  <desc id="desc">Estrela de massinha com cinco pontas arredondadas.</desc>
+  <!--
+    CORRIGIDO em relação ao kit original: o comando `c` do path da estrela
+    vinha com 34 parâmetros, e `c` consome múltiplos de 6. Faltava o
+    primeiro ponto de controle do 6º segmento, então o navegador abortava
+    o path no erro e desenhava uma forma de três pontas.
+    O valor reposto (-9 0) foi DERIVADO, não chutado: os segmentos
+    interno→externo da estrela são o mesmo par de controles rodado de 72°
+    a cada ponta, e girar o 4º segmento prevê os dois números que
+    sobreviveram — (-31,21) contra (-33,20) e (-38,15) contra (-40,14).
+  -->
+  <defs>
+    <linearGradient id="star" x1="38" y1="27" x2="130" y2="140" gradientUnits="userSpaceOnUse"><stop stop-color="#ffd76c"/><stop offset="1" stop-color="#efa936"/></linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#9d6b24" flood-opacity=".23"/></filter>
+  </defs>
+  <path data-part="star" d="M85 19c7 0 14 29 21 35 7 5 38 3 41 12 3 9-23 25-26 33-3 9 10 36 2 41-7 5-31-15-40-15-9 0-33 20-40 14c-7-5 7-32 4-41-3-8-29-25-26-34 3-8 34-6 41-11 7-6 16-35 23-35Z" fill="url(#star)" stroke="#d9952c" stroke-width="4" stroke-linejoin="round" filter="url(#shadow)"/>
+  <path d="M72 42c5-8 9-12 13-16 3 5 6 12 9 21" fill="none" stroke="#ffe89e" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+</svg>

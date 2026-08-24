@@ -64,19 +64,20 @@ export default {
         mint: "hsl(var(--mint))",
         "warm-white": "hsl(var(--warm-white))",
 
-        // Paleta do hero/header novo — ver bloco de tokens em global.css.
+        // Paleta do hero/header — ver bloco de tokens em global.css.
+        // As cores de ARTE valem para os SVGs do kit; as `-ink` são as mesmas
+        // escurecidas o mínimo para passar no contraste, e só aparecem em
+        // texto e botão.
         creme: "hsl(var(--creme))",
         plum: "hsl(var(--plum))",
         uva: "hsl(var(--uva))",
+        "uva-ink": "hsl(var(--uva-ink))",
         coral: "hsl(var(--coral))",
-        "roxo-cta": "hsl(var(--roxo-cta))",
-        "rosa-pill": "hsl(var(--rosa-pill))",
-        "rosa-borda": "hsl(var(--rosa-borda))",
+        "coral-ink": "hsl(var(--coral-ink))",
+        lilas: "hsl(var(--lilas))",
+        rosa: "hsl(var(--rosa))",
+        amarelo: "hsl(var(--amarelo))",
         "texto-suave": "hsl(var(--texto-suave))",
-        "lilas-blob": "hsl(var(--lilas-blob))",
-        "lilas-claro": "hsl(var(--lilas-claro))",
-        "coral-blob": "hsl(var(--coral-blob))",
-        "coral-blob-escuro": "hsl(var(--coral-blob-escuro))",
       },
       borderRadius: {
         lg: "var(--radius)",

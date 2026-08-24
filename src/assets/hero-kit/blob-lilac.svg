@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 500" role="img" aria-labelledby="title desc">
+  <title id="title">Forma orgânica lilás</title>
+  <desc id="desc">Forma secundária de papel recortado para criar profundidade.</desc>
+  <defs>
+    <filter id="paper" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency=".58" numOctaves="4" seed="12" result="noise"/>
+      <feColorMatrix in="noise" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .11 0" result="grain"/>
+      <!--
+        CORRIGIDO em relação ao kit original: faltava recortar o granulado
+        contra o SourceAlpha. `feTurbulence` preenche a REGIÃO INTEIRA do
+        filtro, e `feBlend mode="multiply"` sobre pixel transparente devolve o
+        próprio granulado — então o ruído aparecia fora da forma, como um
+        retângulo cinza visível em volta do blob. O feComposite abaixo mantém
+        o granulado só onde existe blob.
+      -->
+      <feComposite in="grain" in2="SourceAlpha" operator="in" result="grainRecortado"/>
+      <feBlend in="SourceGraphic" in2="grainRecortado" mode="multiply"/>
+    </filter>
+  </defs>
+  <path data-part="paper" d="M82 406C20 348 22 262 69 204c49-60 112-43 143-111 33-72 126-92 203-52 83 43 118 136 92 226-24 84-87 87-132 155-39 58-90 89-168 67-56-16-82-43-125-83Z" fill="var(--mf-lilac, #c9a5dc)" filter="url(#paper)"/>
+  <path data-part="edge" d="M115 419c55 45 115 52 174 19" fill="none" stroke="#e8d1ef" stroke-width="7" stroke-linecap="round" opacity=".45"/>
+</svg>

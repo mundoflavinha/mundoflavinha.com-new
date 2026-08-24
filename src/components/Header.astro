@@ -79,7 +79,7 @@ const ativo = (path: string) => rotaAtual === path || rotaAtual.startsWith(`${pa
             aria-current={ativo(item.path) ? "page" : undefined}
             class:list={[
               "rounded-full px-3.5 py-2 font-heading text-[0.95rem] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-uva",
-              ativo(item.path) ? "bg-white/70 text-uva" : "text-plum/75 hover:bg-white/60 hover:text-plum",
+              ativo(item.path) ? "bg-white/70 text-uva-ink" : "text-plum/75 hover:bg-white/60 hover:text-plum",
             ]}
           >
             {item.label}
@@ -93,7 +93,7 @@ const ativo = (path: string) => rotaAtual === path || rotaAtual.startsWith(`${pa
 
       <a
         href="/brincadeiras"
-        class="hidden rounded-full bg-rosa-pill px-6 py-3 font-heading text-[0.95rem] font-bold text-plum shadow-[0_10px_24px_-14px_hsl(var(--rosa-borda))] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 md:inline-flex"
+        class="hidden rounded-full bg-rosa px-6 py-3 font-heading text-[0.95rem] font-bold text-plum shadow-[0_10px_24px_-14px_hsl(var(--rosa))] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 md:inline-flex"
       >
         Começar a brincar
       </a>
@@ -121,7 +121,7 @@ const ativo = (path: string) => rotaAtual === path || rotaAtual.startsWith(`${pa
             aria-current={ativo(item.path) ? "page" : undefined}
             class:list={[
               "rounded-2xl px-4 py-3 font-heading font-semibold transition-colors",
-              ativo(item.path) ? "bg-white text-uva" : "text-plum/80 hover:bg-white/70",
+              ativo(item.path) ? "bg-white text-uva-ink" : "text-plum/80 hover:bg-white/70",
             ]}
           >
             {item.label}
@@ -130,7 +130,7 @@ const ativo = (path: string) => rotaAtual === path || rotaAtual.startsWith(`${pa
       }
       <a
         href="/brincadeiras"
-        class="mt-2 inline-flex w-full items-center justify-center rounded-full bg-rosa-pill px-4 py-3 font-heading font-bold text-plum md:hidden"
+        class="mt-2 inline-flex w-full items-center justify-center rounded-full bg-rosa px-4 py-3 font-heading font-bold text-plum md:hidden"
       >
         Começar a brincar
       </a>

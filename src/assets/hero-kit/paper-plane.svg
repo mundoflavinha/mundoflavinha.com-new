@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 170" role="img" aria-labelledby="title desc">
+  <title id="title">Avião de papel lilás</title>
+  <desc id="desc">Avião de papel artesanal em tons de lilás e rosa.</desc>
+  <defs>
+    <linearGradient id="wing" x1="22" y1="18" x2="206" y2="143" gradientUnits="userSpaceOnUse">
+      <stop stop-color="var(--mf-purple, #8463bd)"/>
+      <stop offset="1" stop-color="var(--mf-pink, #e5a6cf)"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#4d2d70" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" stroke="#5b3a86" stroke-width="3.5" stroke-linejoin="round">
+    <path data-part="upper-wing" d="M20 29 220 14 114 92Z" fill="url(#wing)"/>
+    <path data-part="lower-wing" d="m114 92 44 62 62-140Z" fill="#d7a5d9"/>
+    <path data-part="tail" d="m114 92-34 51 7-71Z" fill="#7655ac"/>
+    <path data-part="fold" d="M20 29 87 72l133-58" fill="none" stroke="#f4d8ec" stroke-width="4"/>
+  </g>
+  <path data-part="sketch" d="M26 37 218 20" fill="none" stroke="#fff8ee" stroke-width="2" stroke-linecap="round" opacity=".42"/>
+</svg>

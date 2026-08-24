@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 180" role="img" aria-labelledby="title desc">
+  <title id="title">Bloco de madeira</title>
+  <desc id="desc">Bloco infantil tridimensional com furo circular.</desc>
+  <defs>
+    <linearGradient id="front" x1="48" y1="55" x2="145" y2="158" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f1c986"/><stop offset="1" stop-color="#d7974d"/>
+    </linearGradient>
+    <linearGradient id="top" x1="54" y1="42" x2="142" y2="75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe2aa"/><stop offset="1" stop-color="#e7b66c"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#87542e" flood-opacity=".25"/>
+    </filter>
+  </defs>
+  <ellipse cx="97" cy="159" rx="66" ry="12" fill="#85533a" opacity=".13"/>
+  <g filter="url(#shadow)" stroke="#a96f38" stroke-width="3" stroke-linejoin="round">
+    <path data-part="left" d="m42 63 42 22v72l-42-26Z" fill="#d9a25e"/>
+    <path data-part="front" d="m84 85 63-35v73l-63 34Z" fill="url(#front)"/>
+    <path data-part="top" d="m42 63 62-34 43 21-63 35Z" fill="url(#top)"/>
+  </g>
+  <ellipse data-part="hole-rim" cx="116" cy="98" rx="19" ry="24" transform="rotate(22 116 98)" fill="#b16e32"/>
+  <ellipse data-part="hole" cx="118" cy="98" rx="12" ry="17" transform="rotate(22 118 98)" fill="#71451f"/>
+  <g data-part="grain" fill="none" stroke="#b77a3c" stroke-width="2" stroke-linecap="round" opacity=".45">
+    <path d="M96 64c11-4 23-11 34-17M53 59c10-7 21-12 31-16M93 132c15-8 29-14 42-21"/>
+  </g>
+</svg>

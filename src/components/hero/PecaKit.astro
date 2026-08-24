@@ -1,0 +1,49 @@
+---
+import { prepararSvgKit } from "@/lib/svgKit";
+
+/**
+ * Uma peça do hero kit, posicionada.
+ *
+ * `import.meta.glob` com `?raw` resolve os 17 arquivos no BUILD — o SVG entra
+ * como texto no HTML e nada disso sobra em JavaScript no cliente.
+ */
+
+const arquivos = import.meta.glob<string>("../../assets/hero-kit/*.svg", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+interface Props {
+  /** Nome do arquivo sem extensão, ex.: "blob-coral". */
+  nome: string;
+  /** Classes de posição/tamanho. */
+  class?: string;
+  /** Animação do hero-motion; ver as keyframes em global.css. */
+  motion?: "float-a" | "float-b" | "wobble" | "twinkle" | "sway" | "plane-drift" | "breathe" | "breathe-slow" | "orbit";
+  /** Atraso para as peças não pulsarem todas em sincronia. */
+  delay?: string;
+}
+
+const { nome, class: className, motion, delay } = Astro.props;
+
+const chave = `../../assets/hero-kit/${nome}.svg`;
+const bruto = arquivos[chave];
+
+if (!bruto) {
+  // Erro de build, não silêncio: peça com nome errado sumiria da composição
+  // sem deixar rastro, e "faltou um enfeite" é exatamente o tipo de coisa que
+  // ninguém percebe olhando.
+  throw new Error(
+    `Peça "${nome}" não existe em src/assets/hero-kit. Disponíveis: ${Object.keys(arquivos)
+      .map((caminho) => caminho.split("/").pop()?.replace(".svg", ""))
+      .join(", ")}`,
+  );
+}
+
+const svg = prepararSvgKit(bruto, nome);
+---
+
+<div class={className} data-peca={nome} data-motion={motion} style={delay ? `animation-delay:${delay}` : undefined}>
+  <Fragment set:html={svg} />
+</div>

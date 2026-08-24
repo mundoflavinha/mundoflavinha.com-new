@@ -61,25 +61,54 @@
     --warm-white: 30 33% 98%;
 
     /*
-     * Paleta do hero/header novo (ref. _tmp/header_ref.png).
+     * Paleta do hero/header — valores do "Hero SVG Kit" (manifest.json).
      *
      * Tokens NOVOS, não substituições: `--primary` e `--background` continuam
      * valendo para as outras 30 rotas, que não foram redesenhadas. Trocar os
      * tokens base para acertar uma seção repintaria o site inteiro de tabela.
-     * Os valores saíram de amostragem direta dos pixels da referência.
+     *
+     * A separação entre cor de ARTE e cor de TINTA não é preciosismo. Medido
+     * contra o WCAG, a paleta crua do kit reprova em quatro usos: branco sobre
+     * o roxo dá 4,38:1 (precisa de 4,5), coral como texto sobre o creme dá
+     * 2,56:1 (precisa de 3) e branco sobre o coral dá 2,69:1. Numa paleta
+     * pastel isso é esperado — ela foi desenhada para ilustração, não para
+     * texto. Os `-ink` são as mesmas cores escurecidas o mínimo necessário,
+     * usadas SÓ em texto e botão; os SVGs continuam com o tom original.
+     *
+     * O botão coral é a exceção: em vez de escurecer o coral até virar tijolo
+     * (#B9585A), ele leva texto plum, que dá 5,33:1 e preserva o brilho.
      */
-    --creme: 35 68% 95%;
-    --plum: 269 70% 12%;
-    --uva: 255 43% 57%;
-    --coral: 1 84% 66%;
-    --roxo-cta: 260 35% 53%;
-    --rosa-pill: 343 68% 87%;
-    --rosa-borda: 348 77% 76%;
+    --creme: 37 100% 97%;
+    --plum: 266 42% 22%;
+
+    /* arte — o que os SVGs do kit usam */
+    --uva: 267 39% 57%;
+    --coral: 359 89% 72%;
+    --lilas: 279 44% 75%;
+    --rosa: 342 72% 75%;
+    --mint: 163 46% 64%;
+    --amarelo: 42 100% 69%;
+
+    /* tinta — escurecidos até passarem no contraste (ver nota acima) */
+    --uva-ink: 267 34% 54%;
+    --coral-ink: 359 59% 63%;
     --texto-suave: 275 21% 38%;
-    --lilas-blob: 308 33% 78%;
-    --lilas-claro: 295 32% 85%;
-    --coral-blob: 6 93% 76%;
-    --coral-blob-escuro: 6 86% 69%;
+
+    /*
+     * Ponte para o kit. Os SVGs referenciam `var(--mf-coral, #f77678)` e
+     * companhia — este bloco liga aquele contrato aos tokens acima, para a
+     * paleta ter UMA definição só. Sem isto, cada cor existiria duas vezes e
+     * um ajuste em uma delas passaria despercebido na outra.
+     */
+    --mf-cream: hsl(var(--creme));
+    --mf-plum: hsl(var(--plum));
+    --mf-purple: hsl(var(--uva));
+    --mf-lilac: hsl(var(--lilas));
+    --mf-lilac-dark: hsl(var(--uva-ink));
+    --mf-coral: hsl(var(--coral));
+    --mf-pink: hsl(var(--rosa));
+    --mf-mint: hsl(var(--mint));
+    --mf-yellow: hsl(var(--amarelo));
 
     --font-heading: 'Quicksand Variable', 'Quicksand', sans-serif;
     --font-body: 'Nunito Variable', 'Nunito', sans-serif;
@@ -133,6 +162,96 @@
       opacity: 1;
       transform: none;
     }
+  }
+}
+
+@layer components {
+  /*
+   * Movimento do hero kit — adaptado de hero-motion.css.
+   *
+   * Duas mudanças em relação ao arquivo do kit:
+   *
+   * 1. o kit desliga a animação dentro de `prefers-reduced-motion: reduce`;
+   *    aqui a regra é invertida e a animação só é LIGADA dentro de
+   *    `no-preference`. Dá no mesmo para quem pediu menos movimento, mas
+   *    também cobre o navegador que não reporta preferência nenhuma — que com
+   *    a regra original cairia no caso animado por omissão.
+   *
+   * 2. `will-change: transform` saiu do seletor coringa. São 17 peças; manter
+   *    todas promovidas a camada própria custa memória de GPU o tempo todo,
+   *    inclusive depois que a animação já entrou em regime. As animações são
+   *    só de transform e opacity, que o compositor já trata sem a dica.
+   */
+  .mf-hero-art {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .mf-hero-art [data-peca] {
+    position: absolute;
+    transform-origin: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .mf-hero-art [data-peca] > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-motion="float-a"] { animation: mf-float-a 5.6s ease-in-out infinite; }
+    [data-motion="float-b"] { animation: mf-float-b 6.4s ease-in-out infinite; }
+    [data-motion="wobble"] { animation: mf-wobble 7.2s ease-in-out infinite; }
+    [data-motion="twinkle"] { animation: mf-twinkle 3.8s ease-in-out infinite; }
+    [data-motion="sway"] { animation: mf-sway 5.2s ease-in-out infinite; transform-origin: 50% 100%; }
+    [data-motion="plane-drift"] { animation: mf-plane-drift 8.5s ease-in-out infinite; }
+    [data-motion="breathe"] { animation: mf-breathe 8s ease-in-out infinite; }
+    [data-motion="breathe-slow"] { animation: mf-breathe 11s ease-in-out infinite reverse; }
+    [data-motion="orbit"] { animation: mf-orbit 10s linear infinite; }
+  }
+
+  @keyframes mf-float-a {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+    50% { transform: translate3d(0, -10px, 0) rotate(2deg); }
+  }
+
+  @keyframes mf-float-b {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(2deg); }
+    50% { transform: translate3d(4px, -8px, 0) rotate(-3deg); }
+  }
+
+  @keyframes mf-wobble {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    35% { transform: translateY(-7px) rotate(3deg); }
+    68% { transform: translateY(-3px) rotate(-1deg); }
+  }
+
+  @keyframes mf-twinkle {
+    0%, 100% { transform: scale(.94) rotate(-3deg); opacity: .82; }
+    50% { transform: scale(1.06) rotate(3deg); opacity: 1; }
+  }
+
+  @keyframes mf-sway {
+    0%, 100% { transform: rotate(-2.5deg); }
+    50% { transform: rotate(2.5deg); }
+  }
+
+  @keyframes mf-plane-drift {
+    0%, 100% { transform: translate3d(-5px, 2px, 0) rotate(-3deg); }
+    45% { transform: translate3d(12px, -8px, 0) rotate(2deg); }
+    70% { transform: translate3d(7px, -4px, 0) rotate(0); }
+  }
+
+  @keyframes mf-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.012); }
+  }
+
+  @keyframes mf-orbit {
+    from { transform: rotate(0deg) translateX(4px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(4px) rotate(-360deg); }
   }
 }
 
