@@ -52,3 +52,11 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Rascunho local. `_tmp/` guarda os PNGs de referência de design entregues para
+# uma tarefa (o do novo header, por exemplo): são megabytes de imagem que
+# servem de insumo, não de fonte, e não precisam entrar no histórico.
+_tmp/
+
+# Configuração local do Claude Code (launch.json do servidor de dev, etc).
+.claude/

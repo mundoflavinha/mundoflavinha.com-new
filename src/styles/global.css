@@ -60,6 +60,27 @@
     --mint: 160 35% 82%;
     --warm-white: 30 33% 98%;
 
+    /*
+     * Paleta do hero/header novo (ref. _tmp/header_ref.png).
+     *
+     * Tokens NOVOS, não substituições: `--primary` e `--background` continuam
+     * valendo para as outras 30 rotas, que não foram redesenhadas. Trocar os
+     * tokens base para acertar uma seção repintaria o site inteiro de tabela.
+     * Os valores saíram de amostragem direta dos pixels da referência.
+     */
+    --creme: 35 68% 95%;
+    --plum: 269 70% 12%;
+    --uva: 255 43% 57%;
+    --coral: 1 84% 66%;
+    --roxo-cta: 260 35% 53%;
+    --rosa-pill: 343 68% 87%;
+    --rosa-borda: 348 77% 76%;
+    --texto-suave: 275 21% 38%;
+    --lilas-blob: 308 33% 78%;
+    --lilas-claro: 295 32% 85%;
+    --coral-blob: 6 93% 76%;
+    --coral-blob-escuro: 6 86% 69%;
+
     --font-heading: 'Quicksand Variable', 'Quicksand', sans-serif;
     --font-body: 'Nunito Variable', 'Nunito', sans-serif;
   }

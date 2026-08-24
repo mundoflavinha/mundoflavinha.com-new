@@ -1,0 +1,94 @@
+---
+import { Icon } from "astro-icon/components";
+import CenaHero from "./CenaHero.astro";
+import NuvemRodape from "./NuvemRodape.astro";
+import SeletorBrincadeira from "./SeletorBrincadeira.astro";
+import familia from "@/assets/hero-familia-recorte.webp";
+
+/**
+ * Hero da home (ref. _tmp/header_ref-01.png).
+ *
+ * O cenário é vetorial (ver CenaHero) e a foto da família entra por cima, com
+ * fundo já recortado. Como a foto é o LCP da home, ela vai como <img> comum com
+ * `fetchpriority="high"` e as dimensões intrínsecas no HTML — nada de
+ * background-image, que o preload scanner não enxerga.
+ */
+---
+
+<section class="relative isolate overflow-hidden bg-creme">
+  <NuvemRodape class="pointer-events-none absolute -bottom-2 -left-10 z-0 w-[280px] select-none lg:w-[420px]" />
+
+  <div class="container relative z-10">
+    <div class="grid items-center gap-8 pb-14 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-6 lg:pb-24 lg:pt-10">
+      <!-- ============ COLUNA DE TEXTO ============ -->
+      <div class="order-2 lg:order-1">
+        <p class="inline-flex items-center gap-2 rounded-full border-2 border-rosa-borda bg-white/60 px-4 py-2 font-heading text-xs font-bold uppercase tracking-[0.18em] text-uva">
+          <Icon name="lucide:heart" class="h-4 w-4 text-rosa-borda" />
+          Brincar aproxima
+        </p>
+
+        <h1 class="mt-5 font-heading text-4xl font-bold leading-[1.08] tracking-tight text-plum sm:text-5xl lg:text-[3.4rem] xl:text-6xl">
+          Menos telas.<br />
+          <span class="text-uva">Mais infância.</span><br />
+          {/*
+            A quebra depois de "Mais memórias" é fixa, não responsiva: é ela que
+            mantém as quatro linhas da referência. Deixando o texto quebrar
+            sozinho no celular saía "Mais memórias em / família.", que corta a
+            frase no meio e ainda desalinha a cor — "em família." é plum,
+            "Mais memórias" é coral.
+          */}
+          <span class="text-coral">Mais memórias</span><br />
+          em família.
+        </h1>
+
+        <p class="mt-5 max-w-md text-base leading-relaxed text-texto-suave sm:text-lg">
+          Ideias simples e possíveis para transformar o tempo com seus filhos em momentos que ficam para sempre.
+        </p>
+
+        <div class="mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
+          <a
+            href="/brincadeiras"
+            class="inline-flex items-center justify-center rounded-full bg-roxo-cta px-7 py-3.5 font-heading text-base font-bold text-white shadow-[0_14px_30px_-14px_hsl(var(--roxo-cta))] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2"
+          >
+            Encontrar uma brincadeira
+          </a>
+
+          <a
+            href="/brincadeiras#por-idade"
+            class="group inline-flex items-center gap-2 rounded-full px-1 py-2 font-heading text-base font-semibold text-plum transition-colors hover:text-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2"
+          >
+            Ver por idade
+            <Icon
+              name="lucide:arrow-right"
+              class="h-5 w-5 text-coral transition-transform group-hover:translate-x-1"
+            />
+          </a>
+        </div>
+
+        <div class="mt-8 max-w-xl lg:mt-10 lg:max-w-2xl">
+          <SeletorBrincadeira />
+        </div>
+      </div>
+
+      <!-- ============ CENÁRIO + FOTO ============ -->
+      <div class="relative order-1 -mx-6 aspect-square sm:mx-0 lg:order-2 lg:-mr-[4vw] xl:-mr-[6vw]">
+        <CenaHero class="absolute inset-0 h-full w-full" />
+
+        {/*
+          Sem `decoding="async"`: esta é a imagem do LCP e o decode assíncrono
+          atrasa a PINTURA dela — deu para ver em recarga aqui, o cenário SVG
+          aparecendo primeiro e a família entrando um quadro depois. `async` só
+          ajuda quando a imagem não é a que o usuário está esperando ver.
+        */}
+        <img
+          src={familia.src}
+          width={familia.width}
+          height={familia.height}
+          alt="Flávia deitada no chão brincando com Lucas e Bárbara, os três rindo"
+          class="absolute left-[18%] top-[9%] w-[68%] select-none"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </div>
+</section>

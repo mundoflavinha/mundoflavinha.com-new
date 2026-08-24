@@ -1,0 +1,184 @@
+---
+import { Icon } from "astro-icon/components";
+import { FAIXAS } from "@/lib/indiceBrincadeiras";
+
+/**
+ * Lupa do header + diálogo de busca nas brincadeiras.
+ *
+ * A referência mostra um botão redondo de busca. Ele não podia entrar como
+ * enfeite: ícone de lupa que não busca é promessa quebrada — e o site não tinha
+ * busca nenhuma até aqui.
+ *
+ * Usa <dialog> nativo. `showModal()` já entrega trap de foco, fechar no Esc,
+ * `inert` no resto da página e o backdrop — tudo que uma modal caseira erra.
+ *
+ * O índice NÃO vem embutido: é buscado em /indice-brincadeiras.json na primeira
+ * abertura e guardado em memória. Header aparece nas 31 rotas; quem nunca clica
+ * na lupa não paga nada.
+ */
+---
+
+<button
+  type="button"
+  data-abrir-busca
+  class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-plum shadow-[0_10px_24px_-14px_rgba(45,20,70,0.7)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-uva focus-visible:ring-offset-2 md:h-13 md:w-13"
+  aria-label="Buscar brincadeiras"
+>
+  <Icon name="lucide:search" class="h-5 w-5" />
+</button>
+
+<dialog
+  data-dialogo-busca
+  class="w-[min(34rem,calc(100vw-2rem))] rounded-3xl border-0 bg-creme p-0 text-plum shadow-2xl backdrop:bg-plum/40 backdrop:backdrop-blur-sm"
+  aria-label="Buscar brincadeiras"
+>
+  <form method="dialog" class="flex items-center gap-2 border-b border-plum/10 px-4 py-3">
+    <Icon name="lucide:search" class="h-5 w-5 shrink-0 text-uva" />
+    <input
+      type="search"
+      data-campo-busca
+      placeholder="Buscar brincadeira..."
+      autocomplete="off"
+      class="min-w-0 flex-1 bg-transparent py-2 font-heading text-base font-semibold text-plum outline-none placeholder:font-normal placeholder:text-plum/40"
+      aria-controls="resultados-busca"
+    />
+    <button
+      type="submit"
+      class="shrink-0 rounded-full p-2 text-plum/60 transition-colors hover:bg-white hover:text-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-uva"
+      aria-label="Fechar busca"
+    >
+      <Icon name="lucide:x" class="h-5 w-5" />
+    </button>
+  </form>
+
+  <div class="max-h-[min(24rem,60vh)] overflow-y-auto p-2">
+    <p data-estado-busca class="px-3 py-6 text-center text-sm text-texto-suave">
+      Digite para procurar entre as brincadeiras.
+    </p>
+
+    <ul id="resultados-busca" class="flex flex-col gap-0.5" aria-live="polite"></ul>
+  </div>
+
+  <div class="flex flex-wrap gap-2 border-t border-plum/10 px-4 py-3">
+    {
+      FAIXAS.map((faixa) => (
+        <a
+          href={faixa.rota}
+          class="rounded-full bg-white px-3 py-1.5 font-heading text-xs font-semibold text-plum/80 transition-colors hover:bg-rosa-pill hover:text-plum"
+        >
+          {faixa.rotulo}
+        </a>
+      ))
+    }
+  </div>
+</dialog>
+
+<script>
+  import type { ItemIndice } from "@/lib/indiceBrincadeiras";
+
+  const botao = document.querySelector<HTMLButtonElement>("[data-abrir-busca]");
+  const dialogo = document.querySelector<HTMLDialogElement>("[data-dialogo-busca]");
+  const campo = dialogo?.querySelector<HTMLInputElement>("[data-campo-busca]");
+  const lista = dialogo?.querySelector<HTMLUListElement>("#resultados-busca");
+  const estado = dialogo?.querySelector<HTMLParagraphElement>("[data-estado-busca]");
+
+  if (botao && dialogo && campo && lista && estado) {
+    let indice: ItemIndice[] | null = null;
+    let carregando: Promise<void> | null = null;
+
+    const ROTULOS: Record<string, string> = {
+      "0-2": "0 a 2 anos",
+      "3-5": "3 a 5 anos",
+      "6-8": "6 a 8 anos",
+      familia: "Em família",
+    };
+
+    /**
+     * Normaliza para busca: caixa baixa e sem acento. Sem isso "familia" não
+     * acha "Brincadeira em Família" — e ninguém digita acento em campo de busca.
+     */
+    const normalizar = (texto: string) =>
+      texto
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    // Uma requisição por sessão, no máximo: a promessa em voo é reaproveitada.
+    const carregarIndice = () => {
+      if (indice) return Promise.resolve();
+      if (carregando) return carregando;
+
+      carregando = fetch("/indice-brincadeiras.json")
+        .then((resposta) => (resposta.ok ? resposta.json() : []))
+        .then((dados: ItemIndice[]) => {
+          indice = dados;
+        })
+        .catch(() => {
+          indice = [];
+        });
+
+      return carregando;
+    };
+
+    const renderizar = () => {
+      const termo = normalizar(campo.value.trim());
+      lista.innerHTML = "";
+
+      if (termo.length < 2) {
+        estado.textContent = "Digite para procurar entre as brincadeiras.";
+        estado.hidden = false;
+        return;
+      }
+
+      if (!indice) {
+        estado.textContent = "Carregando...";
+        estado.hidden = false;
+        return;
+      }
+
+      const achados = indice.filter((item) => normalizar(item.t).includes(termo)).slice(0, 8);
+
+      if (achados.length === 0) {
+        estado.textContent = `Nada encontrado para "${campo.value.trim()}".`;
+        estado.hidden = false;
+        return;
+      }
+
+      estado.hidden = true;
+
+      for (const item of achados) {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+
+        link.href = item.u;
+        link.className =
+          "flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 font-heading text-sm font-semibold text-plum transition-colors hover:bg-white focus-visible:bg-white focus-visible:outline-none";
+
+        const titulo = document.createElement("span");
+        titulo.textContent = item.t;
+
+        const faixa = document.createElement("span");
+        faixa.className = "shrink-0 rounded-full bg-rosa-pill px-2.5 py-1 text-[0.7rem] font-bold";
+        faixa.textContent = ROTULOS[item.f] ?? "";
+
+        link.append(titulo, faixa);
+        li.append(link);
+        lista.append(li);
+      }
+    };
+
+    botao.addEventListener("click", () => {
+      dialogo.showModal();
+      campo.focus();
+      carregarIndice().then(renderizar);
+    });
+
+    campo.addEventListener("input", renderizar);
+
+    // Clique no backdrop fecha. O <dialog> recebe o clique quando ele cai fora
+    // do conteúdo, então basta conferir se o alvo é o próprio elemento.
+    dialogo.addEventListener("click", (evento) => {
+      if (evento.target === dialogo) dialogo.close();
+    });
+  }
+</script>

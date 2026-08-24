@@ -1,0 +1,280 @@
+---
+/**
+ * Cenário do hero da home, 100% vetorial.
+ *
+ * A referência (_tmp/header_ref.png) é uma composição de fotos: massas de papel
+ * texturizado, tapete de palha e brinquedos de madeira fotografados. Aqui tudo
+ * isso virou SVG — blobs, tapete, brinquedos e rabiscos — por três motivos
+ * práticos, não estéticos:
+ *
+ *  1. peso: a cena inteira sai em ~10 KB de markup gzipado contra ~600 KB de
+ *     PNG com alpha, e o hero é o que o LCP mede;
+ *  2. nitidez: escala de 375px a 2560px sem versão @2x;
+ *  3. tema: as cores vêm dos tokens em global.css, então mexer na paleta não
+ *     exige reexportar imagem nenhuma.
+ *
+ * A única raster que sobrou é a foto da família, que é conteúdo — não cenário.
+ *
+ * Decorativa de ponta a ponta: `aria-hidden` + `focusable="false"` para o SVG
+ * inteiro não aparecer na árvore de acessibilidade nem receber foco no IE/Edge
+ * legado.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 1000 1000"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+  role="presentation"
+>
+  <defs>
+    <linearGradient id="grad-coral" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0%" stop-color="hsl(var(--coral-blob))" />
+      <stop offset="100%" stop-color="hsl(var(--coral-blob-escuro))" />
+    </linearGradient>
+
+    <linearGradient id="grad-lilas" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="hsl(var(--lilas-claro))" />
+      <stop offset="100%" stop-color="hsl(var(--lilas-blob))" />
+    </linearGradient>
+
+    <linearGradient id="grad-palha" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F2E3C6" />
+      <stop offset="100%" stop-color="#E2CBA3" />
+    </linearGradient>
+
+    <!--
+      Granulado que imita o papel texturizado da referência. Fica num <g>
+      próprio com `hidden md:block`: feTurbulence é filtro de área e, numa
+      superfície desse tamanho, custa caro em GPU de celular — no mobile a cor
+      chapada resolve e ninguém percebe a diferença.
+    -->
+    <filter id="grao" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" result="ruido" />
+      <feColorMatrix in="ruido" type="saturate" values="0" result="cinza" />
+      <feComponentTransfer in="cinza" result="suave">
+        <feFuncA type="linear" slope="0.55" />
+      </feComponentTransfer>
+      <feComposite operator="in" in="suave" in2="SourceGraphic" />
+    </filter>
+
+    <clipPath id="recorte-blobs">
+      <path d="M801.8,241.5C817.4,272.9 839.9,309.0 837.7,341.7C835.5,374.3 804.1,404.5 788.4,437.4C772.6,470.3 770.8,516.6 743.2,539.1C715.6,561.6 662.1,566.8 622.9,572.4C583.7,577.9 546.6,572.9 508.0,572.3C469.3,571.7 424.3,581.1 390.9,568.6C357.6,556.1 335.2,521.9 307.8,497.5C280.5,473.1 239.8,451.7 226.9,422.0C214.0,392.3 227.4,353.1 230.3,319.4C233.2,285.6 232.1,251.7 244.4,219.7C256.6,187.7 274.7,149.0 303.6,127.3C332.5,105.5 379.5,100.1 417.8,89.3C456.1,78.4 496.2,59.0 533.3,61.9C570.5,64.9 605.5,91.8 640.6,107.0C675.7,122.2 717.1,130.8 743.9,153.2C770.8,175.6 786.2,210.1 801.8,241.5Z" />
+    </clipPath>
+
+    <!-- Bloco de madeira isométrico, reaproveitado em escalas diferentes. -->
+    <g id="cubo-madeira">
+      <path d="M0,-30 L44,-5 L0,20 L-44,-5 Z" fill="#F0DCBA" />
+      <path d="M-44,-5 L0,20 L0,68 L-44,44 Z" fill="#DCBE92" />
+      <path d="M44,-5 L0,20 L0,68 L44,44 Z" fill="#C9A876" />
+      <ellipse cx="-22" cy="30" rx="9" ry="12" fill="#A8814F" transform="rotate(-6 -22 30)" />
+    </g>
+  </defs>
+
+  <!-- ===================== MASSAS DE FUNDO ===================== -->
+
+  <!-- blob lilás: sangra pela direita de propósito, como na referência -->
+  <path
+    d="M995.2,495.8C979.9,553.5 965.6,622.5 920.6,662.7C875.7,702.9 793.3,716.9 725.4,737.0C657.4,757.2 578.9,792.6 512.8,783.5C446.6,774.3 374.9,724.5 328.6,682.3C282.3,640.2 258.3,584.1 234.7,530.6C211.2,477.1 175.6,413.8 187.3,361.3C198.9,308.8 258.6,260.0 304.5,215.6C350.5,171.2 400.7,113.1 463.2,95.1C525.8,77.0 611.1,93.9 679.7,107.2C748.2,120.5 819.0,140.0 874.4,174.9C929.8,209.8 991.9,263.0 1012.0,316.5C1032.1,370.0 1010.4,438.1 995.2,495.8Z"
+    fill="url(#grad-lilas)"
+  />
+
+  <!-- blob coral principal -->
+  <path
+    d="M801.8,241.5C817.4,272.9 839.9,309.0 837.7,341.7C835.5,374.3 804.1,404.5 788.4,437.4C772.6,470.3 770.8,516.6 743.2,539.1C715.6,561.6 662.1,566.8 622.9,572.4C583.7,577.9 546.6,572.9 508.0,572.3C469.3,571.7 424.3,581.1 390.9,568.6C357.6,556.1 335.2,521.9 307.8,497.5C280.5,473.1 239.8,451.7 226.9,422.0C214.0,392.3 227.4,353.1 230.3,319.4C233.2,285.6 232.1,251.7 244.4,219.7C256.6,187.7 274.7,149.0 303.6,127.3C332.5,105.5 379.5,100.1 417.8,89.3C456.1,78.4 496.2,59.0 533.3,61.9C570.5,64.9 605.5,91.8 640.6,107.0C675.7,122.2 717.1,130.8 743.9,153.2C770.8,175.6 786.2,210.1 801.8,241.5Z"
+    fill="url(#grad-coral)"
+  />
+
+  <!-- granulado só no desktop (ver nota no filtro) -->
+  <g class="hidden md:block" clip-path="url(#recorte-blobs)">
+    <rect x="180" y="40" width="700" height="580" fill="#7A3B33" filter="url(#grao)" opacity="0.5" />
+  </g>
+
+  <!-- trilha tracejada que contorna o blob, como na referência -->
+  <path
+    d="M300,300 C340,220 430,180 520,200 C610,220 660,300 630,370 C600,440 500,450 470,390"
+    stroke="hsl(var(--lilas-blob))"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-dasharray="1 16"
+    opacity="0.65"
+  />
+
+  <!-- ===================== TAPETE DE PALHA ===================== -->
+
+  <g>
+    <ellipse cx="520" cy="845" rx="318" ry="88" fill="url(#grad-palha)" />
+    <g fill="none" stroke="#D3B686" stroke-width="2.5">
+      <ellipse cx="520" cy="845" rx="318" ry="88" opacity="0.8" />
+      <ellipse cx="520" cy="845" rx="256" ry="70" opacity="0.55" />
+      <ellipse cx="520" cy="845" rx="192" ry="52" opacity="0.42" />
+      <ellipse cx="520" cy="845" rx="126" ry="34" opacity="0.3" />
+      <ellipse cx="520" cy="845" rx="62" ry="16" opacity="0.2" />
+    </g>
+  </g>
+
+  <!-- ===================== BRINQUEDOS ===================== -->
+
+  <!-- cubo de madeira flutuando na borda direita do blob -->
+  <g transform="translate(858 330) scale(0.62) rotate(-8)">
+    <use href="#cubo-madeira" />
+  </g>
+
+  <!-- carretel de linha rosa -->
+  <g transform="translate(886 486) scale(0.86)">
+    <rect x="-26" y="-30" width="52" height="60" rx="6" fill="#E86F8C" />
+    <ellipse cx="0" cy="-30" rx="26" ry="9" fill="#C9A876" />
+    <ellipse cx="0" cy="30" rx="26" ry="9" fill="#B08B58" />
+    <path d="M-26,-12 H26 M-26,4 H26 M-26,18 H26" stroke="#D25574" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+  </g>
+
+  <!-- torre de blocos coloridos, à direita do tapete -->
+  <g transform="translate(788 742) scale(0.84)">
+    <rect x="-34" y="52" width="68" height="46" rx="5" fill="#F0A03C" />
+    <rect x="-30" y="4" width="60" height="46" rx="5" fill="#5FBFA8" />
+    <rect x="-26" y="-42" width="52" height="44" rx="5" fill="#E8607A" />
+    <path d="M0,-96 L34,-44 L-34,-44 Z" fill="#9B7BD4" />
+  </g>
+
+  <g transform="translate(868 796) scale(0.7) rotate(6)">
+    <rect x="-30" y="10" width="60" height="44" rx="5" fill="#EBD4AC" />
+    <rect x="-26" y="-36" width="52" height="44" rx="5" fill="#6FBF9B" />
+    <path d="M0,-88 L30,-38 L-30,-38 Z" fill="#F0A03C" />
+  </g>
+
+  <!-- dado roxo -->
+  <g transform="translate(288 828) scale(0.74) rotate(-6)">
+    <path d="M0,-30 L44,-5 L0,20 L-44,-5 Z" fill="#BEA6E4" />
+    <path d="M-44,-5 L0,20 L0,68 L-44,44 Z" fill="#8E6FC8" />
+    <path d="M44,-5 L0,20 L0,68 L44,44 Z" fill="#7A5CB4" />
+    <g fill="#FFFFFF">
+      <ellipse cx="0" cy="-16" rx="7" ry="4" />
+      <ellipse cx="-19" cy="-4" rx="7" ry="4" />
+      <ellipse cx="19" cy="-4" rx="7" ry="4" />
+      <ellipse cx="-22" cy="22" rx="5" ry="7" />
+      <ellipse cx="-22" cy="46" rx="5" ry="7" />
+      <ellipse cx="22" cy="24" rx="5" ry="7" />
+      <ellipse cx="22" cy="48" rx="5" ry="7" />
+    </g>
+  </g>
+
+  <!-- giz de cera rosa -->
+  <g transform="translate(158 892) scale(0.9) rotate(-5)">
+    <!-- corpo: a cera exposta nas pontas e o rótulo de papel no meio -->
+    <rect x="-62" y="-14" width="118" height="28" rx="14" fill="#F0607E" />
+    <path d="M50,-14 L82,0 L50,14 Z" fill="#D9455F" />
+    <rect x="-40" y="-14" width="76" height="28" fill="#FBD4DE" />
+    <path d="M-40,-14 V14 M36,-14 V14" stroke="#E38FA4" stroke-width="3" />
+    <path d="M-26,-3 H22 M-26,5 H14" stroke="#E38FA4" stroke-width="3" stroke-linecap="round" opacity="0.9" />
+  </g>
+
+  <!-- estrela amarela -->
+  <g transform="translate(392 916) scale(0.86) rotate(-10)">
+    <path d="M0.0,-34.0L9.4,-12.9L32.3,-10.5L15.2,4.9L20.0,27.5L0.0,16.0L-20.0,27.5L-15.2,4.9L-32.3,-10.5L-9.4,-12.9Z" fill="#F5C74A" stroke="#E0AE2E" stroke-width="3" stroke-linejoin="round" />
+  </g>
+
+  <!-- peça de quebra-cabeça coral -->
+  <g transform="translate(578 934) scale(0.58) rotate(12)">
+    <!--
+      Um pino em cima e um encaixe à esquerda, e só. Pino nos quatro lados,
+      que foi a primeira tentativa, virava uma flor no tamanho em que a peça
+      aparece — a silhueta de quebra-cabeça precisa de lado reto para contrastar.
+      Os arcos são `A` de verdade, não bezier: com traço grosso o bico achata.
+    -->
+    <path
+      d="M-60,-60 H-20 A22,22 0 0 1 20,-60 H60 V60 H-60 V20 A22,22 0 0 0 -60,-20 Z"
+      fill="#F2657A"
+      stroke="#D9455F"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- bolinha de massinha verde -->
+  <g transform="translate(842 902)">
+    <circle cx="0" cy="0" r="40" fill="#3EA96F" />
+    <path d="M-30,-16 C-22,-30 -4,-36 10,-30" stroke="#7ACB9C" stroke-width="9" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- ===================== RABISCOS ===================== -->
+
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- aviãozinho de papel -->
+    <g transform="translate(150 200) rotate(-14)">
+      <path d="M-56,-30 L64,4 L-6,18 Z" fill="#B79CE0" />
+      <path d="M-56,-30 L-6,18 L-22,44 Z" fill="#8E6FC8" />
+      <path d="M-56,-30 L-6,18 L64,4" stroke="#7A5CB4" stroke-width="2.5" fill="none" opacity="0.5" />
+    </g>
+
+    <!-- rastro tracejado do avião -->
+    <path
+      d="M96,238 C150,268 216,266 262,236 C308,206 356,208 392,238"
+      stroke="hsl(var(--lilas-blob))"
+      stroke-width="5"
+      stroke-dasharray="2 18"
+      opacity="0.85"
+    />
+
+    <!-- nuvem de contorno -->
+    <path
+      d="M64,318 C64,300 80,288 98,292 C104,274 130,272 140,288 C158,284 172,298 168,314 C166,326 154,332 142,332 L86,332 C72,332 64,326 64,318 Z"
+      stroke="#8CC7DE"
+      stroke-width="5"
+      fill="none"
+    />
+
+    <!-- coração rabiscado -->
+    <path
+      d="M902,178 C888,158 856,160 852,184 C848,206 876,226 902,248 C928,226 956,206 952,184 C948,160 916,158 902,178 Z"
+      stroke="hsl(var(--rosa-borda))"
+      stroke-width="6"
+      fill="none"
+    />
+
+    <!-- estrela rabiscada -->
+    <g transform="translate(120 508) rotate(-8)">
+      <path
+        d="M0.0,-30.0L7.6,-10.5L28.5,-9.3L12.4,4.0L17.6,24.3L0.0,13.0L-17.6,24.3L-12.4,4.0L-28.5,-9.3L-7.6,-10.5Z"
+        stroke="#8E6FC8"
+        stroke-width="5"
+        fill="none"
+      />
+    </g>
+
+    <!-- risquinhos de "brilho" amarelos -->
+    <g stroke="#F5C74A" stroke-width="7">
+      <path d="M778,146 L792,182" />
+      <path d="M806,138 L818,176" />
+      <path d="M834,142 L842,178" />
+    </g>
+
+    <!-- trilhas brancas tracejadas que dão volta no cenário -->
+    <g stroke="#FFFFFF" stroke-width="5" stroke-dasharray="20 18" opacity="0.9" fill="none">
+      <path d="M132,432 C214,506 302,520 372,486 C442,452 470,388 436,340" />
+      <path d="M896,338 C946,392 944,470 900,516 C856,562 782,566 742,528" />
+    </g>
+
+    <!-- pontinhos soltos -->
+    <g>
+      <circle cx="176" cy="404" r="9" fill="hsl(var(--coral))" />
+      <circle cx="954" cy="256" r="8" fill="hsl(var(--coral))" />
+      <circle cx="86" cy="606" r="7" fill="hsl(var(--lilas-blob))" />
+      <circle cx="962" cy="602" r="10" fill="hsl(var(--lilas-blob))" />
+      <circle cx="286" cy="642" r="6" fill="#F5C74A" />
+      <circle cx="892" cy="122" r="6" fill="#F5C74A" />
+      <circle cx="668" cy="960" r="7" fill="hsl(var(--coral))" />
+      <circle cx="238" cy="948" r="6" fill="#F5C74A" />
+      <circle cx="836" cy="944" r="7" fill="hsl(var(--lilas-blob))" />
+      <circle cx="946" cy="374" r="12" fill="#FFFFFF" />
+    </g>
+  </g>
+</svg>

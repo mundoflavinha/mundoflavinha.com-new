@@ -1,0 +1,150 @@
+---
+import { Icon } from "astro-icon/components";
+import { indiceBrincadeiras, FAIXAS, TEMPOS } from "@/lib/indiceBrincadeiras";
+
+/**
+ * Barra "tenho X minutos / criança de Y anos → me dê uma ideia".
+ *
+ * Astro puro, sem island: são dois <select> nativos e um clique. Montar isso
+ * como componente React colocaria React + ReactDOM no caminho crítico da home
+ * — justamente a página que o LCP mede — para economizar nada.
+ *
+ * Os <select> são nativos de propósito. Combobox customizado teria que
+ * reimplementar teclado, leitor de tela e o seletor em roda do iOS; o nativo já
+ * traz tudo e ainda é o controle que o usuário de celular conhece. A aparência
+ * de "pílula" da referência sai de `appearance-none` + chevron desenhado.
+ */
+
+const dados = indiceBrincadeiras;
+---
+
+<div
+  class="rounded-[1.75rem] bg-white p-2.5 shadow-[0_18px_45px_-20px_rgba(45,20,70,0.35)] sm:rounded-full"
+  data-seletor-brincadeira
+>
+  {/*
+    O botão volta para a linha de baixo entre lg e xl.
+    Nessa faixa o hero já está em duas colunas mas a coluna de texto ainda é
+    estreita (~476px em 1024): os três controles lado a lado sobra ~61px de
+    texto por <select>, e select nativo CORTA em vez de reticenciar — "10
+    minutos" virava "10 minuto". Daí o `w-full sm:w-auto lg:w-full xl:w-auto`:
+    inline quando cabe, empilhado quando não cabe.
+
+    Mesmo motivo no `basis-full sm:basis-[9rem]` dos campos: abaixo de 640px
+    dois selects lado a lado deixam 74px de texto para um rótulo de 78px.
+    Cada um ocupa a própria linha e sobra espaço de sobra.
+  */}
+  <form class="flex flex-wrap items-center gap-2" data-form>
+    <label class="relative min-w-0 flex-1 basis-full sm:basis-[9rem]">
+      <span class="sr-only">Quanto tempo você tem</span>
+      <Icon
+        name="lucide:clock"
+        class="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-uva"
+      />
+      <select
+        name="tempo"
+        class="w-full cursor-pointer appearance-none rounded-full bg-creme/70 py-3 pl-11 pr-8 font-heading text-sm font-semibold text-plum outline-none transition-colors hover:bg-creme focus-visible:ring-2 focus-visible:ring-uva sm:bg-transparent sm:hover:bg-creme/70"
+      >
+        {TEMPOS.map((minutos, i) => (
+          <option value={minutos} selected={i === 0}>
+            {minutos} minutos
+          </option>
+        ))}
+        <option value="999">Sem pressa</option>
+      </select>
+      <Icon
+        name="lucide:chevron-down"
+        class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-plum/50"
+      />
+    </label>
+
+    <span class="hidden h-8 w-px bg-plum/10 sm:block lg:hidden xl:block"></span>
+
+    <label class="relative min-w-0 flex-1 basis-full sm:basis-[9rem]">
+      <span class="sr-only">Idade da criança</span>
+      <Icon
+        name="lucide:baby"
+        class="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-uva"
+      />
+      <select
+        name="faixa"
+        class="w-full cursor-pointer appearance-none rounded-full bg-creme/70 py-3 pl-11 pr-8 font-heading text-sm font-semibold text-plum outline-none transition-colors hover:bg-creme focus-visible:ring-2 focus-visible:ring-uva sm:bg-transparent sm:hover:bg-creme/70"
+      >
+        {FAIXAS.map((faixa, i) => (
+          <option value={faixa.valor} selected={i === 1}>
+            {faixa.curto}
+          </option>
+        ))}
+      </select>
+      <Icon
+        name="lucide:chevron-down"
+        class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-plum/50"
+      />
+    </label>
+
+    <button
+      type="submit"
+      class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-coral px-6 py-3 sm:w-auto lg:w-full xl:w-auto font-heading text-sm font-bold text-white shadow-[0_8px_20px_-8px_hsl(var(--coral))] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2"
+    >
+      Me dê uma ideia
+      <Icon name="lucide:sparkles" class="h-4 w-4" />
+    </button>
+  </form>
+</div>
+
+{/*
+  `is:inline` + JSON.stringify: o índice é conteúdo de build, não módulo. Sair
+  como <script type="application/json"> evita escapar aspas na mão e mantém o
+  dado fora do bundle JS.
+*/}
+<script id="dados-brincadeiras" type="application/json" is:inline set:html={JSON.stringify(dados)}></script>
+
+<script>
+  import { FAIXAS } from "@/lib/indiceBrincadeiras";
+  import type { ItemIndice } from "@/lib/indiceBrincadeiras";
+
+  const raiz = document.querySelector<HTMLElement>("[data-seletor-brincadeira]");
+  const bruto = document.getElementById("dados-brincadeiras")?.textContent;
+
+  if (raiz && bruto) {
+    const dados: ItemIndice[] = JSON.parse(bruto);
+    const form = raiz.querySelector<HTMLFormElement>("[data-form]");
+
+    form?.addEventListener("submit", (evento) => {
+      evento.preventDefault();
+
+      const dadosForm = new FormData(form);
+      const tempo = Number(dadosForm.get("tempo"));
+      const faixa = String(dadosForm.get("faixa"));
+
+      const daFaixa = dados.filter((item) => item.f === faixa);
+      const cabemNoTempo = daFaixa.filter((item) => item.m <= tempo);
+
+      /*
+       * Nem toda combinação tem resposta exata: nenhuma brincadeira de 3 a 5
+       * anos começa abaixo de 15 minutos, e "10 minutos + 3 a 5 anos" é
+       * justamente o estado INICIAL da barra. Devolver a listagem nesse caso
+       * faria o primeiro clique da home parecer quebrado.
+       *
+       * Então, sem acerto exato, cai nas mais curtas daquela idade — que é a
+       * melhor resposta possível a "tenho 10 minutos", e não uma desculpa.
+       */
+      let candidatas = cabemNoTempo;
+
+      if (candidatas.length === 0 && daFaixa.length > 0) {
+        const menorTempo = Math.min(...daFaixa.map((item) => item.m));
+        candidatas = daFaixa.filter((item) => item.m === menorTempo);
+      }
+
+      // Faixa vazia de verdade só aconteceria com dados quebrados; ainda assim
+      // o usuário sai numa página útil em vez de num clique morto.
+      if (candidatas.length === 0) {
+        window.location.href = FAIXAS.find((f) => f.valor === faixa)?.rota ?? "/brincadeiras";
+        return;
+      }
+
+      const sorteada = candidatas[Math.floor(Math.random() * candidatas.length)];
+      window.location.href = sorteada.u;
+    });
+  }
+</script>

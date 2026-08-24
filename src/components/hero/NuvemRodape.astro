@@ -1,0 +1,56 @@
+---
+/**
+ * Nuvem lilás + florzinha do canto inferior esquerdo do hero.
+ *
+ * Vive separada da CenaHero porque não pertence à mesma caixa: a cena
+ * acompanha a coluna da foto, enquanto esta ancora a borda esquerda da seção
+ * inteira e precisa sangrar para fora do container. Juntá-las obrigaria a
+ * esticar um viewBox de ponta a ponta e amarrar as duas à mesma proporção.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 420 260"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+  role="presentation"
+>
+  <!-- massa da nuvem, cortada pela borda inferior/esquerda da seção -->
+  <path
+    d="M-40,260 L-40,168 C-40,142 -18,120 12,116 C22,84 60,66 96,76 C120,44 176,42 202,72 C238,60 276,80 282,114 C316,110 344,132 348,162 L354,260 Z"
+    fill="hsl(var(--lilas-blob))"
+    opacity="0.75"
+  />
+  <path
+    d="M120,260 L124,196 C124,176 142,160 164,160 C172,138 200,128 222,140 C242,124 274,128 286,148 C312,146 332,164 334,188 L338,260 Z"
+    fill="hsl(var(--lilas-claro))"
+    opacity="0.9"
+  />
+
+  <!-- florzinha amarela -->
+  <g transform="translate(96 176)">
+    <path d="M0,84 C-4,52 -2,30 4,8" stroke="#6FBF9B" stroke-width="7" stroke-linecap="round" fill="none" />
+    <path d="M2,48 C-16,44 -28,32 -30,18 C-14,18 -2,30 2,48 Z" fill="#6FBF9B" />
+    <g fill="#F5C74A">
+      <ellipse cx="4" cy="-14" rx="11" ry="16" />
+      <ellipse cx="22" cy="2" rx="16" ry="11" />
+      <ellipse cx="4" cy="18" rx="11" ry="16" />
+      <ellipse cx="-14" cy="2" rx="16" ry="11" />
+    </g>
+    <circle cx="4" cy="2" r="8" fill="#E8894A" />
+  </g>
+
+  <!-- pontinhos soltos -->
+  <circle cx="272" cy="214" r="6" fill="hsl(var(--coral))" opacity="0.8" />
+  <circle cx="196" cy="238" r="5" fill="#F5C74A" opacity="0.9" />
+  <circle cx="330" cy="238" r="5" fill="hsl(var(--coral))" opacity="0.7" />
+</svg>
