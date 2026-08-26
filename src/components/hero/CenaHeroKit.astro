@@ -47,12 +47,26 @@ const { class: className } = Astro.props;
   <PecaKit nome="flower-doodle" class="left-[2%] top-[79%] z-20 w-[16%] lg:left-[-3%]" motion="sway" />
 
   {/*
-    Sombra de chão. O cenário antigo tinha um tapete que apoiava a família; o
-    kit não traz nada equivalente, e sem apoio nenhum o recorte fica boiando
-    sobre o creme. Uma elipse borrada entre os blobs (z-20) e a foto (z-30)
-    resolve sem inventar um objeto que o kit não tem.
+    SUPERFÍCIE — ponto de troca.
+
+    Na referência o tapete não é um elemento à parte: é a própria fotografia,
+    e o recorte que usamos apagou ele. Este é o substituto vetorial, na
+    perspectiva medida do original (elipse 0,30). Quando o recorte fotográfico
+    do tapete chegar, troca-se ESTA peça por um <img> no mesmo lugar — a
+    posição já está calibrada contra a faixa de contato do recorte e nada mais
+    na composição precisa mudar.
+
+    Onde ele fica não é palpite: medindo o alpha do recorte, a base só encosta
+    no chão entre 35% e 88% da largura (o resto são os braços do Lucas e da
+    Bárbara, no ar), com a base entre 84% e 95% da altura. Convertido para a
+    caixa da arte, isso dá o miolo em x 41–75% e a linha de contato em y 66–74%
+    — daí o tapete centrado em x 59% (o meio da faixa de contato é 58,4%) e
+    com a borda frontal em 81%, deixando uma margem de palha à frente dos pés.
   */}
-  <div class="absolute left-[27%] top-[76%] z-20 h-[8%] w-[46%] rounded-[50%] bg-plum/20 blur-xl"></div>
+  <PecaKit nome="rug-jute" class="left-[24%] top-[60%] z-[15] w-[70%]" />
+
+  {/* Sombra de contato, POR CIMA do tapete: é nele que a família se apoia. */}
+  <div class="absolute left-[33%] top-[70%] z-20 h-[7%] w-[40%] rounded-[50%] bg-[#6b4a2a]/25 blur-lg"></div>
 
   {/* ---------- família ---------- */}
   <div class="absolute inset-0 z-30">

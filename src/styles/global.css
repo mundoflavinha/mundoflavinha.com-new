@@ -110,6 +110,18 @@
     --mf-mint: hsl(var(--mint));
     --mf-yellow: hsl(var(--amarelo));
 
+    /*
+     * Palha do tapete. Não vem do manifest — a paleta do kit não previa uma
+     * superfície de chão. Tons tirados do tapete fotográfico da referência,
+     * na mesma família dos marrons do wooden-block.svg, para o tapete e os
+     * blocos parecerem o mesmo material.
+     */
+    --palha: 37 55% 78%;
+    --mf-straw: hsl(var(--palha));
+    --mf-straw-luz: hsl(37 60% 85%);
+    --mf-straw-alt: hsl(35 47% 68%);
+    --mf-straw-borda: hsl(35 44% 63%);
+
     --font-heading: 'Quicksand Variable', 'Quicksand', sans-serif;
     --font-body: 'Nunito Variable', 'Nunito', sans-serif;
   }
