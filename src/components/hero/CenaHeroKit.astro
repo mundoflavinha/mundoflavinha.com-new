@@ -63,10 +63,18 @@ const { class: className } = Astro.props;
     — daí o tapete centrado em x 59% (o meio da faixa de contato é 58,4%) e
     com a borda frontal em 81%, deixando uma margem de palha à frente dos pés.
   */}
-  <PecaKit nome="rug-jute" class="left-[24%] top-[60%] z-[15] w-[70%]" />
+  <PecaKit nome="rug-jute" class="left-[16%] top-[56%] z-[5] w-[88%]" />
 
-  {/* Sombra de contato, POR CIMA do tapete: é nele que a família se apoia. */}
-  <div class="absolute left-[33%] top-[70%] z-20 h-[7%] w-[40%] rounded-[50%] bg-[#6b4a2a]/25 blur-lg"></div>
+  {/*
+    Sombra de contato, sobre o tapete (z-20) e sob a foto (z-30).
+
+    Ela precisa VAZAR para baixo do recorte para existir: medido no navegador,
+    a versão anterior terminava no mesmo pixel em que a foto termina, então
+    ficava 100% coberta por ela e não pintava nada. Agora começa acima dos pés
+    e sai por baixo deles, que é o único pedaço onde uma sombra de contato tem
+    o que mostrar.
+  */}
+  <div class="absolute left-[35%] top-[73%] z-20 h-[9%] w-[44%] rounded-[50%] bg-[#6b4a2a]/30 blur-lg"></div>
 
   {/* ---------- família ---------- */}
   <div class="absolute inset-0 z-30">
