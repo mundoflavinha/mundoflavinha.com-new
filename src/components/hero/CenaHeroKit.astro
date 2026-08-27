@@ -23,11 +23,20 @@ import PecaKit from "./PecaKit.astro";
  * então elas entram até `lg`.
  */
 
+/**
+ * `superficie` controla o que apoia a família. Existe porque a pose é
+ * SUSPENSA — todos os pés estão em ponta, ninguém pisa em nada — e um plano de
+ * chão em perspectiva entra em contradição com ela. Ver as variantes em
+ * /variantes-hero.
+ */
+export type Superficie = "tapete" | "tapete-recuado" | "poca" | "nenhuma";
+
 interface Props {
   class?: string;
+  superficie?: Superficie;
 }
 
-const { class: className } = Astro.props;
+const { class: className, superficie = "tapete" } = Astro.props;
 ---
 
 <div class:list={["mf-hero-art", className]}>
@@ -63,7 +72,11 @@ const { class: className } = Astro.props;
     — daí o tapete centrado em x 59% (o meio da faixa de contato é 58,4%) e
     com a borda frontal em 81%, deixando uma margem de palha à frente dos pés.
   */}
-  <PecaKit nome="rug-jute" class="left-[16%] top-[56%] z-[5] w-[88%]" />
+  {superficie === "tapete" && <PecaKit nome="rug-jute" class="left-[16%] top-[56%] z-[5] w-[88%]" />}
+  {superficie === "tapete-recuado" && (
+    <PecaKit nome="rug-jute" class="left-[19%] top-[50%] z-[5] w-[84%] opacity-70" />
+  )}
+  {superficie === "poca" && <PecaKit nome="pool-sand" class="left-[14%] top-[60%] z-[5] w-[86%]" />}
 
   {/*
     Sombra de contato, sobre o tapete (z-20) e sob a foto (z-30).
@@ -74,7 +87,9 @@ const { class: className } = Astro.props;
     e sai por baixo deles, que é o único pedaço onde uma sombra de contato tem
     o que mostrar.
   */}
-  <div class="absolute left-[35%] top-[73%] z-20 h-[9%] w-[44%] rounded-[50%] bg-[#6b4a2a]/30 blur-lg"></div>
+  {superficie !== "nenhuma" && (
+    <div class="absolute left-[35%] top-[73%] z-20 h-[9%] w-[44%] rounded-[50%] bg-[#6b4a2a]/30 blur-lg" />
+  )}
 
   {/* ---------- família ---------- */}
   <div class="absolute inset-0 z-30">

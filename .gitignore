@@ -60,3 +60,6 @@ _tmp/
 
 # Configuração local do Claude Code (launch.json do servidor de dev, etc).
 .claude/
+
+# pagina de comparacao temporaria (nao versionada)
+src/pages/variantes-hero.astro
