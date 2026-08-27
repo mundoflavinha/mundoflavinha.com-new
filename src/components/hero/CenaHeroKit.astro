@@ -1,5 +1,6 @@
 ---
 import PecaKit from "./PecaKit.astro";
+import tapeteFoto from "@/assets/tapete-recorte.webp";
 
 /**
  * Composição do hero com o "Hero SVG Kit".
@@ -29,7 +30,7 @@ import PecaKit from "./PecaKit.astro";
  * chão em perspectiva entra em contradição com ela. Ver as variantes em
  * /variantes-hero.
  */
-export type Superficie = "tapete" | "tapete-recuado" | "poca" | "nenhuma";
+export type Superficie = "tapete" | "tapete-recuado" | "tapete-foto" | "poca" | "nenhuma";
 
 interface Props {
   class?: string;
@@ -79,6 +80,32 @@ const { class: className, superficie = "tapete" } = Astro.props;
     <PecaKit nome="rug-jute" class="left-[24.5%] top-[56%] z-[5] w-[60.6%] opacity-75" />
   )}
   {superficie === "poca" && <PecaKit nome="pool-sand" class="left-[14%] top-[60%] z-[5] w-[86%]" />}
+  {superficie === "tapete-foto" && (
+    /*
+      Recorte fotográfico real, não SVG do kit — por isso <img>, não <PecaKit>.
+      Chegou com franja verde de chroma key e tom salmão; ambos corrigidos à
+      parte (choke de máscara + dilatação de cor + correção multiplicativa de
+      canal). O que NÃO foi corrigido é a perspectiva: a elipse desta foto tem
+      razão 0,377 (câmera mais de cima) contra 0,213 medida no tapete da
+      referência — esticar verticalmente para forçar a razão teria distorcido
+      a trama trançada, então a largura manda e a altura segue a proporção
+      própria da imagem.
+
+      Por isso a MESMA largura da versão vetorial (60,6%, medida contra a
+      família) produz uma altura maior aqui. Para não empurrar o tapete para
+      baixo do que a versão calibrada previa, a borda de trás (top) recua o
+      quanto a foto cresceu, mas a borda da FRENTE (top+height, onde os pés
+      encostam) fica no mesmo lugar: 72,4% — top 59,5% + altura 12,9% da
+      versão vetorial.
+    */
+    <img
+      src={tapeteFoto.src}
+      width={tapeteFoto.width}
+      height={tapeteFoto.height}
+      alt=""
+      class="absolute left-[24.5%] top-[49.6%] z-[15] w-[60.6%] select-none"
+    />
+  )}
 
   {/*
     Sombra de contato, sobre o tapete (z-20) e sob a foto (z-30).
