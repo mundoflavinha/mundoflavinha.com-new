@@ -58,23 +58,25 @@ const { class: className, superficie = "tapete" } = Astro.props;
   {/*
     SUPERFÍCIE — ponto de troca.
 
-    Na referência o tapete não é um elemento à parte: é a própria fotografia,
-    e o recorte que usamos apagou ele. Este é o substituto vetorial, na
-    perspectiva medida do original (elipse 0,30). Quando o recorte fotográfico
-    do tapete chegar, troca-se ESTA peça por um <img> no mesmo lugar — a
-    posição já está calibrada contra a faixa de contato do recorte e nada mais
-    na composição precisa mudar.
+    Na referência o tapete não é um elemento à parte: é a própria fotografia do
+    ensaio, e o recorte que usamos apagou ele. Este é o substituto vetorial.
+    Quando o recorte fotográfico chegar, troca-se ESTA peça por um <img> na
+    mesma posição e nada mais na composição muda.
 
-    Onde ele fica não é palpite: medindo o alpha do recorte, a base só encosta
-    no chão entre 35% e 88% da largura (o resto são os braços do Lucas e da
-    Bárbara, no ar), com a base entre 84% e 95% da altura. Convertido para a
-    caixa da arte, isso dá o miolo em x 41–75% e a linha de contato em y 66–74%
-    — daí o tapete centrado em x 59% (o meio da faixa de contato é 58,4%) e
-    com a borda frontal em 81%, deixando uma margem de palha à frente dos pés.
+    Os números não são palpite. A família foi localizada na referência por
+    casamento de silhueta — contra a diferença entre a composta e a base sem
+    família — e o tapete foi lido em grade sobre a base. O casamento confere:
+    proporção 1,081 contra 1,079 do nosso recorte. Daí sai o tapete a 0,95 da
+    largura da família, começando a 8,6% dela e a 74,6% da sua altura, o que
+    nesta caixa vira left 24,5%, width 60,6%, top 59,5%.
+
+    Duas correções que isso trouxe: o tapete é mais ESTREITO que a família, não
+    mais largo, e fica ACIMA dos blobs — na referência a borda de trás dele é
+    visível recortada contra o lilás, não escondida por ele.
   */}
-  {superficie === "tapete" && <PecaKit nome="rug-jute" class="left-[16%] top-[56%] z-[5] w-[88%]" />}
+  {superficie === "tapete" && <PecaKit nome="rug-jute" class="left-[24.5%] top-[59.5%] z-[15] w-[60.6%]" />}
   {superficie === "tapete-recuado" && (
-    <PecaKit nome="rug-jute" class="left-[19%] top-[50%] z-[5] w-[84%] opacity-70" />
+    <PecaKit nome="rug-jute" class="left-[24.5%] top-[56%] z-[5] w-[60.6%] opacity-75" />
   )}
   {superficie === "poca" && <PecaKit nome="pool-sand" class="left-[14%] top-[60%] z-[5] w-[86%]" />}
 
