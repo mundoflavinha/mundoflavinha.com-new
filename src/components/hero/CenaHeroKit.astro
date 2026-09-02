@@ -1,6 +1,5 @@
 ---
 import PecaKit from "./PecaKit.astro";
-import tapeteFoto from "@/assets/tapete-recorte.webp";
 
 /**
  * Composição do hero com o "Hero SVG Kit".
@@ -22,22 +21,21 @@ import tapeteFoto from "@/assets/tapete-recorte.webp";
  * desktop, onde a coluna tem o container em volta. No celular a caixa é
  * full-bleed (`-mx-6`) e "para fora" passa a ser "cortado na borda da tela",
  * então elas entram até `lg`.
+ *
+ * SEM SUPERFÍCIE DE CHÃO: existiu uma (tapete vetorial, depois um recorte
+ * fotográfico à parte) numa versão anterior. As duas esbarravam sempre na
+ * mesma coisa — a pose da família é SUSPENSA, todos os pés em ponta, ninguém
+ * apoiado — então qualquer piso desenhado por baixo brigava com a foto. A
+ * foto atual (hero-familia-tapete.webp, importada em HeroHome) já veio com o
+ * tapete NA MESMA cena, com contato e sombra reais, o que tornou essa camada
+ * desnecessária.
  */
-
-/**
- * `superficie` controla o que apoia a família. Existe porque a pose é
- * SUSPENSA — todos os pés estão em ponta, ninguém pisa em nada — e um plano de
- * chão em perspectiva entra em contradição com ela. Ver as variantes em
- * /variantes-hero.
- */
-export type Superficie = "tapete" | "tapete-recuado" | "tapete-foto" | "poca" | "nenhuma";
 
 interface Props {
   class?: string;
-  superficie?: Superficie;
 }
 
-const { class: className, superficie = "tapete" } = Astro.props;
+const { class: className } = Astro.props;
 ---
 
 <div class:list={["mf-hero-art", className]}>
@@ -56,71 +54,7 @@ const { class: className, superficie = "tapete" } = Astro.props;
   <PecaKit nome="scribble-purple" class="left-[55%] top-[94%] z-20 hidden w-[24%] sm:block" motion="sway" delay="-1.8s" />
   <PecaKit nome="flower-doodle" class="left-[2%] top-[79%] z-20 w-[16%] lg:left-[-3%]" motion="sway" />
 
-  {/*
-    SUPERFÍCIE — ponto de troca.
-
-    Na referência o tapete não é um elemento à parte: é a própria fotografia do
-    ensaio, e o recorte que usamos apagou ele. Este é o substituto vetorial.
-    Quando o recorte fotográfico chegar, troca-se ESTA peça por um <img> na
-    mesma posição e nada mais na composição muda.
-
-    Os números não são palpite. A família foi localizada na referência por
-    casamento de silhueta — contra a diferença entre a composta e a base sem
-    família — e o tapete foi lido em grade sobre a base. O casamento confere:
-    proporção 1,081 contra 1,079 do nosso recorte. Daí sai o tapete a 0,95 da
-    largura da família, começando a 8,6% dela e a 74,6% da sua altura, o que
-    nesta caixa vira left 24,5%, width 60,6%, top 59,5%.
-
-    Duas correções que isso trouxe: o tapete é mais ESTREITO que a família, não
-    mais largo, e fica ACIMA dos blobs — na referência a borda de trás dele é
-    visível recortada contra o lilás, não escondida por ele.
-  */}
-  {superficie === "tapete" && <PecaKit nome="rug-jute" class="left-[24.5%] top-[59.5%] z-[15] w-[60.6%]" />}
-  {superficie === "tapete-recuado" && (
-    <PecaKit nome="rug-jute" class="left-[24.5%] top-[56%] z-[5] w-[60.6%] opacity-75" />
-  )}
-  {superficie === "poca" && <PecaKit nome="pool-sand" class="left-[14%] top-[60%] z-[5] w-[86%]" />}
-  {superficie === "tapete-foto" && (
-    /*
-      Recorte fotográfico real, não SVG do kit — por isso <img>, não <PecaKit>.
-      Chegou com franja verde de chroma key e tom salmão; ambos corrigidos à
-      parte (choke de máscara + dilatação de cor + correção multiplicativa de
-      canal). O que NÃO foi corrigido é a perspectiva: a elipse desta foto tem
-      razão 0,377 (câmera mais de cima) contra 0,213 medida no tapete da
-      referência — esticar verticalmente para forçar a razão teria distorcido
-      a trama trançada, então a largura manda e a altura segue a proporção
-      própria da imagem.
-
-      Por isso a MESMA largura da versão vetorial (60,6%, medida contra a
-      família) produz uma altura maior aqui. Para não empurrar o tapete para
-      baixo do que a versão calibrada previa, a borda de trás (top) recua o
-      quanto a foto cresceu, mas a borda da FRENTE (top+height, onde os pés
-      encostam) fica no mesmo lugar: 72,4% — top 59,5% + altura 12,9% da
-      versão vetorial.
-    */
-    <img
-      src={tapeteFoto.src}
-      width={tapeteFoto.width}
-      height={tapeteFoto.height}
-      alt=""
-      class="absolute left-[24.5%] top-[49.6%] z-[15] w-[60.6%] select-none"
-    />
-  )}
-
-  {/*
-    Sombra de contato, sobre o tapete (z-20) e sob a foto (z-30).
-
-    Ela precisa VAZAR para baixo do recorte para existir: medido no navegador,
-    a versão anterior terminava no mesmo pixel em que a foto termina, então
-    ficava 100% coberta por ela e não pintava nada. Agora começa acima dos pés
-    e sai por baixo deles, que é o único pedaço onde uma sombra de contato tem
-    o que mostrar.
-  */}
-  {superficie !== "nenhuma" && (
-    <div class="absolute left-[35%] top-[73%] z-20 h-[9%] w-[44%] rounded-[50%] bg-[#6b4a2a]/30 blur-lg" />
-  )}
-
-  {/* ---------- família ---------- */}
+  {/* ---------- família (com o tapete, já na própria foto) ---------- */}
   <div class="absolute inset-0 z-30">
     <slot />
   </div>

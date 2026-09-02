@@ -2,7 +2,7 @@
 import { Icon } from "astro-icon/components";
 import CenaHeroKit from "./CenaHeroKit.astro";
 import SeletorBrincadeira from "./SeletorBrincadeira.astro";
-import familia from "@/assets/hero-familia-recorte.webp";
+import familiaTapete from "@/assets/hero-familia-tapete.webp";
 
 /**
  * Hero da home (ref. _tmp/header_ref-01.png).
@@ -69,20 +69,37 @@ import familia from "@/assets/hero-familia-recorte.webp";
 
       <!-- ============ CENÁRIO + FOTO ============ -->
       <div class="order-1 -mx-6 sm:mx-0 lg:order-2 lg:-mr-[4vw] xl:-mr-[6vw]">
-        <CenaHeroKit class="aspect-square w-full" superficie="tapete-foto">
+        {/*
+          O tapete não é uma peça à parte — veio na MESMA foto da família
+          (hero_family.jpeg), com contato, sombra e perspectiva reais, em vez
+          de simulados. Tentativas anteriores (tapete vetorial, depois
+          fotográfico separado) sempre esbarravam em algo que só a foto
+          original resolve de graça: a pose é suspensa (pés em ponta), e um
+          piso desenhado por baixo sempre brigava com ela. Ver nota em
+          CenaHeroKit.astro.
+        */}
+        <CenaHeroKit class="aspect-square w-full">
           {/*
             Sem `decoding="async"`: esta é a imagem do LCP e o decode
             assíncrono atrasa a PINTURA dela — deu para ver em recarga aqui, o
-            cenário SVG
-            aparecendo primeiro e a família entrando um quadro depois. `async`
-            só ajuda quando a imagem não é a que o usuário está esperando ver.
+            cenário SVG aparecendo primeiro e a família entrando um quadro
+            depois. `async` só ajuda quando a imagem não é a que o usuário está
+            esperando ver.
+
+            Recorte com fundo removido a partir do original (hero_family.jpeg,
+            2048×2048, fundo creme quase uniforme rgb(244,237,227)). O corte
+            usou distância de cor ao fundo + flood-fill desde a borda —
+            protege a saia clara (que também é cor de creme, mas com distância
+            de cor bem maior que o limiar) — e incorporou os vãos internos
+            grandes (entre os braços erguidos) que o flood-fill sozinho não
+            alcança por não tocarem a borda da imagem.
           */}
           <img
-            src={familia.src}
-            width={familia.width}
-            height={familia.height}
-            alt="Flávia deitada no chão brincando com Lucas e Bárbara, os três rindo"
-            class="absolute left-[19%] top-[8%] w-[64%] select-none"
+            src={familiaTapete.src}
+            width={familiaTapete.width}
+            height={familiaTapete.height}
+            alt="Flávia sentada no tapete de palha, brincando com Lucas e Bárbara, os três rindo"
+            class="absolute left-[15%] top-[8%] w-[70%] select-none"
             fetchpriority="high"
           />
         </CenaHeroKit>
