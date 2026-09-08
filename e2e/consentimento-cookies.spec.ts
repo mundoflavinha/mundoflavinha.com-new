@@ -13,6 +13,23 @@ import { expect, test, type Page } from "@playwright/test";
 const cookieDeConsentimento = async (page: Page) =>
   (await page.context().cookies()).find((c) => c.name === "cc_cookie");
 
+/**
+ * Checa o HOST da requisição, não a URL inteira.
+ *
+ * Um `/youtube|ytimg|googlevideo/.test(req.url())` cru já deu falso positivo:
+ * a home passou a importar `src/lib/youtube.ts` (busca do último vídeo do
+ * canal), e o Vite nomeia o chunk gerado a partir do arquivo —
+ * `youtube.[hash].js`, servido pelo NOSSO domínio. A regex batia na palavra
+ * "youtube" dentro do path do asset, não no destino real da requisição.
+ */
+const ehRequisicaoParaGoogle = (url: string): boolean => {
+  try {
+    return /(^|\.)(youtube(-nocookie)?\.com|ytimg\.com|googlevideo\.com)$/.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+};
+
 test("a primeira visita pergunta ANTES de qualquer contato com terceiro", async ({ page, baseURL }) => {
   // O banner passou a aparecer na entrada quando o Analytics entrou: existe
   // coleta que começaria sozinha, sem nenhuma ação da pessoa, então a pergunta
@@ -57,7 +74,7 @@ test("recusar é tão visível quanto aceitar, e nada fica pré-marcado", async 
 test("sem autorização, o player da home não carrega e nada vai ao Google", async ({ page }) => {
   const google: string[] = [];
   page.on("request", (req) => {
-    if (/youtube|ytimg|googlevideo/.test(req.url())) google.push(req.url());
+    if (ehRequisicaoParaGoogle(req.url())) google.push(req.url());
   });
 
   await page.goto("/");
@@ -73,7 +90,7 @@ test("sem autorização, o player da home não carrega e nada vai ao Google", as
 test("autorizando conteúdo externo, o player carrega — e só então há contato", async ({ page }) => {
   const google: string[] = [];
   page.on("request", (req) => {
-    if (/youtube|ytimg|googlevideo/.test(req.url())) google.push(req.url());
+    if (ehRequisicaoParaGoogle(req.url())) google.push(req.url());
   });
 
   await page.goto("/");
@@ -138,7 +155,7 @@ test("recusar mantém tudo bloqueado, inclusive depois de recarregar", async ({ 
 
   const google: string[] = [];
   page.on("request", (req) => {
-    if (/youtube|ytimg|googlevideo/.test(req.url())) google.push(req.url());
+    if (ehRequisicaoParaGoogle(req.url())) google.push(req.url());
   });
 
   await page.goto("/");
