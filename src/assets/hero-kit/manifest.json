@@ -1,0 +1,33 @@
+{
+  "name": "Mundo Flavinha — Hero SVG Kit",
+  "version": "1.0.0",
+  "palette": {
+    "cream": "#FFF9EF",
+    "plum": "#34204F",
+    "purple": "#8D67BC",
+    "lilac": "#C9A5DC",
+    "coral": "#F77678",
+    "pink": "#ED91AD",
+    "mint": "#77CDB5",
+    "yellow": "#FFD060"
+  },
+  "assets": [
+    {"file":"blob-coral.svg","role":"main-backdrop","desktopWidth":"clamp(520px, 47vw, 760px)","zIndex":0,"motion":"breathe"},
+    {"file":"blob-lilac.svg","role":"secondary-backdrop","desktopWidth":"clamp(340px, 32vw, 520px)","zIndex":-1,"motion":"breathe-slow"},
+    {"file":"paper-plane.svg","role":"floating-object","desktopWidth":"clamp(110px, 12vw, 190px)","zIndex":3,"motion":"plane-drift"},
+    {"file":"wooden-block.svg","role":"floating-object","desktopWidth":"clamp(82px, 8vw, 130px)","zIndex":3,"motion":"float-b"},
+    {"file":"dice-purple.svg","role":"foreground-object","desktopWidth":"clamp(72px, 7vw, 112px)","zIndex":4,"motion":"wobble"},
+    {"file":"crayon-coral.svg","role":"foreground-object","desktopWidth":"clamp(150px, 17vw, 250px)","zIndex":4,"motion":"float-a"},
+    {"file":"jigsaw-pink.svg","role":"foreground-object","desktopWidth":"clamp(90px, 10vw, 150px)","zIndex":4,"motion":"wobble"},
+    {"file":"star-yellow.svg","role":"foreground-object","desktopWidth":"clamp(58px, 6vw, 92px)","zIndex":4,"motion":"twinkle"},
+    {"file":"clay-ball-mint.svg","role":"foreground-object","desktopWidth":"clamp(72px, 7vw, 112px)","zIndex":4,"motion":"float-b"},
+    {"file":"heart-doodle.svg","role":"doodle","desktopWidth":"clamp(76px, 8vw, 120px)","zIndex":2,"motion":"draw"},
+    {"file":"cloud-doodle.svg","role":"doodle","desktopWidth":"clamp(100px, 10vw, 160px)","zIndex":2,"motion":"draw"},
+    {"file":"motion-path.svg","role":"motion-guide","desktopWidth":"clamp(320px, 36vw, 560px)","zIndex":1,"motion":"draw"},
+    {"file":"spark-lines.svg","role":"doodle","desktopWidth":"clamp(74px, 7vw, 112px)","zIndex":2,"motion":"twinkle"},
+    {"file":"scribble-purple.svg","role":"doodle","desktopWidth":"clamp(150px, 17vw, 260px)","zIndex":2,"motion":"draw"},
+    {"file":"flower-doodle.svg","role":"doodle","desktopWidth":"clamp(80px, 9vw, 140px)","zIndex":2,"motion":"sway"},
+    {"file":"sparkle.svg","role":"doodle","desktopWidth":"clamp(46px, 5vw, 78px)","zIndex":2,"motion":"twinkle"},
+    {"file":"orbit-dot.svg","role":"accent","desktopWidth":"clamp(38px, 4vw, 64px)","zIndex":2,"motion":"orbit"}
+  ]
+}

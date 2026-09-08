@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { CheckCircle2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -84,9 +84,14 @@ const NewsletterForm = ({ variant = "compact" }: NewsletterFormProps) => {
 
   if (status === "success") {
     return (
-      <p role="status" className="text-sm text-muted-foreground">
-        Inscrição confirmada! Fique de olho no seu e-mail. 💌
-      </p>
+      <div
+        role="status"
+        className="mt-4 flex flex-col items-center gap-1.5 rounded-2xl border border-mint bg-mint/30 px-5 py-4 text-center"
+      >
+        <CheckCircle2 className="h-7 w-7 text-emerald-600" />
+        <p className="font-heading font-bold text-foreground">Inscrição confirmada!</p>
+        <p className="text-sm text-muted-foreground">Fique de olho no seu e-mail. 💌</p>
+      </div>
     );
   }
 

@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import logo from "@/assets/logo_01.webp";
+import BuscaHeader from "@/components/hero/BuscaHeader.astro";
 
 /**
  * Deixou de ser componente React de propósito.
@@ -10,10 +11,21 @@ import logo from "@/assets/logo_01.webp";
  * Metade da interatividade sumiu sozinha na migração — `useLocation` virou
  * `Astro.url.pathname`, resolvido no build, então `aria-current` e o realce da
  * rota ativa agora são HTML estático. Sobrou o toggle, em ~15 linhas de JS.
+ *
+ * ------------------------------------------------------------------
+ * Redesign (ref. _tmp/header_ref.png)
+ *
+ * Na home o header flutua sobre o creme do hero, sem barra nem borda — é o que
+ * a referência mostra. Isso exige que ele seja transparente no topo e ganhe
+ * fundo ao rolar, senão o texto do menu passa por cima do conteúdo da página.
+ * Nas outras 30 rotas, que não foram redesenhadas, ele nasce sólido: seria
+ * transparente sobre um <main> branco qualquer.
+ *
+ * "Início" saiu do menu — o logo já leva para a home e a referência mostra a
+ * barra sem ele. Nenhuma rota foi removida; as oito continuam alcançáveis.
  */
 
 const navItems = [
-  { label: "Início", path: "/" },
   { label: "Brincadeiras", path: "/brincadeiras" },
   { label: "Downloads", path: "/downloads" },
   { label: "Vídeos", path: "/videos" },
@@ -25,32 +37,49 @@ const navItems = [
 
 const rotaAtual = Astro.url.pathname;
 const ehHome = rotaAtual === "/";
-const ativo = (path: string) => rotaAtual === path;
+const ativo = (path: string) => rotaAtual === path || rotaAtual.startsWith(`${path}/`);
 ---
 
 <header
-  class="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm"
+  data-cabecalho
+  data-sobreposto={ehHome ? "true" : undefined}
+  class:list={[
+    "sticky top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300",
+    /*
+     * Na home o header é CREME, não transparente. Transparente deixava uma
+     * faixa branca no topo: ele é `sticky`, então ocupa espaço no fluxo ANTES
+     * da seção do hero, e o que aparecia atrás dele era o `--background` do
+     * body, não o creme do hero. A emenda ficava visível na largura inteira.
+     * Pintar da mesma cor do hero resolve sem puxar a seção com margem
+     * negativa. Ao rolar, só entram sombra e blur para descolar do conteúdo.
+     *
+     * Fora da home não há hero creme atrás: nasce sólido.
+     */
+    ehHome
+      ? "bg-creme data-[rolado=true]:bg-creme/90 data-[rolado=true]:shadow-[0_8px_28px_-12px_rgba(45,20,70,0.28)] data-[rolado=true]:backdrop-blur-md"
+      : "border-b border-border bg-card/95 shadow-sm backdrop-blur-md",
+  ]}
 >
-  <div class="container flex items-center justify-between h-16 md:h-20">
-    <a href="/" class="flex items-center gap-2">
+  <div class="container flex h-20 items-center justify-between gap-4 md:h-24">
+    <a href="/" class="flex shrink-0 items-center" aria-label="Mundo Flavinha — página inicial">
       <img
         src={logo.src}
         width={logo.width}
         height={logo.height}
         alt="Mundo Flavinha"
-        class="h-14 md:h-16 w-auto"
+        class="h-14 w-auto md:h-16"
       />
     </a>
 
-    <nav aria-label="Navegação principal" class="hidden lg:flex items-center gap-1">
+    <nav aria-label="Navegação principal" class="hidden items-center gap-0.5 xl:flex">
       {
         navItems.map((item) => (
           <a
             href={item.path}
             aria-current={ativo(item.path) ? "page" : undefined}
             class:list={[
-              "px-3 py-2 rounded-lg text-sm font-heading font-semibold transition-colors hover:bg-secondary",
-              ativo(item.path) ? "text-primary bg-secondary" : "text-foreground/70 hover:text-foreground",
+              "rounded-full px-3.5 py-2 font-heading text-[0.95rem] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-uva",
+              ativo(item.path) ? "bg-white/70 text-uva-ink" : "text-plum/75 hover:bg-white/60 hover:text-plum",
             ]}
           >
             {item.label}
@@ -59,60 +88,52 @@ const ativo = (path: string) => rotaAtual === path;
       }
     </nav>
 
-    {
-      !ehHome && (
-        <div class="hidden lg:flex items-center gap-3">
-          <a
-            href="/downloads"
-            class="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-heading font-bold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <Icon name="lucide:download" class="w-4 h-4" />
-            Baixar atividade gratuita
-          </a>
-        </div>
-      )
-    }
+    <div class="flex shrink-0 items-center gap-2 md:gap-3">
+      <BuscaHeader />
 
-    <button
-      type="button"
-      id="botao-menu"
-      class="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors text-foreground"
-      aria-label="Abrir menu"
-      aria-expanded="false"
-      aria-controls="menu-mobile"
-    >
-      <Icon name="lucide:menu" class="w-6 h-6" data-icone="abrir" />
-      <Icon name="lucide:x" class="w-6 h-6 hidden" data-icone="fechar" />
-    </button>
+      <a
+        href="/brincadeiras"
+        class="hidden rounded-full bg-rosa px-6 py-3 font-heading text-[0.95rem] font-bold text-plum shadow-[0_10px_24px_-14px_hsl(var(--rosa))] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 md:inline-flex"
+      >
+        Começar a brincar
+      </a>
+
+      <button
+        type="button"
+        id="botao-menu"
+        class="rounded-full p-2.5 text-plum transition-colors hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-uva xl:hidden"
+        aria-label="Abrir menu"
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+      >
+        <Icon name="lucide:menu" class="h-6 w-6" data-icone="abrir" />
+        <Icon name="lucide:x" class="hidden h-6 w-6" data-icone="fechar" />
+      </button>
+    </div>
   </div>
 
-  <div id="menu-mobile" class="lg:hidden bg-card border-t border-border hidden">
-    <nav aria-label="Navegação principal" class="container py-4 flex flex-col gap-1">
+  <div id="menu-mobile" class="hidden border-t border-plum/10 bg-creme/95 backdrop-blur-md xl:hidden">
+    <nav aria-label="Navegação principal" class="container flex flex-col gap-1 py-4">
       {
         navItems.map((item) => (
           <a
             href={item.path}
             aria-current={ativo(item.path) ? "page" : undefined}
             class:list={[
-              "px-4 py-3 rounded-lg font-heading font-semibold transition-colors",
-              ativo(item.path) ? "text-primary bg-secondary" : "text-foreground/70 hover:bg-secondary",
+              "rounded-2xl px-4 py-3 font-heading font-semibold transition-colors",
+              ativo(item.path) ? "bg-white text-uva-ink" : "text-plum/80 hover:bg-white/70",
             ]}
           >
             {item.label}
           </a>
         ))
       }
-      {
-        !ehHome && (
-          <a
-            href="/downloads"
-            class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 font-heading font-bold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <Icon name="lucide:download" class="w-4 h-4" />
-            Baixar atividade gratuita
-          </a>
-        )
-      }
+      <a
+        href="/brincadeiras"
+        class="mt-2 inline-flex w-full items-center justify-center rounded-full bg-rosa px-4 py-3 font-heading font-bold text-plum md:hidden"
+      >
+        Começar a brincar
+      </a>
     </nav>
   </div>
 </header>
@@ -135,5 +156,21 @@ const ativo = (path: string) => rotaAtual === path;
       iconeAbrir?.classList.toggle("hidden", proximo);
       iconeFechar?.classList.toggle("hidden", !proximo);
     });
+  }
+
+  /*
+   * Só na home o header nasce transparente, então só nela existe estado de
+   * "rolado". O listener é passivo e escreve um atributo — quem pinta é o CSS,
+   * o que mantém o scroll fora da thread de layout do JS.
+   */
+  const cabecalho = document.querySelector<HTMLElement>("[data-cabecalho][data-sobreposto]");
+
+  if (cabecalho) {
+    const sincronizar = () => {
+      cabecalho.dataset.rolado = String(window.scrollY > 12);
+    };
+
+    sincronizar();
+    window.addEventListener("scroll", sincronizar, { passive: true });
   }
 </script>

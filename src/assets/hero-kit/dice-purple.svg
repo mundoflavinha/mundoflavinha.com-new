@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 170" role="img" aria-labelledby="title desc">
+  <title id="title">Dado roxo</title>
+  <desc id="desc">Dado infantil arredondado em perspectiva.</desc>
+  <defs>
+    <linearGradient id="face" x1="28" y1="24" x2="145" y2="148" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9e78d0"/><stop offset="1" stop-color="var(--mf-purple, #7044a0)"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#482d68" flood-opacity=".25"/></filter>
+  </defs>
+  <ellipse cx="85" cy="146" rx="53" ry="12" fill="#51326f" opacity=".15"/>
+  <rect data-part="body" x="27" y="22" width="116" height="116" rx="31" fill="url(#face)" stroke="#60368f" stroke-width="4" filter="url(#shadow)"/>
+  <g data-part="pips" fill="#fff4dc" stroke="#eadfc9" stroke-width="2">
+    <circle cx="58" cy="52" r="10"/><circle cx="112" cy="52" r="10"/><circle cx="85" cy="80" r="10"/><circle cx="58" cy="108" r="10"/><circle cx="112" cy="108" r="10"/>
+  </g>
+  <path d="M49 39c18-14 50-14 70-5" fill="none" stroke="#c4a9e2" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+</svg>

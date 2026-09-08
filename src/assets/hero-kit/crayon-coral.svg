@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 290 100" role="img" aria-labelledby="title desc">
+  <title id="title">Giz de cera coral</title>
+  <desc id="desc">Giz de cera desenhado à mão com rótulo de papel.</desc>
+  <defs>
+    <linearGradient id="wax" x1="25" y1="21" x2="270" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff8587"/><stop offset="1" stop-color="var(--mf-coral, #ee5e68)"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-30%" width="120%" height="170%"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#8a3a47" flood-opacity=".2"/></filter>
+  </defs>
+  <g transform="rotate(-8 145 50)" filter="url(#shadow)" stroke="#b84052" stroke-width="3" stroke-linejoin="round">
+    <path data-part="tip" d="m19 50 39-25v50Z" fill="#f7b9a6"/>
+    <path d="m19 50 17-6v12Z" fill="#a7444f" stroke="none"/>
+    <rect data-part="wax" x="55" y="25" width="210" height="50" rx="8" fill="url(#wax)"/>
+    <rect data-part="wrapper" x="92" y="25" width="118" height="50" fill="#f8bfcc" opacity=".9"/>
+    <path d="M103 25v50M199 25v50" stroke="#d5687d"/>
+    <path d="M115 44h72M115 56h48" stroke="#fff1e5" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+    <path data-part="cap" d="M265 30c15 2 15 38 0 40Z" fill="#d84d5c"/>
+  </g>
+</svg>

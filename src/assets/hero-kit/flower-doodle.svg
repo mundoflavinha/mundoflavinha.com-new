@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 250" role="img" aria-labelledby="title desc">
+  <title id="title">Flor desenhada à mão</title>
+  <desc id="desc">Flor infantil amarela com caule verde e pétalas imperfeitas.</desc>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path data-part="stem" d="M89 109c0 38-5 73 4 118M90 176c-18-10-34-13-48-6 12 15 28 21 49 20M92 196c18-14 33-18 46-11-9 16-24 24-45 25" fill="none" stroke="#2e9d72" stroke-width="8"/>
+    <g data-part="petals" fill="#ffd26a" stroke="#e8a937" stroke-width="4">
+      <path d="M88 68C64 52 61 25 77 18c15-7 27 15 23 43"/>
+      <path d="M102 72c10-28 37-39 49-25 12 14-4 33-34 39"/>
+      <path d="M109 88c31-7 51 12 44 29-7 16-34 11-52-12"/>
+      <path d="M86 101c-11 29-39 35-49 19-10-16 9-32 37-34"/>
+      <path d="M75 78c-30 1-46-21-36-36 10-14 33-4 48 21"/>
+    </g>
+    <circle data-part="center" cx="91" cy="84" r="23" fill="#f39b45" stroke="#d77a34" stroke-width="4"/>
+    <path d="M80 76c7-6 16-7 23-3" fill="none" stroke="#ffd299" stroke-width="4" opacity=".7"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 190" role="img" aria-labelledby="title desc">
+  <title id="title">Peça de quebra-cabeça rosa</title>
+  <desc id="desc">Peça infantil de encaixe com volume suave.</desc>
+  <defs>
+    <linearGradient id="piece" x1="33" y1="30" x2="188" y2="169" gradientUnits="userSpaceOnUse"><stop stop-color="#f889a3"/><stop offset="1" stop-color="#dc4f75"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#9a3557" flood-opacity=".25"/></filter>
+  </defs>
+  <path data-part="piece" d="M63 35h37c-2 7-2 13 1 18 6 10 21 13 31 7 10-5 14-16 10-25h35c8 0 14 6 14 14v35c-8-3-17-1-23 6-8 9-7 23 2 31 6 5 14 7 21 4v31c0 8-6 14-14 14h-39c4-8 2-18-5-24-10-9-26-7-33 4-4 6-4 13-1 20H63c-8 0-14-6-14-14v-32c-8 4-18 2-24-5-9-9-8-24 1-32 6-5 15-6 23-3V49c0-8 6-14 14-14Z" fill="url(#piece)" stroke="#bd3d67" stroke-width="4" stroke-linejoin="round" filter="url(#shadow)"/>
+  <path d="M68 52c30 1 59 0 88-2" fill="none" stroke="#ffb5c5" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+</svg>

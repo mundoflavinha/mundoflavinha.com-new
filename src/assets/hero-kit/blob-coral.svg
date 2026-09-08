@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" role="img" aria-labelledby="title desc">
+  <title id="title">Forma orgânica coral</title>
+  <desc id="desc">Grande forma de papel recortado para o fundo da família.</desc>
+  <defs>
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" seed="8" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="grain"/>
+      <feComponentTransfer in="grain" result="softGrain">
+        <feFuncA type="table" tableValues="0 .12"/>
+      </feComponentTransfer>
+      <!--
+        CORRIGIDO em relação ao kit original: faltava recortar o granulado
+        contra o SourceAlpha. `feTurbulence` preenche a REGIÃO INTEIRA do
+        filtro, e `feBlend mode="multiply"` sobre pixel transparente devolve o
+        próprio granulado — então o ruído aparecia fora da forma, como um
+        retângulo cinza visível em volta do blob. O feComposite abaixo mantém
+        o granulado só onde existe blob.
+      -->
+      <feComposite in="softGrain" in2="SourceAlpha" operator="in" result="grainRecortado"/>
+      <feBlend in="SourceGraphic" in2="grainRecortado" mode="multiply"/>
+    </filter>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#6d3144" flood-opacity=".15"/>
+    </filter>
+  </defs>
+  <path data-part="shadow" d="M110 476C33 416 22 324 66 251 105 186 162 177 191 114 229 31 327 6 423 22c116 20 149 83 196 158 43 69 112 103 89 204-22 99-106 121-185 150-103 38-126 83-245 62-75-13-116-79-168-120Z" fill="#6d3144" opacity=".12" filter="url(#shadow)"/>
+  <path data-part="paper" d="M103 459C28 401 24 311 67 240c38-63 94-73 122-134C226 26 322 3 416 19c113 19 146 80 192 153 42 67 108 101 86 199-22 96-103 117-180 145-100 37-123 81-239 60-73-13-113-77-172-117Z" fill="var(--mf-coral, #f77678)" filter="url(#paper)"/>
+  <path data-part="highlight" d="M184 130C254 45 407 38 516 97" fill="none" stroke="#ffb1aa" stroke-width="8" stroke-linecap="round" opacity=".34"/>
+</svg>

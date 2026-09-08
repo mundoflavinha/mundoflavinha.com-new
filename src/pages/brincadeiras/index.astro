@@ -71,7 +71,9 @@ const cards = [
         </p>
       </div>
 
-      <div class="mb-8 flex flex-wrap justify-center gap-2">
+      {/* Alvo da âncora "Ver por idade" do hero da home — os filtros SÃO a
+          navegação por idade, então não faz sentido criar seção só para isso. */}
+      <div id="por-idade" class="mb-8 flex flex-wrap justify-center gap-2">
         {
           filtros.map((filtro) => (
             <button

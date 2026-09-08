@@ -63,6 +63,21 @@ export default {
         "pastel-yellow": "hsl(var(--pastel-yellow))",
         mint: "hsl(var(--mint))",
         "warm-white": "hsl(var(--warm-white))",
+
+        // Paleta do hero/header — ver bloco de tokens em global.css.
+        // As cores de ARTE valem para os SVGs do kit; as `-ink` são as mesmas
+        // escurecidas o mínimo para passar no contraste, e só aparecem em
+        // texto e botão.
+        creme: "hsl(var(--creme))",
+        plum: "hsl(var(--plum))",
+        uva: "hsl(var(--uva))",
+        "uva-ink": "hsl(var(--uva-ink))",
+        coral: "hsl(var(--coral))",
+        "coral-ink": "hsl(var(--coral-ink))",
+        lilas: "hsl(var(--lilas))",
+        rosa: "hsl(var(--rosa))",
+        amarelo: "hsl(var(--amarelo))",
+        "texto-suave": "hsl(var(--texto-suave))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -76,9 +91,19 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        "flutua-suave": {
+          "0%, 100%": { transform: "translate3d(0,0,0)" },
+          "50%": { transform: "translate3d(0,-14px,0)" },
+        },
+        "gira-leve": {
+          "0%, 100%": { transform: "rotate(-4deg)" },
+          "50%": { transform: "rotate(4deg)" },
+        },
       },
       animation: {
         "float": "float 3s ease-in-out infinite",
+        "flutua-suave": "flutua-suave 6s ease-in-out infinite",
+        "gira-leve": "gira-leve 7s ease-in-out infinite",
       },
     },
   },

@@ -1,0 +1,69 @@
+---
+import PecaKit from "./PecaKit.astro";
+
+/**
+ * Composição do hero com o "Hero SVG Kit".
+ *
+ * Segue a direção do README do kit: blob coral atrás da família e blob lilás
+ * deslocado para direita/baixo; avião, nuvem e trilha na faixa superior;
+ * dado, giz, estrela, quebra-cabeça e massinha no primeiro plano, junto à base
+ * do recorte. Rostos, mãos e o CTA ficam livres.
+ *
+ * A foto entra por <slot> e não direto aqui: ela é CONTEÚDO (tem alt, é o LCP)
+ * e pertence ao HeroHome; o que este componente detém é o empilhamento. Assim
+ * a ordem das camadas mora num lugar só, em vez de ficar dividida entre dois
+ * arquivos que precisam concordar sobre z-index.
+ *
+ * As peças que o README manda cortar primeiro em tela pequena — wooden-block,
+ * heart-doodle e scribble-purple — saem com `hidden sm:block`.
+ *
+ * As da borda esquerda (avião, nuvem, flor, orbit-dot) sangram de propósito no
+ * desktop, onde a coluna tem o container em volta. No celular a caixa é
+ * full-bleed (`-mx-6`) e "para fora" passa a ser "cortado na borda da tela",
+ * então elas entram até `lg`.
+ *
+ * SEM SUPERFÍCIE DE CHÃO: existiu uma (tapete vetorial, depois um recorte
+ * fotográfico à parte) numa versão anterior. As duas esbarravam sempre na
+ * mesma coisa — a pose da família é SUSPENSA, todos os pés em ponta, ninguém
+ * apoiado — então qualquer piso desenhado por baixo brigava com a foto. A
+ * foto atual (hero-familia-tapete.webp, importada em HeroHome) já veio com o
+ * tapete NA MESMA cena, com contato e sombra reais, o que tornou essa camada
+ * desnecessária.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["mf-hero-art", className]}>
+  {/* ---------- fundo ---------- */}
+  <PecaKit nome="blob-lilac" class="left-[33%] top-[23%] z-0 w-[63%]" motion="breathe-slow" />
+  <PecaKit nome="blob-coral" class="left-[7%] top-[0%] z-10 w-[82%]" motion="breathe" />
+
+  {/* ---------- rabiscos, atrás da família ---------- */}
+  <PecaKit nome="motion-path" class="left-[13%] top-[9%] z-20 w-[42%]" />
+  <PecaKit nome="cloud-doodle" class="left-[2%] top-[27%] z-20 w-[18%] lg:left-[-1%]" motion="float-a" delay="-2.4s" />
+  <PecaKit nome="paper-plane" class="left-[3%] top-[3%] z-20 w-[23%] lg:left-[-3%]" motion="plane-drift" />
+  <PecaKit nome="spark-lines" class="left-[70%] top-[1%] z-20 w-[11%]" motion="twinkle" delay="-1.2s" />
+  <PecaKit nome="heart-doodle" class="left-[84%] top-[5%] z-20 hidden w-[13%] sm:block" motion="twinkle" delay="-2.8s" />
+  <PecaKit nome="sparkle" class="left-[88%] top-[43%] z-20 w-[9%]" motion="twinkle" delay="-0.6s" />
+  <PecaKit nome="orbit-dot" class="left-[2%] top-[52%] z-20 w-[7%] lg:left-[0%]" motion="orbit" />
+  <PecaKit nome="scribble-purple" class="left-[55%] top-[94%] z-20 hidden w-[24%] sm:block" motion="sway" delay="-1.8s" />
+  <PecaKit nome="flower-doodle" class="left-[2%] top-[79%] z-20 w-[16%] lg:left-[-3%]" motion="sway" />
+
+  {/* ---------- família (com o tapete, já na própria foto) ---------- */}
+  <div class="absolute inset-0 z-30">
+    <slot />
+  </div>
+
+  {/* ---------- brinquedos, na frente ---------- */}
+  <PecaKit nome="wooden-block" class="left-[86%] top-[14%] z-40 hidden w-[13%] sm:block" motion="float-b" delay="-3.1s" />
+  <PecaKit nome="clay-ball-mint" class="left-[85%] top-[64%] z-40 w-[12%]" motion="float-b" delay="-1.5s" />
+  <PecaKit nome="jigsaw-pink" class="left-[63%] top-[80%] z-40 w-[16%]" motion="wobble" delay="-3.6s" />
+  <PecaKit nome="star-yellow" class="left-[46%] top-[88%] z-40 w-[11%]" motion="twinkle" delay="-1.9s" />
+  <PecaKit nome="dice-purple" class="left-[3%] top-[67%] z-40 w-[13%]" motion="wobble" />
+  <PecaKit nome="crayon-coral" class="left-[16%] top-[85%] z-40 w-[27%]" motion="float-a" delay="-2.2s" />
+</div>

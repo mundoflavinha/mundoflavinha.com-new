@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" role="img" aria-labelledby="title desc">
+  <title id="title">Brilho lúdico</title>
+  <desc id="desc">Pequeno brilho de quatro pontas com pontos coloridos.</desc>
+  <path data-part="spark" d="M70 13c5 30 13 43 39 56-27 11-36 24-40 55-5-31-14-44-40-56 27-11 36-24 41-55Z" fill="var(--mf-yellow, #ffd060)" stroke="#e4a73f" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="20" cy="31" r="7" fill="var(--mf-mint, #77cdb5)"/>
+  <circle cx="119" cy="28" r="6" fill="var(--mf-coral, #f77678)"/>
+  <circle cx="122" cy="111" r="8" fill="var(--mf-lilac, #b996d2)"/>
+</svg>
