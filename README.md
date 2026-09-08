@@ -74,6 +74,8 @@ A home também consome `/api/videos`: a seção "Novo vídeo no canal" (`UltimoV
 
 A resposta de `/api/videos` fica em cache por 30 min na CDN da Cloudflare (`Cache-Control: s-maxage=1800`) — a maioria das visitas nem chega a chamar o YouTube, o que reduz o consumo de cota da API. As miniaturas passam por `/api/thumb` (proxy pelo próprio domínio) — o navegador nunca contata o Google diretamente para carregar `/videos`, só quando a pessoa autoriza conteúdo externo no banner de cookies e clica para assistir.
 
+O pipeline (`channels.list` → `playlists.list` → uma `playlistItems.list` por playlist, para montar as categorias) faz 1 subrequisição HTTP por playlist do canal, mais 1 por página de 50 itens de upload — sem limite, isso cresce junto com o canal. Cloudflare Pages Functions no plano Free limitam a 50 subrequisições por invocação; um canal grande o bastante estoura esse teto e a function falha com um 502 genérico da borda (não um erro do nosso `catch`, que devolveria JSON). `fetchChannelVideos` (`src/lib/youtubeFetcher.ts`) se defende com um orçamento compartilhado de `ORCAMENTO_PADRAO_SUBREQUISICOES` (40) chamadas: busca os vídeos ANTES das categorias, então um canal que estoura o orçamento perde playlists de categorização (`"Todos"` continua valendo) antes de perder vídeos da lista.
+
 ## Captura de leads (Neon)
 
 Os formulários de newsletter e de download de material gravam no Postgres do Neon via `functions/api/lead.ts` (Cloudflare Pages Function).
