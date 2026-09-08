@@ -6,9 +6,9 @@ import YouTubeFacade from "./YouTubeFacade.astro";
  *
  * O `videoId`/`title`/`start` abaixo não são o vídeo dinâmico — são o
  * FALLBACK: o que aparece sem JavaScript, para crawler, e enquanto (ou se) a
- * busca do último vídeo falha. Prático mantê-lo um vídeo real e já publicado,
- * em vez de um placeholder, porque o `<script>` abaixo só troca o conteúdo se
- * conseguir algo melhor — nunca troca por um estado vazio.
+ * busca do último vídeo falha ou ainda não respondeu. É um vídeo real, com o
+ * título real dele (conferido via oEmbed público), não um placeholder — o
+ * `<script>` abaixo só troca por algo melhor, nunca por um estado vazio.
  *
  * Por que não virou ilha React: o resto desta página não hidrata nada além do
  * botão de captura de lead (`LeadModal`), e replicar aqui o mesmo fetch +
@@ -18,12 +18,18 @@ import YouTubeFacade from "./YouTubeFacade.astro";
  * o design é para EXATAMENTE dois lugares montarem um player, o facade
  * estático e o diálogo da galeria).
  *
- * A atualização troca dataset.src/title/linkDireto do MESMO <button> que já
- * está na página, sem recriar o elemento — o listener de clique que
- * YouTubeFacade.astro já anexou continua valendo, agora apontando pro vídeo
- * novo. Por isso não há necessidade de re-executar nenhuma lógica de
- * consentimento aqui.
+ * A atualização troca dataset.src/title/linkDireto e a miniatura do MESMO
+ * <button> que já está na página, sem recriar o elemento — o listener de
+ * clique que YouTubeFacade.astro já anexou continua valendo, agora apontando
+ * pro vídeo novo. Por isso não há necessidade de re-executar nenhuma lógica
+ * de consentimento aqui.
  */
+
+const FALLBACK = {
+  videoId: "uuaYyN7v8H4",
+  title: "Como fazer um baú do tesouro com caixa de papelão | Passo a passo fácil",
+  start: 19,
+};
 
 interface Props {
   class?: string;
@@ -32,13 +38,18 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<div id="ultimo-video-canal" class="h-full w-full">
-  <YouTubeFacade
-    videoId="uuaYyN7v8H4"
-    title="Novo vídeo no canal Mundo Flavinha"
-    start={19}
-    class={className}
-  />
+<div id="ultimo-video-canal">
+  <div class:list={["relative overflow-hidden rounded-2xl bg-foreground/5 shadow-lg aspect-video", className]}>
+    <YouTubeFacade
+      videoId={FALLBACK.videoId}
+      title={FALLBACK.title}
+      start={FALLBACK.start}
+      class="h-full w-full"
+    />
+  </div>
+  <p data-titulo-destaque class="mt-4 text-center font-heading text-lg font-bold leading-snug text-foreground">
+    {FALLBACK.title}
+  </p>
 </div>
 
 <script>
@@ -47,7 +58,8 @@ const { class: className } = Astro.props;
   const raiz = document.getElementById("ultimo-video-canal");
   const botao = raiz?.querySelector<HTMLButtonElement>("[data-youtube-facade]");
   if (raiz && botao) {
-    const tituloVisivel = botao.querySelector<HTMLElement>("[data-titulo-facade]");
+    const miniatura = botao.querySelector<HTMLImageElement>("[data-thumb-facade]");
+    const tituloDestaque = raiz.querySelector<HTMLElement>("[data-titulo-destaque]");
     const linkDireto = raiz.querySelector<HTMLAnchorElement>("[data-link-direto-facade]");
 
     getChannelVideos()
@@ -64,7 +76,11 @@ const { class: className } = Astro.props;
         botao.dataset.title = ultimo.title;
         botao.dataset.linkDireto = urlDireta;
         botao.setAttribute("aria-label", `Assistir: ${ultimo.title}`);
-        if (tituloVisivel) tituloVisivel.textContent = ultimo.title;
+        // Miniatura pelo proxy do próprio domínio — ver a nota em
+        // YouTubeFacade.astro sobre por que não é i.ytimg.com direto. Se essa
+        // troca falhar, o handler onerror já embutido no <img> remove a tag.
+        if (miniatura) miniatura.src = `/api/thumb?id=${encodeURIComponent(ultimo.id)}`;
+        if (tituloDestaque) tituloDestaque.textContent = ultimo.title;
         if (linkDireto) linkDireto.href = urlDireta;
       })
       // Sem tratamento visível de erro de propósito: o fallback (vídeo

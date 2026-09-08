@@ -31,6 +31,15 @@ const params = new URLSearchParams({ autoplay: "1", rel: "0" });
 if (start) params.set("start", String(start));
 const src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
 const linkDireto = `https://www.youtube.com/watch?v=${videoId}${start ? `&t=${start}` : ""}`;
+
+/*
+ * Miniatura pelo NOSSO domínio (functions/api/thumb.ts), nunca i.ytimg.com
+ * direto — mesma razão do `/videos`: sem isso, abrir a home já baixaria uma
+ * imagem do Google antes de qualquer clique ou aceite. `loading="lazy"` não
+ * substitui isso; só adia o que está fora da tela, e este card está acima da
+ * dobra.
+ */
+const thumbnailUrl = `/api/thumb?id=${encodeURIComponent(videoId)}`;
 ---
 
 <button
@@ -41,18 +50,27 @@ const linkDireto = `https://www.youtube.com/watch?v=${videoId}${start ? `&t=${st
   data-classe-iframe={className}
   data-link-direto={linkDireto}
   aria-label={`Assistir: ${title}`}
-  class:list={[
-    "group relative flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-lilac/30 via-pink/25 to-baby-blue/30 transition-colors hover:from-lilac/40 hover:via-pink/35 hover:to-baby-blue/40",
-    className,
-  ]}
+  class:list={["group relative flex items-center justify-center overflow-hidden bg-foreground/10", className]}
 >
-  <span class="flex h-16 w-16 items-center justify-center rounded-full bg-card shadow-lg transition-transform group-hover:scale-110">
+  {/*
+    Se a miniatura falhar (proxy fora do ar, id inexistente), o <img> some sem
+    reservar espaço vazio — sobra o bg-foreground/10 do botão. Sem onerror
+    seria um quadrado quebrado por cima do play, pior que não ter miniatura.
+  */}
+  <img
+    data-thumb-facade
+    src={thumbnailUrl}
+    alt=""
+    width="1280"
+    height="720"
+    loading="lazy"
+    class="absolute inset-0 h-full w-full object-cover"
+    onerror="this.remove()"
+  />
+  <span class="absolute inset-0 bg-plum/35 transition-colors group-hover:bg-plum/45" aria-hidden="true"></span>
+  <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-card shadow-lg transition-transform group-hover:scale-110">
     <Icon name="lucide:play" class="ml-1 h-7 w-7 text-primary" />
   </span>
-  <span data-titulo-facade class="max-w-[80%] text-center font-heading text-sm font-bold text-foreground md:text-base">
-    {title}
-  </span>
-  <span class="text-xs text-foreground/60">Clique para assistir no YouTube</span>
 </button>
 
 <p data-aviso-consentimento hidden class="mt-2 text-center text-sm text-muted-foreground" role="status">
