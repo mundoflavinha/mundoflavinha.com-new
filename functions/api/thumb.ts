@@ -84,7 +84,12 @@ export const onRequestGet: PagesFunction = async ({ request }) => {
 
   const imagem = await buscarUpstream(id);
   if (!imagem) {
-    return json({ error: "Não foi possível carregar a miniatura." }, 502);
+    // 500, não 502 — a Cloudflare intercepta 502 na borda e troca o corpo
+    // pela página de erro genérica dela, mesmo quando a function respondeu
+    // certinho. Ver o comentário equivalente em functions/api/videos.ts, onde
+    // isso escondeu "API key not valid" atrás de um "Bad gateway" sem detalhe
+    // nenhum por dias.
+    return json({ error: "Não foi possível carregar a miniatura." }, 500);
   }
 
   // Miniatura de vídeo publicado praticamente não muda. Cache longo na CDN faz

@@ -44,6 +44,14 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     return json(data, 200, { "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600" });
   } catch (err) {
     console.error("falha ao buscar vídeos do YouTube", err);
-    return json({ error: "Não foi possível carregar os vídeos." }, 502);
+    /*
+     * 500, não 502. A Cloudflare intercepta 502/504/522/523/525/526 na
+     * própria borda e SUBSTITUI o corpo da resposta pela página de erro
+     * genérica dela — mesmo quando a function respondeu certinho, com JSON e
+     * tudo. Foi exatamente isso que escondeu "API key not valid" atrás de um
+     * "Bad gateway" sem detalhe nenhum: só apareceu no log ao vivo da
+     * function, nunca na resposta que o navegador via. 500 passa direto.
+     */
+    return json({ error: "Não foi possível carregar os vídeos." }, 500);
   }
 };
