@@ -5,7 +5,7 @@ import Button from "@/components/Button.astro";
 import BotaoMaterial from "@/components/BotaoMaterial.astro";
 import LeadModal from "@/components/LeadModal.astro";
 import Newsletter from "@/components/Newsletter.astro";
-import YouTubeFacade from "@/components/YouTubeFacade.astro";
+import UltimoVideoCanal from "@/components/UltimoVideoCanal.astro";
 import { Icon } from "astro-icon/components";
 import { WHATSAPP } from "@/lib/site";
 import { organizationJsonLd } from "@/lib/seoJsonLd";
@@ -131,12 +131,7 @@ const posts = [
       />
       <div class="max-w-3xl mx-auto">
         <div class="relative rounded-2xl overflow-hidden shadow-lg bg-foreground/5 aspect-video">
-          <YouTubeFacade
-            videoId="uuaYyN7v8H4"
-            title="Novo vídeo no canal Mundo Flavinha"
-            start={19}
-            class="h-full w-full"
-          />
+          <UltimoVideoCanal class="h-full w-full" />
         </div>
         <div class="mt-6 flex flex-wrap justify-center gap-3">
           <Button

@@ -3,6 +3,7 @@ import { AlertCircle, ArrowRight, Calendar, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ChannelVideo, ChannelVideosResult } from "@/lib/youtube";
+import { getChannelVideos } from "@/lib/youtube";
 import { pedirMidiaExterna, podeCarregarMidiaExterna } from "@/lib/consentimentoMidia";
 
 /**
@@ -30,43 +31,17 @@ const formatarData = (valor: string) => {
   return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(data);
 };
 
-/** IDs do YouTube são 11 caracteres de base64url. */
-const ID_VALIDO = /^[A-Za-z0-9_-]{11}$/;
-
 /**
  * O `embedUrl` e o `thumbnailUrl` são DERIVADOS do id, nunca lidos da resposta.
  *
  * A versão anterior aceitava `embedUrl` como veio da API, exigindo apenas que
  * fosse string. Uma resposta comprometida — ou um bug no fetcher — colocaria um
  * iframe de host arbitrário dentro da página, com a credibilidade do nosso
- * domínio. O id passa por um formato estreito e o resto é montado aqui.
+ * domínio. O id passa pela validação de `getChannelVideos` (formato estreito
+ * de 11 caracteres) e o resto é montado aqui.
  */
 const urlDoEmbed = (id: string) => `https://www.youtube-nocookie.com/embed/${id}`;
 const urlDaMiniatura = (id: string) => `/api/thumb?id=${encodeURIComponent(id)}`;
-
-const ehVideo = (valor: unknown): valor is ChannelVideo => {
-  if (typeof valor !== "object" || valor === null) return false;
-  const v = valor as Record<string, unknown>;
-  return (
-    typeof v.id === "string" &&
-    ID_VALIDO.test(v.id) &&
-    typeof v.title === "string" &&
-    typeof v.publishedAt === "string" &&
-    Array.isArray(v.categories) &&
-    v.categories.every((c) => typeof c === "string")
-  );
-};
-
-const ehResposta = (valor: unknown): valor is ChannelVideosResult => {
-  if (typeof valor !== "object" || valor === null) return false;
-  const v = valor as Record<string, unknown>;
-  return (
-    Array.isArray(v.videos) &&
-    v.videos.every(ehVideo) &&
-    Array.isArray(v.categories) &&
-    v.categories.every((c) => typeof c === "string")
-  );
-};
 
 const Esqueleto = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -95,13 +70,7 @@ const GaleriaVideos = () => {
   useEffect(() => {
     const controle = new AbortController();
 
-    fetch("/api/videos", { signal: controle.signal })
-      .then(async (resposta) => {
-        if (!resposta.ok) throw new Error("Não foi possível carregar os vídeos do YouTube.");
-        const json: unknown = await resposta.json();
-        if (!ehResposta(json)) throw new Error("A resposta do servidor veio em formato inesperado.");
-        return json;
-      })
+    getChannelVideos(controle.signal)
       .then((json) => {
         setDados(json);
         setCarregando(false);

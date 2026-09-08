@@ -1,0 +1,76 @@
+---
+import YouTubeFacade from "./YouTubeFacade.astro";
+
+/**
+ * Facade do YouTube que se atualiza para o vídeo MAIS RECENTE do canal.
+ *
+ * O `videoId`/`title`/`start` abaixo não são o vídeo dinâmico — são o
+ * FALLBACK: o que aparece sem JavaScript, para crawler, e enquanto (ou se) a
+ * busca do último vídeo falha. Prático mantê-lo um vídeo real e já publicado,
+ * em vez de um placeholder, porque o `<script>` abaixo só troca o conteúdo se
+ * conseguir algo melhor — nunca troca por um estado vazio.
+ *
+ * Por que não virou ilha React: o resto desta página não hidrata nada além do
+ * botão de captura de lead (`LeadModal`), e replicar aqui o mesmo fetch +
+ * validação que `getChannelVideos` já faz — só que via `<script>` puro, como
+ * o próprio `YouTubeFacade.astro` já faz para o clique — evita adicionar um
+ * segundo caminho de consentimento (ver comentário em consentimentoMidia.ts:
+ * o design é para EXATAMENTE dois lugares montarem um player, o facade
+ * estático e o diálogo da galeria).
+ *
+ * A atualização troca dataset.src/title/linkDireto do MESMO <button> que já
+ * está na página, sem recriar o elemento — o listener de clique que
+ * YouTubeFacade.astro já anexou continua valendo, agora apontando pro vídeo
+ * novo. Por isso não há necessidade de re-executar nenhuma lógica de
+ * consentimento aqui.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div id="ultimo-video-canal" class="h-full w-full">
+  <YouTubeFacade
+    videoId="uuaYyN7v8H4"
+    title="Novo vídeo no canal Mundo Flavinha"
+    start={19}
+    class={className}
+  />
+</div>
+
+<script>
+  import { getChannelVideos } from "@/lib/youtube";
+
+  const raiz = document.getElementById("ultimo-video-canal");
+  const botao = raiz?.querySelector<HTMLButtonElement>("[data-youtube-facade]");
+  if (raiz && botao) {
+    const tituloVisivel = botao.querySelector<HTMLElement>("[data-titulo-facade]");
+    const linkDireto = raiz.querySelector<HTMLAnchorElement>("[data-link-direto-facade]");
+
+    getChannelVideos()
+      .then(({ videos }) => {
+        // `videos` já vem ordenado do mais novo pro mais antigo
+        // (fetchChannelVideos ordena por publishedAt desc).
+        const ultimo = videos[0];
+        if (!ultimo) return;
+
+        const src = `https://www.youtube-nocookie.com/embed/${ultimo.id}?autoplay=1&rel=0`;
+        const urlDireta = `https://www.youtube.com/watch?v=${ultimo.id}`;
+
+        botao.dataset.src = src;
+        botao.dataset.title = ultimo.title;
+        botao.dataset.linkDireto = urlDireta;
+        botao.setAttribute("aria-label", `Assistir: ${ultimo.title}`);
+        if (tituloVisivel) tituloVisivel.textContent = ultimo.title;
+        if (linkDireto) linkDireto.href = urlDireta;
+      })
+      // Sem tratamento visível de erro de propósito: o fallback (vídeo
+      // estático, já publicado) continua na tela. Um card de erro aqui
+      // trocaria "vídeo bom, um pouco antigo" por "seção quebrada" — a
+      // troca errada para uma vitrine que a maioria das visitas nem clica.
+      .catch((causa) => console.error("não foi possível atualizar o último vídeo do canal", causa));
+  }
+</script>

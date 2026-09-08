@@ -70,6 +70,8 @@ YOUTUBE_MAX_RESULTS=
 
 A página de vídeos usa as playlists do canal como categorias. Deixe `YOUTUBE_MAX_RESULTS` vazio para carregar todos os vídeos enviados pelo canal.
 
+A home também consome `/api/videos`: a seção "Novo vídeo no canal" (`UltimoVideoCanal.astro`) busca a lista no navegador e troca o vídeo do facade estático pelo primeiro item (o mais recente — a lista já vem ordenada). Sem JS, com a busca falhando, ou em `astro dev` (onde `/api/videos` não existe), fica o vídeo fixo definido no componente como fallback.
+
 A resposta de `/api/videos` fica em cache por 30 min na CDN da Cloudflare (`Cache-Control: s-maxage=1800`) — a maioria das visitas nem chega a chamar o YouTube, o que reduz o consumo de cota da API. As miniaturas passam por `/api/thumb` (proxy pelo próprio domínio) — o navegador nunca contata o Google diretamente para carregar `/videos`, só quando a pessoa autoriza conteúdo externo no banner de cookies e clica para assistir.
 
 ## Captura de leads (Neon)

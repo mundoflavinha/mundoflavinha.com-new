@@ -49,7 +49,7 @@ const linkDireto = `https://www.youtube.com/watch?v=${videoId}${start ? `&t=${st
   <span class="flex h-16 w-16 items-center justify-center rounded-full bg-card shadow-lg transition-transform group-hover:scale-110">
     <Icon name="lucide:play" class="ml-1 h-7 w-7 text-primary" />
   </span>
-  <span class="max-w-[80%] text-center font-heading text-sm font-bold text-foreground md:text-base">
+  <span data-titulo-facade class="max-w-[80%] text-center font-heading text-sm font-bold text-foreground md:text-base">
     {title}
   </span>
   <span class="text-xs text-foreground/60">Clique para assistir no YouTube</span>
@@ -57,7 +57,7 @@ const linkDireto = `https://www.youtube.com/watch?v=${videoId}${start ? `&t=${st
 
 <p data-aviso-consentimento hidden class="mt-2 text-center text-sm text-muted-foreground" role="status">
   Não foi possível abrir as preferências de cookies neste navegador.
-  <a class="text-primary underline underline-offset-2" href={linkDireto} target="_blank" rel="noopener noreferrer">
+  <a data-link-direto-facade class="text-primary underline underline-offset-2" href={linkDireto} target="_blank" rel="noopener noreferrer">
     Assistir direto no YouTube
   </a>.
 </p>
