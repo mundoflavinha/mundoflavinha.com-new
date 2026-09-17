@@ -213,3 +213,69 @@ describe.skipIf(arquivos.length === 0)("regras específicas", () => {
     ).toBe(true);
   });
 });
+
+/*
+ * Bloqueio prévio em TODOS os modos de tagging. `npm run build:e2e` gera
+ * dist/ (direct), dist-gtm/ e dist-disabled/; com `npm run build` simples só
+ * dist/ existe e só ele é checado.
+ *
+ * Nenhum modo pode ter tag de vendor no HTML: a injeção é por JavaScript,
+ * depois do consentimento. Se alguma destas strings aparecer, o container ou o
+ * Pixel voltou a ser hardcoded e carrega antes de qualquer escolha.
+ */
+const PROIBIDAS_NO_HTML = [
+  "googletagmanager.com/gtm.js",
+  "googletagmanager.com/gtag/js",
+  "gtm.js?id=",
+  "googletagmanager.com/ns.html",
+  "connect.facebook.net",
+  "fbevents.js",
+];
+
+const buildsDeTagging = ["dist", "dist-gtm", "dist-disabled"]
+  .map((dir) => join(process.cwd(), dir))
+  .filter((dir) => existsSync(dir))
+  .flatMap((dir) => paginas(dir).map((f) => ({ build: relative(process.cwd(), dir), rota: "/" + relative(dir, f).split(sep).join("/"), arquivo: f })));
+
+describe.skipIf(buildsDeTagging.length === 0)("bloqueio prévio: nenhuma tag de terceiro no HTML", () => {
+  it.each(buildsDeTagging.map((b) => [b.build, b.rota, b.arquivo]))("%s%s não carrega tag de vendor", (_b, _r, arquivo) => {
+    const html = readFileSync(arquivo as string, "utf-8");
+    for (const proibida of PROIBIDAS_NO_HTML) expect(html).not.toContain(proibida);
+    expect(html).not.toMatch(/GTM-[A-Z0-9]{4,}/);
+  });
+});
+
+describe.skipIf(arquivos.length === 0)("defaults do Consent Mode", () => {
+  it.each(conteudosGlobais.map((c) => c.rota))("%s declara os defaults negados", (rota) => {
+    const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
+    expect(html).toContain("ad_storage");
+    expect(html).toMatch(/ad_storage:\s*"denied"/);
+    expect(html).toMatch(/analytics_storage:\s*"denied"/);
+    expect(html).toMatch(/ad_personalization:\s*"denied"/);
+  });
+
+  it.each(conteudosGlobais.map((c) => c.rota))("%s põe os defaults antes do </head>", (rota) => {
+    const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
+    const defaults = html.indexOf("ad_storage");
+    const fimDoHead = html.indexOf("</head>");
+    expect(defaults).toBeGreaterThan(-1);
+    expect(defaults).toBeLessThan(fimDoHead);
+  });
+
+  it.each(conteudosGlobais.map((c) => c.rota))("%s mantém o charset nos primeiros 1024 bytes", (rota) => {
+    const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
+    // O script do Consent Mode tem mais de 1 KB. Se alguém o mover para antes
+    // do charset, a especificação deixa de ser atendida e o navegador volta a
+    // adivinhar a codificação — todo acento da página quebra.
+    const charset = Buffer.from(html, "utf-8").indexOf(Buffer.from("charset", "utf-8"));
+    expect(charset).toBeGreaterThan(-1);
+    expect(charset).toBeLessThan(1024);
+  });
+});
+
+describe.skipIf(arquivos.length === 0)("revogar é tão fácil quanto aceitar", () => {
+  it.each(conteudosGlobais.map((c) => c.rota))("%s tem gatilho de preferências no rodapé", (rota) => {
+    const { html } = conteudosGlobais.find((c) => c.rota === rota)!;
+    expect(html).toMatch(/data-abrir-preferencias/);
+  });
+});

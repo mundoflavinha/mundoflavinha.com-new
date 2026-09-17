@@ -105,12 +105,16 @@ const secoes: SecaoLegal[] = [
     <LegalList>
       <li>Não pedimos CPF, RG, endereço residencial nem dados bancários</li>
       <li>Não coletamos nome, idade exata, data de nascimento, foto ou escola de nenhuma criança</li>
-      <li>Não usamos pixels de publicidade nem rastreadores de comportamento entre sites</li>
+      <li>Não usamos rastreadores que sigam você por outros sites por conta própria</li>
       <li>
         Usamos o Google Analytics para contagem agregada de acessos, e só se você aceitar. Enquanto não aceitar,
         nada dele é carregado
       </li>
-      <li>Não usamos esses números para identificar você individualmente nem para direcionar anúncios</li>
+      <li>
+        Usamos o Meta Pixel para medir nossos anúncios no Facebook e no Instagram, e só se você aceitar essa categoria
+        especificamente. Enquanto não aceitar, nada dele é carregado. Aceitar as estatísticas não liga o pixel
+      </li>
+      <li>Não usamos os números do Analytics para identificar você individualmente</li>
     </LegalList>
   </LegalSection>
 
@@ -211,15 +215,16 @@ const secoes: SecaoLegal[] = [
 
   <LegalSection id="cookies" title="Cookies e tecnologias semelhantes" numero={7}>
     <LegalP>
-      Cookies são pequenos arquivos que um site guarda no seu navegador. Nosso uso hoje é bastante limitado:
+      Cookies são pequenos arquivos que um site guarda no seu navegador. Nada além do necessário é carregado antes de
+      você escolher — nem as ferramentas de medição, nem as de publicidade:
     </LegalP>
     <LegalTable headers={["Categoria", "Usamos?", "Detalhe"]}>
       <LegalRow>
         <LegalCell>Necessários</LegalCell>
         <LegalCell>Sim, um</LegalCell>
         <LegalCell>
-          <strong class="text-foreground">cc_cookie</strong>, do próprio site, guarda apenas a sua escolha nesta
-          tabela por 6 meses. Sem ele, perguntaríamos de novo a cada página.
+          <strong class="text-foreground">mundoflavinha_cookie_consent</strong>, do próprio site, guarda apenas a sua
+          escolha nesta tabela por 12 meses. Sem ele, perguntaríamos de novo a cada página.
         </LegalCell>
       </LegalRow>
       <LegalRow>
@@ -247,8 +252,14 @@ const secoes: SecaoLegal[] = [
       </LegalRow>
       <LegalRow>
         <LegalCell>Publicidade / marketing</LegalCell>
-        <LegalCell>Não</LegalCell>
-        <LegalCell>Não usamos pixel do Meta, do TikTok nem de qualquer rede</LegalCell>
+        <LegalCell>Só com sua autorização</LegalCell>
+        <LegalCell>
+          Meta Pixel (<strong class="text-foreground">_fbp</strong> e <strong class="text-foreground">_fbc</strong>, até
+          3 meses), para medir os resultados dos nossos anúncios no Facebook e no Instagram e mostrar conteúdo nosso a
+          quem já visitou o site. É uma categoria separada das estatísticas: aceitar uma não aceita a outra. O pixel só
+          é carregado depois do seu aceite — antes disso a Meta não é contatada. Ao recusar ou revogar, esses cookies
+          são apagados e paramos de enviar dados. Não usamos pixel do TikTok nem de qualquer outra rede.
+        </LegalCell>
       </LegalRow>
     </LegalTable>
     <LegalSubtitle>Fontes e aparência</LegalSubtitle>

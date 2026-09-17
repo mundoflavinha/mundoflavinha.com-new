@@ -47,8 +47,22 @@ export type CategoriaCookie = {
  * quando o Google Analytics entrar. O CookieConsent compara com o que está
  * gravado e mostra o banner de novo: uma escolha feita sobre um conjunto antigo
  * de categorias não vale como escolha sobre um conjunto novo.
+ *
+ * 2 → 3: entrou a categoria "Publicidade" (Meta Pixel). Quem escolheu sobre
+ * três categorias não escolheu sobre quatro — reaproveitar aquele aceite seria
+ * inventar um consentimento que ninguém deu, ainda mais para a finalidade que
+ * mais exige escolha informada.
  */
-export const REVISAO_COOKIES = 2;
+export const REVISAO_COOKIES = 3;
+
+/**
+ * Nome do cookie do CMP. Constante porque quatro lugares precisam concordar:
+ * a configuração do CookieConsent, a tabela da Política (gerada do catálogo
+ * abaixo), a leitura server-side em `api/lead.ts` e os testes. Divergir aqui
+ * faz a Política declarar um cookie que não existe e o servidor ler consentimento
+ * de um cookie que nunca vai encontrar — ou seja, negar tudo, em silêncio.
+ */
+export const NOME_DO_COOKIE_DE_CONSENTIMENTO = "mundoflavinha_cookie_consent";
 
 export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
   {
@@ -59,10 +73,11 @@ export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
     obrigatoria: true,
     cookies: [
       {
-        nome: "cc_cookie",
+        nome: NOME_DO_COOKIE_DE_CONSENTIMENTO,
         fornecedor: "Mundo Flavinha (primeira parte)",
         finalidade: "Guarda quais categorias você aceitou ou recusou",
-        duracao: "6 meses",
+        // Bate com `expiresAfterDays: 365` em ConsentimentoCookies.astro.
+        duracao: "12 meses",
       },
     ],
   },
@@ -79,6 +94,23 @@ export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
         fornecedor: "Google Analytics",
         finalidade: "Distinguir visitantes e sessões para contagem agregada de acessos",
         duracao: "Até 2 anos",
+      },
+    ],
+  },
+  {
+    id: "marketing",
+    titulo: "Publicidade",
+    descricao:
+      "Permitem medir os resultados dos nossos anúncios na Meta (Facebook e Instagram) e mostrar conteúdo nosso para quem já visitou o site. Recusar não muda nada no que você vê aqui — só deixa de nos dizer se o anúncio funcionou.",
+    obrigatoria: false,
+    cookies: [
+      {
+        nome: "_fbp, _fbc",
+        padrao: /^_fb/,
+        fornecedor: "Meta Platforms (Facebook, Instagram)",
+        finalidade:
+          "Identificar o navegador para medir conversões de anúncios e formar público de remarketing",
+        duracao: "Até 3 meses",
       },
     ],
   },
@@ -103,3 +135,4 @@ export const CATEGORIAS_COOKIES: CategoriaCookie[] = [
 export const SERVICO_YOUTUBE = "youtube";
 export const CATEGORIA_MIDIA_EXTERNA = "external_media";
 export const CATEGORIA_ESTATISTICAS = "analytics";
+export const CATEGORIA_PUBLICIDADE = "marketing";

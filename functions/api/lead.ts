@@ -10,7 +10,14 @@ import {
   // ERR_MODULE_NOT_FOUND (é o arquivo compilado .js que existe em runtime,
   // mesmo a fonte sendo .ts — convenção padrão de projeto ESM/NodeNext).
 } from "../../src/lib/consent.js";
-import { payloadSchema, legacySchema } from "../../src/lib/leadSchema.js";
+import {
+  caiuNoSucessoFalso,
+  honeypotPreenchido,
+  legacySchema,
+  payloadSchema,
+  podeSerLegado,
+} from "../../src/lib/leadSchema.js";
+import { atribuicaoPermitida, type AtribuicaoParaGravar } from "../../src/lib/atribuicao/servidor.js";
 
 interface Env {
   DATABASE_URL: string;
@@ -29,9 +36,6 @@ type Sql = NeonQueryFunction<false, false>;
 const JANELA_SEGUNDOS = 600; // 10 min
 const LIMITE_POR_IP = 8;
 const LIMITE_POR_EMAIL = 3;
-
-const MIN_PREENCHIMENTO_MS = 2_000;
-const MAX_PREENCHIMENTO_MS = 12 * 60 * 60 * 1000;
 
 type EventoConsentimento = { finalidade: Finalidade; acao: AcaoConsentimento; texto: string };
 
@@ -230,6 +234,45 @@ async function gravar(
   `;
 }
 
+/**
+ * Atribuição gravada em statement SEPARADO do lead, de propósito.
+ *
+ * Não é atômico com o cadastro, e é essa a escolha: atribuição é metadado.
+ * Se falhar — inclusive por schema desatualizado (tabela ausente) — o lead já
+ * foi gravado e a pessoa recebe o material. Perder a origem de um lead é
+ * ruim; perder o lead por causa da origem é pior.
+ *
+ * Schema incompatível NÃO deveria chegar aqui: o build de produção verifica
+ * `schema_migrations` antes de publicar (scripts/verificar-schema.mjs). Este
+ * catch é a segunda linha, e o prefixo do log existe para ser buscado.
+ */
+async function gravarAtribuicao(sql: Sql, email: string, origem: string, atribuicao: AtribuicaoParaGravar) {
+  try {
+    await sql`
+      insert into lead_attributions (
+        contact_id, origem,
+        utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+        identificadores_midia,
+        preferencia_revisao, preferencia_categorias, preferencia_registrada_em
+      )
+      select
+        c.id, ${origem},
+        ${atribuicao.campanha?.utmSource ?? null}, ${atribuicao.campanha?.utmMedium ?? null},
+        ${atribuicao.campanha?.utmCampaign ?? null}, ${atribuicao.campanha?.utmContent ?? null},
+        ${atribuicao.campanha?.utmTerm ?? null},
+        ${atribuicao.identificadoresDeMidia ? JSON.stringify(atribuicao.identificadoresDeMidia) : null}::jsonb,
+        ${atribuicao.preferencia.revisao}, ${JSON.stringify(atribuicao.preferencia.categorias)}::jsonb,
+        ${atribuicao.preferencia.registradaEm}::timestamptz
+      from contacts c where c.email = ${email}
+    `;
+  } catch (err) {
+    const codigo = (err as { code?: string }).code;
+    // 42P01 undefined_table / 42703 undefined_column: código mais novo que o banco.
+    const prefixo = codigo === "42P01" || codigo === "42703" ? "[schema-incompativel]" : "[atribuicao]";
+    console.error(`${prefixo} falha ao gravar atribuição; lead preservado`, err);
+  }
+}
+
 export const onRequest: PagesFunction<Env> = async (context) => {
   if (context.request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405, { Allow: "POST" });
@@ -264,9 +307,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   const pepper = env.THROTTLE_PEPPER ?? "mundoflavinha-sem-pepper";
 
+  // Antes de QUALQUER schema. Antes disto, `hp` preenchido reprovava o schema
+  // atual (max(0)) e caía no legado — que ignora `hp` — e o bot era GRAVADO
+  // com um evento de consentimento de e-mail marketing fabricado.
+  if (honeypotPreenchido(body)) return sucessoSilencioso();
+
   const parsed = payloadSchema.safeParse(body);
 
   if (!parsed.success) {
+    // Payload do formulário atual que falhou validação é inválido, não legado.
+    if (!podeSerLegado(body)) return json({ error: "Dados inválidos" }, 400);
     const legacy = legacySchema.safeParse(body);
     if (!legacy.success) {
       return json({ error: "Dados inválidos" }, 400);
@@ -278,12 +328,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   // Honeypot preenchido ou preenchimento rápido/velho demais: sucesso falso.
   if (data.hp) return sucessoSilencioso();
-  if (
-    data.elapsedMs !== undefined &&
-    (data.elapsedMs < MIN_PREENCHIMENTO_MS || data.elapsedMs > MAX_PREENCHIMENTO_MS)
-  ) {
-    return sucessoSilencioso();
-  }
+  // Mesmo predicado que leadApi.ts usa para decidir se emite o evento de
+  // conversão — importado, não recopiado.
+  if (caiuNoSucessoFalso(data.elapsedMs)) return sucessoSilencioso();
 
   const textos = getConsentTexts(data.consentVersion);
   if (!textos) {
@@ -340,6 +387,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       ip,
       userAgent,
     });
+
+    const atribuicao = atribuicaoPermitida(request.headers.get("cookie"), data);
+    if (atribuicao) await gravarAtribuicao(sql, data.email, data.origem, atribuicao);
 
     await purgarThrottleEventualmente(sql);
     return json({ ok: true }, 201);

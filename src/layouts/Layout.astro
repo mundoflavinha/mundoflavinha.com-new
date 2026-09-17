@@ -3,7 +3,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import WhatsAppButton from "@/components/WhatsAppButton.astro";
 import ConsentimentoCookies from "@/components/ConsentimentoCookies.astro";
-import GoogleAnalytics from "@/components/GoogleAnalytics.astro";
+import ConsentModeDefaults from "@/components/ConsentModeDefaults.astro";
 import "@/styles/global.css";
 
 /**
@@ -51,7 +51,23 @@ const imagemOg = new URL(image ?? "/og-default.webp", Astro.site).href;
 <!doctype html>
 <html lang="pt-BR">
   <head>
+    {/*
+      `charset` tem que ser a PRIMEIRA coisa do <head>, e não é preferência:
+      a especificação exige que ela apareça nos primeiros 1024 bytes do
+      documento. O script do Consent Mode abaixo tem mais de 1 KB — colocá-lo
+      antes empurraria a declaração para fora da janela e o navegador voltaria
+      a adivinhar a codificação, quebrando todo acento da página.
+    */}
     <meta charset="UTF-8" />
+
+    {/*
+      Logo em seguida, antes de qualquer outra coisa: os defaults do Consent
+      Mode precisam existir antes de tudo que possa puxar tag do Google. Nada
+      entre o charset e este bloco pode carregar script. Ver o componente — a
+      posição é a funcionalidade, e há teste de posição em html.test.ts.
+    */}
+    <ConsentModeDefaults />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
@@ -74,12 +90,6 @@ const imagemOg = new URL(image ?? "/og-default.webp", Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
 
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
-
-    {/*
-      No Layout, e não no slot de cada rota: centralizar impede que uma página
-      insira sua própria tag do Google fora do bloqueio.
-    */}
-    <GoogleAnalytics />
 
     <slot name="head" />
   </head>

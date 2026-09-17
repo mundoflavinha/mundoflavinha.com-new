@@ -35,18 +35,17 @@ jobs:
       - name: Testes
         run: npm test
 
-      # PUBLIC_GA_ID aqui, não só no passo de e2e: antes cada um rodava seu
-      # PRÓPRIO build — este passo sem a variável, e o webServer do Playwright
-      # reconstruindo com ela (definida só no env daquele step). Resultado: dois
-      # dist/ diferentes, e "Testes sobre o HTML gerado" nunca via as tags do
-      # Analytics. Com um build só, os dois validam exatamente o mesmo artefato,
-      # e é este `dist/` que o webServer do Playwright serve (não reconstrói —
-      # ver playwright.config.ts). O valor é público (aparece no HTML de
-      # qualquer site com GA), então não é segredo de CI.
-      - name: Build
-        run: npm run build
-        env:
-          PUBLIC_GA_ID: G-452LR8P42T
+      # Um build por modo de tagging (direct → dist/, gtm → dist-gtm/,
+      # disabled → dist-disabled/), com ids de TESTE definidos em
+      # e2e/ambientes.mjs — fonte única, usada também pelos specs. Nenhuma
+      # variável de tagging é declarada aqui: foi assim que o measurement ID de
+      # PRODUÇÃO entrou no CI e cada execução de e2e gerava pageviews reais.
+      # src/test/tagging.test.ts falha se isso voltar.
+      #
+      # Build único antes de test:html e e2e: os dois validam os MESMOS
+      # artefatos, e o webServer do Playwright só serve (não reconstrói).
+      - name: Build (um por modo de tagging)
+        run: npm run build:e2e
 
       # Depende do build: estas asserções leem o HTML realmente gerado em dist/.
       - name: Testes sobre o HTML gerado

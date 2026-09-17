@@ -1,5 +1,5 @@
 import { dispensarBannerDeCookies } from "./apoio";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
  * Nenhuma página pode rolar na horizontal.

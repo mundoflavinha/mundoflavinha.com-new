@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, ArrowRight, Calendar, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ChannelVideo, ChannelVideosResult } from "@/lib/youtube";
 import { getChannelVideos } from "@/lib/youtube";
 import { pedirMidiaExterna, podeCarregarMidiaExterna } from "@/lib/consentimentoMidia";
+import { acompanharVideoDoYouTube, urlComApiDeMensagens } from "@/lib/video/rastreioYouTube";
 
 /**
  * Ilha da galeria de /videos. O resto da página (banner, <head>) é estático.
@@ -66,6 +67,19 @@ const GaleriaVideos = () => {
   const [videoSelecionado, setVideoSelecionado] = useState<ChannelVideo | null>(null);
   const acionador = useRef<HTMLElement | null>(null);
   const conteudo = useRef<HTMLDivElement>(null);
+  const pararRastreio = useRef<(() => void) | null>(null);
+
+  // Callback ref estável por vídeo: um ref inline seria recriado a cada render
+  // e reiniciaria o rastreio — o mesmo vídeo emitiria `video_started` de novo.
+  const idDoVideo = videoSelecionado?.id;
+  const tituloDoVideo = videoSelecionado?.title;
+  const aoMontarPlayer = useCallback(
+    (iframe: HTMLIFrameElement | null) => {
+      pararRastreio.current?.();
+      pararRastreio.current = iframe && idDoVideo ? acompanharVideoDoYouTube(iframe, { videoId: idDoVideo, titulo: tituloDoVideo ?? "" }) : null;
+    },
+    [idDoVideo, tituloDoVideo],
+  );
 
   useEffect(() => {
     const controle = new AbortController();
@@ -228,7 +242,8 @@ const GaleriaVideos = () => {
                     src/lib/youtubeFetcher.ts. */}
                 <iframe
                   key={videoSelecionado.id}
-                  src={`${urlDoEmbed(videoSelecionado.id)}?autoplay=1&rel=0`}
+                  ref={aoMontarPlayer}
+                  src={urlComApiDeMensagens(`${urlDoEmbed(videoSelecionado.id)}?autoplay=1&rel=0`)}
                   title={videoSelecionado.title}
                   className="h-full w-full"
                   allow="autoplay; encrypted-media; picture-in-picture"

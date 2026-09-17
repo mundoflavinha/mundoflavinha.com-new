@@ -46,6 +46,7 @@ const thumbnailUrl = `/api/thumb?id=${encodeURIComponent(videoId)}`;
   type="button"
   data-youtube-facade
   data-src={src}
+  data-video-id={videoId}
   data-title={title}
   data-classe-iframe={className}
   data-link-direto={linkDireto}
@@ -83,10 +84,13 @@ const thumbnailUrl = `/api/thumb?id=${encodeURIComponent(videoId)}`;
 <script>
   import { CATEGORIA_MIDIA_EXTERNA } from "@/lib/cookies";
   import { podeCarregarMidiaExterna, pedirMidiaExterna } from "@/lib/consentimentoMidia";
+  import { acompanharVideoDoYouTube, urlComApiDeMensagens } from "@/lib/video/rastreioYouTube";
 
   const montarPlayer = (botao: HTMLElement) => {
     const iframe = document.createElement("iframe");
-    iframe.src = botao.dataset.src ?? "";
+    // `enablejsapi` + `origin` só no navegador: o player precisa deles para
+    // reportar estado (início, progresso, fim) — ver rastreioYouTube.ts.
+    iframe.src = urlComApiDeMensagens(botao.dataset.src ?? "");
     iframe.title = botao.dataset.title ?? "";
     // Só as classes de dimensão, como no React original: o gradiente e o
     // layout de centralização eram do botão, não do player.
@@ -94,6 +98,7 @@ const thumbnailUrl = `/api/thumb?id=${encodeURIComponent(videoId)}`;
     iframe.allow = "autoplay; encrypted-media; picture-in-picture";
     iframe.allowFullscreen = true;
     botao.replaceWith(iframe);
+    acompanharVideoDoYouTube(iframe, { videoId: botao.dataset.videoId ?? "", titulo: botao.dataset.title ?? "" });
   };
 
   document.querySelectorAll<HTMLButtonElement>("[data-youtube-facade]").forEach((botao) => {

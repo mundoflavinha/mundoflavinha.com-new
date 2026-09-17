@@ -1,5 +1,6 @@
 import { dispensarBannerDeCookies } from "./apoio";
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
  * A ponte entre os gatilhos estáticos e a ilha do modal.

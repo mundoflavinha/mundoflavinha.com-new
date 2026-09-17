@@ -9,6 +9,8 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-gtm
+dist-disabled
 
 # Reinclui public/ explicitamente. O ~/.gitignore_global desta máquina tem uma
 # regra `public` que excluía a pasta INTEIRA — e o .gitignore do repositório tem

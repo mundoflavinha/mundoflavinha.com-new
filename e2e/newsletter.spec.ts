@@ -1,5 +1,5 @@
 import { dispensarBannerDeCookies } from "./apoio";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
  * A janela entre "o HTML do formulário já está na página" e "o React já
