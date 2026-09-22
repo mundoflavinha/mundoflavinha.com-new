@@ -17,8 +17,29 @@
 <script>
   import "vanilla-cookieconsent/dist/cookieconsent.css";
   import * as CookieConsent from "vanilla-cookieconsent";
-  import { CATEGORIAS_COOKIES, REVISAO_COOKIES } from "@/lib/cookies";
+  import { CATEGORIAS_COOKIES, NOME_DO_COOKIE_DE_CONSENTIMENTO, REVISAO_COOKIES } from "@/lib/cookies";
   import { ROTAS_LEGAIS } from "@/lib/site";
+  import { initConsent } from "@/lib/tagging";
+  import { DOMINIO_DO_COOKIE } from "@/lib/tagging/config";
+
+  /*
+   * `enableMarketing: true` porque o site é uma superfície só, pública, sem
+   * área logada. O dia em que existir uma (app., painel.), ela chama
+   * `initConsent({ enableMarketing: false })` — o cookie de consentimento é
+   * compartilhável entre subdomínios, e sem esse flag quem aceitasse
+   * publicidade aqui levaria o Pixel para dentro de uma tela com dado pessoal.
+   *
+   * Com PUBLIC_TAGGING_MODE=disabled os handlers existem mas o adaptador é
+   * no-op: o banner continua funcionando (o YouTube depende dele).
+   */
+  const tags = initConsent({ enableMarketing: true });
+
+  // O cookie do CMP mudou de nome (cc_cookie → NOME_DO_COOKIE_DE_CONSENTIMENTO)
+  // junto com a revisão 3. O antigo não vale mais como escolha e ficaria órfão
+  // no navegador de quem visitou antes; apagar é só limpeza do que o próprio
+  // site gravou.
+  document.cookie = `cc_cookie=; Max-Age=0; path=/; domain=${window.location.hostname}`;
+  document.cookie = "cc_cookie=; Max-Age=0; path=/";
 
   const categorias = Object.fromEntries(
     CATEGORIAS_COOKIES.map((c) => {
@@ -44,6 +65,22 @@
     // declarado aqui de propósito — silêncio não é consentimento.
     mode: "opt-in",
     revision: REVISAO_COOKIES,
+
+    cookie: {
+      name: NOME_DO_COOKIE_DE_CONSENTIMENTO,
+      // Vazio = hostname atual. Só vira `.mundoflavinha.com` se um dia houver
+      // subdomínio que deva herdar a escolha; em dev tem que ficar vazio,
+      // senão o cookie não grava em localhost.
+      domain: DOMINIO_DO_COOKIE || window.location.hostname,
+      path: "/",
+      sameSite: "Lax",
+      secure: window.location.protocol === "https:",
+      expiresAfterDays: 365,
+      // localStorage é origin-scoped: não atravessa subdomínio, e some em
+      // navegação privativa de um jeito que o cookie não some. A escolha sobre
+      // cookies não pode depender de um mecanismo mais frágil que o cookie.
+      useLocalStorage: false,
+    },
 
     // Com o Analytics no jogo, passa a existir coleta que começaria sozinha, sem
     // nenhuma ação da pessoa — então a pergunta tem que vir na frente. Enquanto
@@ -74,6 +111,15 @@
 
     categories: categorias,
 
+    /*
+     * Injeção das tags. `onConsent` cobre a decisão já gravada em visitas
+     * anteriores; `onChange`, a mudança feita agora no painel — sem ele,
+     * revogar só valeria no próximo reload, e revogar que exige recarregar
+     * não é revogar.
+     */
+    onConsent: tags.onConsent,
+    onChange: tags.onChange,
+
     language: {
       default: "pt",
       translations: {
@@ -81,7 +127,7 @@
           consentModal: {
             title: "Cookies e conteúdo externo",
             description:
-              "Este site não usa cookies de publicidade nem rastreadores. Guardamos apenas a sua escolha aqui, e os vídeos do YouTube só carregam quando você autoriza.",
+              "Usamos cookies para medir o uso do site (Google Analytics), para avaliar nossos anúncios na Meta (Facebook e Instagram) e para carregar os vídeos do YouTube. Nada disso roda antes de você permitir, e recusar não tira nenhum conteúdo do ar.",
             acceptAllBtn: "Aceitar tudo",
             // Rótulo explícito: "Continuar sem aceitar" não deixa claro que é
             // uma recusa, e recusar tem que ser tão evidente quanto aceitar.

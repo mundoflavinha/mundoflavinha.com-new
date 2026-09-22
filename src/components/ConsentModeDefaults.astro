@@ -1,0 +1,56 @@
+---
+/**
+ * Defaults do Consent Mode v2 do Google.
+ *
+ * PRIMEIRO elemento do <head>, antes de <meta>, CSS e bundle. A posição é a
+ * funcionalidade: se qualquer tag do Google chegar a existir antes destes
+ * defaults, ela dispara com o padrão dela (concedido) e o estrago já aconteceu.
+ * Há teste em html.test.ts comparando a posição das strings no HTML gerado —
+ * não é uma convenção que se possa confiar à revisão humana.
+ *
+ * `is:inline` é obrigatório: sem ele o Astro extrai o script para um bundle
+ * externo, que carrega async e perde exatamente a garantia de ordem acima.
+ *
+ * Cada chave: `functionality_storage`/`security_storage` concedidos porque
+ * cobrem idioma e antifraude — negá-los quebra funcionalidade sem proteger
+ * ninguém, e nenhum alimenta publicidade. `wait_for_update: 500` dá meio
+ * segundo para o CMP responder antes de as tags decidirem disparar; sem ele,
+ * uma tag que carregue rápido decide com o default e não revê.
+ * `ads_data_redaction` remove identificadores de anúncio enquanto ad_storage
+ * estiver negado. `url_passthrough: false` impede propagação de gclid pela
+ * URL, que é rastreamento por fora do cookie e escaparia da recusa.
+ *
+ * `arguments` no shim, e não rest params: o gtag.js identifica as chamadas
+ * enfileiradas pelo objeto `arguments` que encontra no dataLayer. Trocar por
+ * `(...args)` empurra um ARRAY, que a biblioteca ignora — os defaults seriam
+ * descartados em silêncio e as tags disparariam concedidas.
+ *
+ * Os comentários daqui de cima NÃO descem para o script inline de propósito:
+ * `is:inline` não passa por minificação, então cada linha seria servida em
+ * todas as 122 páginas.
+ *
+ * Isto NÃO é o Advanced Consent Mode. Aqui nenhuma tag do Google é carregada
+ * antes do aceite (ver src/lib/tagging/index.ts) — estes defaults existem para
+ * o caso de uma tag entrar depois, pelo container do GTM, já encontrando o
+ * estado correto.
+ */
+---
+
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  // eslint-disable-next-line prefer-rest-params
+  window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+
+  window.gtag("consent", "default", {
+    analytics_storage: "denied",
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+    functionality_storage: "granted",
+    security_storage: "granted",
+    wait_for_update: 500,
+  });
+
+  window.gtag("set", "ads_data_redaction", true);
+  window.gtag("set", "url_passthrough", false);
+</script>

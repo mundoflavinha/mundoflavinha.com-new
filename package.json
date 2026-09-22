@@ -5,14 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/verificar-schema.mjs && astro build",
+    "build:e2e": "node scripts/build-e2e.mjs",
     "preview": "astro preview",
     "typecheck": "astro check && tsc -p tsconfig.functions.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run --exclude '**/html.test.ts'",
     "test:watch": "vitest",
     "test:html": "vitest run src/test/html.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:check": "node scripts/verificar-schema.mjs --impor"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

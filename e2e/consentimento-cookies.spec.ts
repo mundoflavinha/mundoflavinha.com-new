@@ -1,5 +1,7 @@
 import { dispensarBannerDeCookies } from "./apoio";
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
+import { NOME_DO_COOKIE_DE_CONSENTIMENTO } from "../src/lib/cookies";
 
 /**
  * Consentimento de cookies e conteúdo externo.
@@ -11,7 +13,7 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const cookieDeConsentimento = async (page: Page) =>
-  (await page.context().cookies()).find((c) => c.name === "cc_cookie");
+  (await page.context().cookies()).find((c) => c.name === NOME_DO_COOKIE_DE_CONSENTIMENTO);
 
 /**
  * Checa o HOST da requisição, não a URL inteira.

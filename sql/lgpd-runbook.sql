@@ -45,6 +45,15 @@ union all
 select 'materiais baixados', to_jsonb(m) - 'id' - 'contact_id'
 from material_requests m
 join contacts c on c.id = m.contact_id
+where c.email = :'titular'
+
+union all
+
+-- Origem de campanha e identificadores publicitários (desde 002_atribuicao).
+-- Entram no acesso: fbclid/_fbp/_fbc são dados vinculados ao titular.
+select 'atribuicao', to_jsonb(a) - 'id' - 'contact_id'
+from lead_attributions a
+join contacts c on c.id = a.contact_id
 where c.email = :'titular';
 
 -- ===============================================================

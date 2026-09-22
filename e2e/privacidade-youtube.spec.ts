@@ -1,5 +1,5 @@
 import { dispensarBannerDeCookies } from "./apoio";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
  * Nenhum contato com o Google antes de a pessoa pedir.
@@ -13,7 +13,7 @@ import { expect, test } from "@playwright/test";
  */
 
 const DOMINIOS_GOOGLE =
-  /(youtube\.com|youtube-nocookie\.com|ytimg\.com|googlevideo\.com|google\.com|googleapis\.com|gstatic\.com|googletagmanager\.com|google-analytics\.com|doubleclick\.net)/;
+  /(youtube\.com|youtube-nocookie\.com|ytimg\.com|googlevideo\.com|google\.com|googleapis\.com|gstatic\.com|googletagmanager\.com|google-analytics\.com|doubleclick\.net|connect\.facebook\.net|facebook\.com)/;
 
 /**
  * A asserção forte: NENHUMA requisição sai do nosso domínio ao carregar.

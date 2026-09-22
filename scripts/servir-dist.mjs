@@ -15,13 +15,19 @@
  *   - rota inexistente            → dist/404.html com status 404
  *
  * Uso: node scripts/servir-dist.mjs [porta]
+ *      node scripts/servir-dist.mjs 4322:dist 4323:dist-gtm 4324:dist-disabled
+ *
+ * A segunda forma serve um build por modo de tagging (ver scripts/build-e2e.mjs)
+ * num único processo — o Playwright precisa de um processo vivo só.
  */
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 
-const PORTA = Number(process.argv[2] ?? 4322);
-const DIST = join(process.cwd(), "dist");
+const alvos = (process.argv.length > 2 ? process.argv.slice(2) : ["4322"]).map((arg) => {
+  const [porta, dir = "dist"] = arg.split(":");
+  return { porta: Number(porta), dist: join(process.cwd(), dir), dir };
+});
 
 const TIPOS = {
   ".html": "text/html; charset=utf-8",
@@ -47,7 +53,7 @@ const entregar = (res, caminho, status = 200) => {
 
 const arquivo = (caminho) => existsSync(caminho) && statSync(caminho).isFile();
 
-createServer((req, res) => {
+const servir = ({ porta: PORTA, dist: DIST, dir }) => createServer((req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORTA}`);
   const rota = decodeURIComponent(url.pathname);
 
@@ -70,5 +76,13 @@ createServer((req, res) => {
   res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
   res.end("404");
 }).listen(PORTA, () => {
-  console.log(`dist/ em http://localhost:${PORTA}`);
+  console.log(`${dir}/ em http://localhost:${PORTA}`);
 });
+
+for (const alvo of alvos) {
+  if (!existsSync(alvo.dist)) {
+    console.error(`${alvo.dir}/ não existe — rode o build antes.`);
+    process.exit(1);
+  }
+  servir(alvo);
+}
